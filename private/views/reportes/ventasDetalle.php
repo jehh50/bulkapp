@@ -50,7 +50,7 @@
               <?php if ($_POST) { ?>
                 <p class="sub-title">Total resultados: <?=count($ventas)?>. Período consultado <?= date('d-m-Y', strtotime($desde)); ?> - <?= date('d-m-Y', strtotime($hasta)) ?></p>
               <?php } ?>
-              <table class="table table-hover table-condensed" style="table-layout: fixed; width: 100%;">
+              <table class="table table-hover table-condensed">
                 <thead>
                   <tr class="bg-success">
                     <th style="text-align: center; width: 4%;">#</th>
