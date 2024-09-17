@@ -1,0 +1,64 @@
+.cuadro{
+	margin-top: 20px;
+}
+.margen{
+	margin-top: 15px;
+}
+
+.panel1{
+	background: #00073D;
+	color: #FFF;
+	border-color: #00073D;
+}
+.loginbox{
+	margin-top: 200px;
+}
+.sele{
+	margin-top: -50px;
+	margin-bottom: 10px;
+}
+.sele2{
+	margin-top: -30px;
+	margin-bottom: 10px;
+}
+.adh{
+	margin-top: -30px;
+	margin-bottom: 0px;
+}
+.fil{
+	margin-top: 15px;
+}
+.fil2{
+	margin-top: 0px;
+}
+.boxconsulta{
+	margin-top: -30px;
+	height: 215px;
+	width: auto;
+	background-color: #EBF5FF;
+	border-radius: 6px;
+}
+.botonfiltrar{
+	margin-top: 25px;
+	margin-left: auto;
+}
+.pills{
+	margin-top: 30px;
+}
+.boxpills{
+	margin-top: 10px;
+}
+.izq{
+	margin-left: -200px;
+}
+.margen2{
+	margin-top: -15px;
+	margin-bottom: 25px;
+}
+.pswd_info{
+	display:none;
+}
+.botonexportar{
+	margin-top: 25px;
+	margin-left: 20px;
+}

@@ -1,0 +1,141 @@
+$(document).ready(function(){
+  $('#btn-eliminar').hide();
+  $('#btn-actualizar').hide();
+  $('#servicio').hide();
+  $('#d_genero').hide();
+  $('#d_nacimiento').hide();
+
+// FUNCIÓN QUE BUSCA LOS DATOS DE LA VENTA
+
+  $('#btn-buscar').click(function(){
+    if ($('#cedula').val() == "") {
+      alert('Ingrese un número de cedula valido.');
+    }
+    else{
+       a = $('#telf_hab').val(); 
+       b = $('#telf_ofi').val(); 
+       c = $('#telf_cel').val(); 
+       d = $('#correo').val(); 
+       e = $('#cuenta').val(); 
+       f = $('#servicio').val(); 
+       g = $('#cedula').val(); 
+       h = '<h3 style="color: #ffffff; padding: 8px; background-color: #4cb957 ;height: 40px;border-radius: 5px;">SERVICIO: <strong>';
+       i = '<section><span class="form-group-addon">Sexo</span></section><select class="form-control" id="genero">';
+       j = '<span class="form-group-addon">Fecha de nacimiento</span><input type="date" class="form-control" aria-describedby="fecha_nac" value="';
+
+       $.ajax({
+            type:'POST',
+            url:'?view=configuracion&mode=buscar',
+            dataType: "json",
+            data:{telf_hab:a, telf_ofi:b, telf_cel:c, correo:d, cuenta:e, servicio:f, cedula:g },
+            success:function(datos){
+              if(datos.response == 'true'){
+                $('#btn-buscar').hide();
+                $('#btn-actualizar').show();
+                $('#btn-eliminar').show();
+                $('#servicio').show().html(h + datos.servicio + '</strong></h3>');
+                if(datos.genero == 'F'){$('#d_genero').show().html(i + '<option selected value=F selected>FEMENINO</option><option value=M>MASCULINO</option></select>');}
+                else{$('#d_genero').show().html(i + '<option selected value=F>FEMENINO</option><option value=M selected>MASCULINO</option></select>');}
+                $('#d_nacimiento').show().html(j + datos.nacimiento + '" id="fecha_nac"/>');
+                $('#id_resultado').val(datos.id_resultado);
+                $('#cod_servicio').val(datos.cod_servicio);
+                $('#telf_hab').removeAttr('readonly').val(datos.telf_hab); 
+                $('#telf_ofi').removeAttr('readonly').val(datos.telf_ofi); 
+                $('#telf_cel').removeAttr('readonly').val(datos.telf_celular); 
+                $('#correo').removeAttr('readonly').val(datos.correo); 
+                $('#cuenta').removeAttr('readonly').val(datos.cuenta); 
+                $('#cedula').val(datos.cedula);
+                $('#nombre').removeAttr('readonly').val(datos.nombre);
+                $('#apellido').removeAttr('readonly').val(datos.apellido);
+                $('#gestion').val(datos.id_gestion);
+              }
+              else if(datos.response == 'eliminado'){
+                alert('Esta venta ya se encuentra rechazada');
+              }
+              else{
+                alert('Esta venta no existe.');
+              }
+            }
+      });
+     }
+    });
+
+// FIN FUNCION BUSCAR
+// FUNCION QUE ELIMINA LA VENTA
+
+    $('#btn-guardar').click(function(){
+      if($('select#eliminar_venta').val() == null){
+        alert('Debe elegir un motivo de rechazo de venta');
+      }
+      else{
+        a = $('select#eliminar_venta').val();
+        b = $('#cedula').val();
+        c = $('#cod_servicio').val();
+        d = $('#id_resultado').val();
+        e = $('#gestion').val();
+
+        $.ajax({
+              type:'POST',
+              url:'?view=configuracion&mode=eliminar',
+              dataType: "json",
+              data:{rechazo: a, cedula: b, servicio: c, id_resultado: d, id_gestion: e},
+              success:function(datos){
+                if(datos.response == 'true'){
+                  $('#modalRechazo').modal('hide');
+                  $('#modalConfirm').modal('toggle');
+                  setTimeout(function(){ $('#modalConfirm').modal('show') }, 1000);
+                  setTimeout(function(){$(location).attr('href','?view=configuracion&mode=editarResultado')}, 2000);
+                }
+                else{
+                  alert('NO ENTRO');
+                }
+              }
+        });
+      }
+    })
+
+// FIN FUNCION ELIMINA
+// FUNCION QUE ACTUALIZA LA INFORMACIÓN
+
+  $('#btn-actualizar').click(function(){
+    a = $('#cedula').val();
+    b = $('#nombre').val();
+    c = $('#apellido').val();
+    d = $('#telf_hab').val();
+    e = $('#telf_ofi').val();
+    f = $('#telf_cel').val();
+    g = $('#correo').val();
+    h = $('#cuenta').val();
+    i = $('#cod_servicio').val();
+    j = $('#id_resultado').val();
+    k = $('select#genero').val();
+    l = $('#fecha_nac').val();
+
+    $.ajax({
+            type:'POST',
+            url:'?view=configuracion&mode=actualiza',
+            dataType: "json",
+            data:{cedula:a, nombre:b, apellido:c, telf_hab:d, telf_ofi:e, telf_cel: f, correo:g, cuenta:h,cod_servicio:i,id_resultado:j,genero:k,fecha_nac:l},
+            success:function(datos){
+              if(datos.response == 'true'){
+                $('#modalActualiza').modal('toggle');
+                setTimeout(function(){ $('#modalActualiza').modal('show') }, 1000);
+                setTimeout(function(){$(location).attr('href','?view=configuracion&mode=editarResultado')}, 2000);
+              }
+              else{
+                alert('Error. Por favor contacte al administrador del sistema.');
+              }
+            }
+      });   
+
+
+
+  });
+
+// FIN FUNCION ACTUALIZA
+// FUNCION REFRESCA
+  $('#btn-limpiar').click(function(){
+    $(location).attr('href','?view=configuracion&mode=editarResultado');
+  });
+// FIN FUNCION REFRESCA
+})
