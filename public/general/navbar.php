@@ -14,7 +14,7 @@
           <ul class="nav navbar-nav navbar-right">
 
             <?php if($_SESSION['usertype_id'] == 1 || $_SESSION['usertype_id'] == 2){?>
-              <li><a href="" data-toggle="modal" data-target="#staticBackdrop">Acumulado</a></li>
+              <!-- <li><a href="" data-toggle="modal" data-target="#staticBackdrop">Acumulado</a></li> -->
               <li><a href="?view=formulario&mode=index">Formulario</a></li>
             <?php } if($_SESSION['usertype_id'] == 2){?>   
               <li class="dropdown">
