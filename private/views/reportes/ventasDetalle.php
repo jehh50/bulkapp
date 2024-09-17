@@ -76,7 +76,7 @@
                         <td><?= $venta['telf_celular']; ?></td>
                         <td><?= $venta['descripcion']; ?></td>
                         <td><?= $venta['agente']; ?></td>
-                        <td><?= $venta['fecha_venta']; ?></td>
+                        <td><?= date('d-m-Y', strtotime($venta['fecha_venta'])); ?></td>
                       </tr>
                     <?php $i++;}
                   } ?>
