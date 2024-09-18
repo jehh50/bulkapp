@@ -27,7 +27,7 @@ if (empty($_SESSION)) {
 
 				if ($cliente) {
 					foreach ($cliente as $c) {
-						if ($c['status_id'] == 4) {
+						if ($c['status_id'] == 7) {
 							$json['response'] = 'atendido';
 						} else {
 							$json['response'] = 'true';
@@ -142,18 +142,13 @@ if (empty($_SESSION)) {
 						$municipio = $_POST['municipio'];
 						$obs = $_POST['observaciones'];
 						$fecha = date('Ymd');
-						$status = 4;
+						$status = 7;
 						$var = 0;
 
 						$registro = $conn->registroResultados($contacto, $efectivo, $producto, $noefectivo, $id_usuario, $date, $nombre, $apellido, $genero, $fecha_nac, $nacionalidad, $cedula, $telf_hab, $telf_cel, $correo, $estado, $ciudad, $municipio, $cuenta, $tipocuenta, $obs, $fecha, $status, $id_cliente, $var, $hora, $servicio);
 						
 					} else {
-						$efectivo = $_POST['efectivo'];
-						if ($efectivo == 1) {
-							$status = 4;
-						} else {
-							$status = 3;
-						}
+						$status = 4;
 						$registro = $conn->registroGestion($contacto, $efectivo, $producto, $noefectivo, $id_usuario, $date, $id_cliente, $status, $hora, $servicio);
 					}
 				}
