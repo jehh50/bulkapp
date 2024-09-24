@@ -63,7 +63,7 @@ class database
 
   public function busquedaResultados($cedula)
   {
-    $sql = $this->db->query("SELECT a.id, a.gestion_id, a.nombre, a.apellido, a.genero, a.fecha_nacimiento, a.cedula, a.telf_hab, a.telf_ofi, a.telf_celular, a.correo, a.cuenta, b.descripcion, b.id FROM resultados a LEFT JOIN servicios b  ON a.servicio_id = b.id WHERE a.cedula = '$cedula'");
+    $sql = $this->db->query("SELECT a.id as resultado_id, a.gestion_id, a.nombre, a.apellido, a.genero, a.fecha_nacimiento, a.cedula, a.telf_hab, a.telf_ofi, a.telf_celular, a.correo, a.cuenta, b.descripcion, b.id as servicio_id FROM resultados a LEFT JOIN servicios b  ON a.servicio_id = b.id WHERE a.cedula = '$cedula'");
     if ($this->db->rows($sql) > 0) {
       while ($data = $this->db->recorrer($sql)) {
         $respuesta[] = $data;
@@ -74,9 +74,10 @@ class database
     return $respuesta;
   }
 
-  public function updateResultados($idresultado, $nombre, $apellido, $cedula, $tlf_hab, $tlf_ofic, $tlf_celu, $correo, $cuenta, $servicio, $genero, $fecha_nac)
+  public function updateResultados($idresultado, $nombre, $apellido, $cedula, $tlf_hab, $tlf_celu, $correo, $cuenta, $servicio, $genero, $fecha_nac)
   {
-    $this->db->query("UPDATE resultados SET nombre='$nombre', apellido='$apellido', genero='$genero', fecha_nacimiento='$fecha_nac', cedula=$cedula, telf_hab='$tlf_hab', telf_ofi='$tlf_ofic', telf_celular='$tlf_celu', correo='$correo', cuenta='$cuenta' WHERE  id=$idresultado");
+    echo "Esta es la query->".("UPDATE resultados SET nombre='$nombre', apellido='$apellido', genero='$genero', fecha_nacimiento='$fecha_nac', cedula=$cedula, telf_hab='$tlf_hab', telf_celular='$tlf_celu', correo='$correo', cuenta='$cuenta' WHERE  id=$idresultado");
+    $this->db->query("UPDATE resultados SET nombre='$nombre', apellido='$apellido', genero='$genero', fecha_nacimiento='$fecha_nac', cedula=$cedula, telf_hab='$tlf_hab', telf_celular='$tlf_celu', correo='$correo', cuenta='$cuenta' WHERE  id=$idresultado");
     return true;
   }
 

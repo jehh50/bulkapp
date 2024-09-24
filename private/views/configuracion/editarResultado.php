@@ -87,10 +87,10 @@ if (isset($_GET['mensaje'])=='exito') {
                 <span class="form-group-addon">Teléfono habitación</span>
                 <input type="text" class="form-control" placeholder="(0212)345.67.89" aria-describedby="tlf_hab" id="telf_hab" onchange="validaTelf(this);" readonly/>
               </div>
-              <div class="form-group col-lg-6">
+              <!-- <div class="form-group col-lg-6">
                 <span class="form-group-addon">Teléfono oficina</span>
                 <input type="text" class="form-control" placeholder="(0212)345.67.89"  aria-describedby="tlf_ofic" id="telf_ofi" onchange="validaTelf(this);" readonly/>
-              </div>
+              </div> -->
               <div class="form-group col-lg-6">
                 <span class="form-group-addon">Teléfono celular</span>
                 <input type="text" class="form-control" placeholder="(0424)234.56.78" aria-describedby="tlf_celu" id="telf_cel" onchange="validaTelf(this);" readonly/>

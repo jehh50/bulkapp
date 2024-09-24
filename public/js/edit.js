@@ -40,7 +40,7 @@ $(document).ready(function(){
                 $('#id_resultado').val(datos.id_resultado);
                 $('#cod_servicio').val(datos.cod_servicio);
                 $('#telf_hab').removeAttr('readonly').val(datos.telf_hab); 
-                $('#telf_ofi').removeAttr('readonly').val(datos.telf_ofi); 
+                // $('#telf_ofi').removeAttr('readonly').val(datos.telf_ofi); 
                 $('#telf_cel').removeAttr('readonly').val(datos.telf_celular); 
                 $('#correo').removeAttr('readonly').val(datos.correo); 
                 $('#cuenta').removeAttr('readonly').val(datos.cuenta); 
@@ -68,17 +68,12 @@ $(document).ready(function(){
         alert('Debe elegir un motivo de rechazo de venta');
       }
       else{
-        a = $('select#eliminar_venta').val();
-        b = $('#cedula').val();
-        c = $('#cod_servicio').val();
-        d = $('#id_resultado').val();
-        e = $('#gestion').val();
-
+        console.log($('#cod_servicio').val());
         $.ajax({
               type:'POST',
               url:'?view=configuracion&mode=eliminar',
               dataType: "json",
-              data:{rechazo: a, cedula: b, servicio: c, id_resultado: d, id_gestion: e},
+              data:{rechazo: $('select#eliminar_venta').val(), cedula: $('#cedula').val(), servicio: $('#cod_servicio').val(), id_resultado: $('#id_resultado').val(), id_gestion: $('#gestion').val()},
               success:function(datos){
                 if(datos.response == 'true'){
                   $('#modalRechazo').modal('hide');
@@ -98,29 +93,17 @@ $(document).ready(function(){
 // FUNCION QUE ACTUALIZA LA INFORMACIÓN
 
   $('#btn-actualizar').click(function(){
-    a = $('#cedula').val();
-    b = $('#nombre').val();
-    c = $('#apellido').val();
-    d = $('#telf_hab').val();
-    e = $('#telf_ofi').val();
-    f = $('#telf_cel').val();
-    g = $('#correo').val();
-    h = $('#cuenta').val();
-    i = $('#cod_servicio').val();
-    j = $('#id_resultado').val();
-    k = $('select#genero').val();
-    l = $('#fecha_nac').val();
-
     $.ajax({
             type:'POST',
             url:'?view=configuracion&mode=actualiza',
             dataType: "json",
-            data:{cedula:a, nombre:b, apellido:c, telf_hab:d, telf_ofi:e, telf_cel: f, correo:g, cuenta:h,cod_servicio:i,id_resultado:j,genero:k,fecha_nac:l},
+            data:{cedula:$('#cedula').val(), nombre:$('#nombre').val(), apellido:$('#apellido').val(), telf_hab:$('#telf_hab').val(), telf_cel: $('#telf_cel').val(), correo:$('#correo').val(), cuenta:$('#cuenta').val(), cod_servicio:$('#cod_servicio').val(),id_resultado:$('#id_resultado').val(),genero:$('select#genero').val(),fecha_nac:$('#fecha_nac').val()},
+            
             success:function(datos){
               if(datos.response == 'true'){
                 $('#modalActualiza').modal('toggle');
                 setTimeout(function(){ $('#modalActualiza').modal('show') }, 1000);
-                setTimeout(function(){$(location).attr('href','?view=configuracion&mode=editarResultado')}, 2000);
+                setTimeout(function(){$(location).attr('href','?view=configuracion&mode=editarResultado')}, 1000);
               }
               else{
                 alert('Error. Por favor contacte al administrador del sistema.');

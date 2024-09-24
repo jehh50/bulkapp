@@ -100,27 +100,23 @@ if (empty($_SESSION)) {
 
 			case 'buscar':
 				$ejecucion = $con->busquedaResultados($_POST['cedula']);
-				$i = 1;
 				if ($ejecucion) {
 					foreach ($ejecucion as $b) {
 						if ($b) {
 							$json['response'] = 'true';
-							$json['id_resultado'] = $b['id'];
+							$json['id_resultado'] = $b['resultado_id'];
 							$json['nombre'] = $b['nombre'];
 							$json['apellido'] = $b['apellido'];
 							$json['cedula'] = $b['cedula'];
 							$json['telf_hab'] = $b['telf_hab'];
-							$json['telf_ofi'] = $b['telf_ofi'];
 							$json['telf_celular'] = $b['telf_celular'];
 							$json['correo'] = $b['correo'];
 							$json['cuenta'] = $b['cuenta'];
 							$json['servicio'] = $b['descripcion'];
-							$json['cod_servicio'] = $b['id'];
+							$json['cod_servicio'] = $b['servicio_id'];
 							$json['genero'] = $b['genero'];
 							$json['nacimiento'] = $b['fecha_nacimiento'];
 							$json['id_gestion'] = $b['gestion_id'];
-
-							$i++;
 						} else {
 							$json['response'] = 'eliminado';
 						}
@@ -134,7 +130,8 @@ if (empty($_SESSION)) {
 			case 'actualiza':
 				$nombre = str_replace(',', ' ', $_POST['nombre']);
 				$apellido = str_replace(',', ' ', $_POST['apellido']);
-				$ejecucion = $con->updateResultados($_POST['id_resultado'], $nombre, $apellido, $_POST['cedula'], $_POST['telf_hab'], $_POST['telf_ofi'], $_POST['telf_cel'], $_POST['correo'], $_POST['cuenta'], $_POST['cod_servicio'], $_POST['genero'], $_POST['fecha_nac']);
+
+				$ejecucion = $con->updateResultados($_POST['id_resultado'], $nombre, $apellido, $_POST['cedula'], $_POST['telf_hab'], $_POST['telf_cel'], $_POST['correo'], $_POST['cuenta'], $_POST['cod_servicio'], $_POST['genero'], $_POST['fecha_nac']);
 
 				if ($ejecucion) {
 					$json['response'] = 'true';
