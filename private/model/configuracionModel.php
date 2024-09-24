@@ -76,7 +76,6 @@ class database
 
   public function updateResultados($idresultado, $nombre, $apellido, $cedula, $tlf_hab, $tlf_celu, $correo, $cuenta, $servicio, $genero, $fecha_nac)
   {
-    echo "Esta es la query->".("UPDATE resultados SET nombre='$nombre', apellido='$apellido', genero='$genero', fecha_nacimiento='$fecha_nac', cedula=$cedula, telf_hab='$tlf_hab', telf_celular='$tlf_celu', correo='$correo', cuenta='$cuenta' WHERE  id=$idresultado");
     $this->db->query("UPDATE resultados SET nombre='$nombre', apellido='$apellido', genero='$genero', fecha_nacimiento='$fecha_nac', cedula=$cedula, telf_hab='$tlf_hab', telf_celular='$tlf_celu', correo='$correo', cuenta='$cuenta' WHERE  id=$idresultado");
     return true;
   }
