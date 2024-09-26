@@ -1,9 +1,6 @@
-<div class="container">
+<div class="container" style="margin-top:20px;">
   <div class="row">
     <div class="col-sm-6 col-md-6 col-lg-6">
-      <section class="container">
-        <header><h1></h1></header>
-      </section>
       <div class="panel panel-default">
         <div class="panel-body" >
           <div class="form-group">
@@ -63,9 +60,6 @@
     <!-- INICIO DEL FORMULARIO DE VENTAS -->
 
     <div class="col-offset-lg-6 col-sm-6 col-md-6 col-lg-6" id="formularioCliente" hidden>
-      <section class="container">
-        <header><h1><h1></header>
-      </section>
       <div class="panel panel-default">
         <div class="panel-body">  <!-- onpaste="alert('No puedes pegar');return false"  -->
           <form name="form1" enctype="multipart/form-data" method="POST" onsubmit="return validaform(this);" action="?view=formulario&mode=registro" autocomplete="off">
@@ -121,12 +115,12 @@
 
             <div class="form-group">
               <span class="form-group-addon">Nombre del cliente</span>
-              <input type="text" class="form-control" placeholder="Carolina" aria-describedby="nombre2" name="nombre2" id="nombre2" onkeyup="mayus(this);">
+              <input type="text" class="form-control" placeholder="Carolina" aria-describedby="nombre2" name="nombre2" id="nombre2" oninput="onlyLetters(this);">
             </div>
 
             <div class="form-group">
               <span class="form-group-addon">Apellido del cliente</span>
-              <input type="text" class="form-control" placeholder="Perez" aria-describedby="apellido2" name="apellido2" id="apellido2" onkeyup="mayus(this);">
+              <input type="text" class="form-control" placeholder="Perez" aria-describedby="apellido2" name="apellido2" id="apellido2" oninput="onlyLetters(this);">
             </div>
             <div class="form-group">
               <section>
@@ -141,7 +135,7 @@
 
             <div class="form-group">
               <span class="form-group-addon">Fecha de nacimiento</span>
-              <input type="date" class="form-control" aria-describedby="fecha_nac" name="fecha_nac" id="fecha_nac"/>
+              <input type="text" class="form-control" aria-describedby="fecha_nac" name="fecha_nac" id="fecha_nac" placeholder="01/01/2024" oninput="formatDate(this)"/>
             </div>
 
             <div class="form-group">
@@ -158,7 +152,7 @@
 
             <div class="form-group">
               <span class="form-group-addon">Cedula del cliente</span>
-              <input type="text" class="form-control" onchange="return onlyNumbers(event)" placeholder="12456345" aria-describedby="cedula2" name="cedula2" id="cedula2" maxlength="8" required/>
+              <input type="text" class="form-control" oninput="onlyNumbers(this)" placeholder="12456345" aria-describedby="cedula2" name="cedula2" id="cedula2" maxlength="8" required/>
             </div>
 
             <div class="form-group">
@@ -166,11 +160,6 @@
               <input type="text" class="form-control telefono" placeholder="(0212)345.67.89" aria-describedby="telf_hab" name="telf_hab" id="telf_hab" onchange="validaTelf(this);" maxlength="15" required/>
             </div>
             
-            <!-- <div class="form-group">
-              <span class="form-group-addon">Teléfono Oficina</span>
-              <input type="text" class="form-control" placeholder="(0212)345.67.89" aria-describedby="telf_ofi" name="telf_ofi" id="telf_ofi" maxlength="15" onchange="validaTelf(this);" required/>
-            </div> -->
-
             <div class="form-group">
               <span class="form-group-addon">Teléfono Celular</span>
               <input type="text" class="form-control telefono" placeholder="(0424)234.56.78" aria-describedby="telf_cel" name="telf_cel" id="telf_cel" maxlength="15" required/>
@@ -178,7 +167,7 @@
 
             <div class="form-group">
               <span class="form-group-addon">Correo electrónico</span>
-              <input type="text" class="form-control" placeholder="usario@dominio.com" aria-describedby="correo2" name="correo2" id="correo2" onkeyup="mayus(this);" onchange="validateEmail(this)" required/>
+              <input type="text" class="form-control" placeholder="usario@dominio.com" aria-describedby="correo2" name="correo2" id="correo2" oninput="upperCase(this);" onchange="validateEmail(this)" required/>
             </div>
 
 
@@ -228,17 +217,13 @@
               </select>
             </div>
 
-            <!-- <div class="form-group">
-              <span class="form-group-addon">Número de cuenta</span>
-              <input type="text" class="form-control" placeholder="00000000000000001111" aria-describedby="cuenta2" name="cuenta2" id="cuenta2" maxlength="20" onchange="onlyNumbers(event)" data-toggle="tooltip" data-placement="bottom" title="El número de cuenta debe tener 20 digitos" required >
-            </div> -->
-
             <div class="form-group">
               <span class="form-group-addon" id="">Observaciones</span>
-              <textarea class="form-control" rows=3 maxlength="250" name="observaciones" id="observaciones" onkeyup="mayus(this);" required ></textarea>
+              <textarea class="form-control" rows=3 maxlength="250" name="observaciones" id="observaciones" oninput="upperCase(this);" ></textarea>
             </div>        
           </div>
-          <button type="submit" class="btn btn-success btn-md" onclick="fecha_actual()">Guardar</button>
+          <button type="submit" class="btn btn-success btn-md" onclick="validateForm()">Guardar</button>
+          <a href="#" class="btn btn-success btn-md" onclick="validateForm()">Valida</a>
         </div>
       </div>
     </div>

@@ -117,6 +117,8 @@ if (empty($_SESSION)) {
 							$json['genero'] = $b['genero'];
 							$json['nacimiento'] = $b['fecha_nacimiento'];
 							$json['id_gestion'] = $b['gestion_id'];
+							$json['producto_id'] = $b['producto_id'];
+							$json['name_product'] = $b['name_product'];
 						} else {
 							$json['response'] = 'eliminado';
 						}
@@ -131,7 +133,7 @@ if (empty($_SESSION)) {
 				$nombre = str_replace(',', ' ', $_POST['nombre']);
 				$apellido = str_replace(',', ' ', $_POST['apellido']);
 
-				$ejecucion = $con->updateResultados($_POST['id_resultado'], $nombre, $apellido, $_POST['cedula'], $_POST['telf_hab'], $_POST['telf_cel'], $_POST['correo'], $_POST['cuenta'], $_POST['cod_servicio'], $_POST['genero'], $_POST['fecha_nac']);
+				$ejecucion = $con->updateResultados($_POST['id_resultado'], $nombre, $apellido, $_POST['cedula'], $_POST['telf_hab'], $_POST['telf_cel'], $_POST['correo'], $_POST['cod_servicio'], $_POST['genero'], $_POST['fecha_nac']);
 
 				if ($ejecucion) {
 					$json['response'] = 'true';

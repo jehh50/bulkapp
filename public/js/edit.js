@@ -3,8 +3,31 @@ $(document).ready(function(){
   $('#btn-actualizar').hide();
   $('#servicio').hide();
   $('#d_genero').hide();
-  $('#d_nacimiento').hide();
+  $('#d_producto').hide();
 
+
+  document.querySelectorAll('.telefono').forEach(function (element) {
+    element.addEventListener('input', function (event) {
+      let input = event.target.value.replace(/\D/g, ''); // Remueve todos los caracteres no numéricos
+      let formattedInput = '(0'; // Asegura el '0' en la primera posición
+
+      // Controla la longitud del input para evitar concatenaciones incorrectas
+      if (input.length > 1) {
+        formattedInput += input.substring(1, 4); // Extrae los primeros 3 dígitos reales
+      }
+      if (input.length >= 5) {
+        formattedInput += ')' + input.substring(4, 7); // Extrae los siguientes 3 dígitos
+      }
+      if (input.length >= 8) {
+        formattedInput += '.' + input.substring(7, 9); // Extrae los siguientes 2 dígitos
+      }
+      if (input.length >= 10) {
+        formattedInput += '.' + input.substring(9, 11); // Extrae los últimos 2 dígitos
+      }
+
+      event.target.value = formattedInput;
+    });
+  });
 // FUNCIÓN QUE BUSCA LOS DATOS DE LA VENTA
 
   $('#btn-buscar').click(function(){
@@ -21,7 +44,7 @@ $(document).ready(function(){
        g = $('#cedula').val(); 
        h = '<h3 style="color: #ffffff; padding: 8px; background-color: #4cb957 ;height: 40px;border-radius: 5px;">SERVICIO: <strong>';
        i = '<section><span class="form-group-addon">Sexo</span></section><select class="form-control" id="genero">';
-       j = '<span class="form-group-addon">Fecha de nacimiento</span><input type="date" class="form-control" aria-describedby="fecha_nac" value="';
+       p = '<span class="form-group-addon">Tipo de producto</span><select class="form-control" name="producto" id="producto">';
 
        $.ajax({
             type:'POST',
@@ -36,11 +59,11 @@ $(document).ready(function(){
                 $('#servicio').show().html(h + datos.servicio + '</strong></h3>');
                 if(datos.genero == 'F'){$('#d_genero').show().html(i + '<option selected value=F selected>FEMENINO</option><option value=M>MASCULINO</option></select>');}
                 else{$('#d_genero').show().html(i + '<option selected value=F>FEMENINO</option><option value=M selected>MASCULINO</option></select>');}
-                $('#d_nacimiento').show().html(j + datos.nacimiento + '" id="fecha_nac"/>');
+                $('#d_producto').show().val('select#'+datos.producto_id);                
+                $('#d_nacimiento').removeAttr('readonly').val(datos.nacimiento);
                 $('#id_resultado').val(datos.id_resultado);
                 $('#cod_servicio').val(datos.cod_servicio);
-                $('#telf_hab').removeAttr('readonly').val(datos.telf_hab); 
-                // $('#telf_ofi').removeAttr('readonly').val(datos.telf_ofi); 
+                $('#telf_hab').removeAttr('readonly').val(datos.telf_hab);
                 $('#telf_cel').removeAttr('readonly').val(datos.telf_celular); 
                 $('#correo').removeAttr('readonly').val(datos.correo); 
                 $('#cuenta').removeAttr('readonly').val(datos.cuenta); 
@@ -48,6 +71,7 @@ $(document).ready(function(){
                 $('#nombre').removeAttr('readonly').val(datos.nombre);
                 $('#apellido').removeAttr('readonly').val(datos.apellido);
                 $('#gestion').val(datos.id_gestion);
+                4('#producto')
               }
               else if(datos.response == 'eliminado'){
                 alert('Esta venta ya se encuentra rechazada');
@@ -97,7 +121,7 @@ $(document).ready(function(){
             type:'POST',
             url:'?view=configuracion&mode=actualiza',
             dataType: "json",
-            data:{cedula:$('#cedula').val(), nombre:$('#nombre').val(), apellido:$('#apellido').val(), telf_hab:$('#telf_hab').val(), telf_cel: $('#telf_cel').val(), correo:$('#correo').val(), cuenta:$('#cuenta').val(), cod_servicio:$('#cod_servicio').val(),id_resultado:$('#id_resultado').val(),genero:$('select#genero').val(),fecha_nac:$('#fecha_nac').val()},
+            data:{cedula:$('#cedula').val(), nombre:$('#nombre').val(), apellido:$('#apellido').val(), telf_hab:$('#telf_hab').val(), telf_cel: $('#telf_cel').val(), correo:$('#correo').val(), cod_servicio:$('#cod_servicio').val(),id_resultado:$('#id_resultado').val(),genero:$('select#genero').val(),fecha_nac:$('#d_nacimiento').val()},
             
             success:function(datos){
               if(datos.response == 'true'){
