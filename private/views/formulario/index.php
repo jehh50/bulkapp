@@ -223,7 +223,7 @@
             </div>        
           </div>
           <button type="submit" class="btn btn-success btn-md" onclick="validateForm()">Guardar</button>
-          <a href="#" class="btn btn-success btn-md" onclick="validateForm()">Valida</a>
+          <!-- <a href="#" class="btn btn-success btn-md" onclick="validateForm()">Valida</a> -->
         </div>
       </div>
     </div>
