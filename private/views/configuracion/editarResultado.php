@@ -29,7 +29,7 @@
     // Convertir el texto a mayúsculas y permitir solo letras y números
     e.value = e.value
       .toUpperCase() // Convertir a mayúsculas
-      .replace(/[^A-Z]/g, ''); // Eliminar caracteres que no sean letras ni números
+      .replace(/[^A-Z\s]/g, ''); // Eliminar caracteres que no sean letras ni números
   }
 
   function onlyNumbers(e) {
