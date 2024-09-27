@@ -25,6 +25,31 @@
     }
   }
 
+  function formatDate_(e) {
+    let value = e.value.replace(/\D/g, ''); // Eliminar todo lo que no sea dígito
+    let day, month, year;
+
+    if (value.length >= 1) {
+      day = value.substring(0, 4); // Obtener los primeros 2 dígitos (día)
+    }
+
+    if (value.length >= 3) {
+      month = value.substring(4, 6); // Obtener los siguientes 2 dígitos (mes)
+    }
+
+    if (value.length >= 5) {
+      year = value.substring(6, 8); // Obtener los últimos 4 dígitos (año)
+    }
+
+    if (year) {
+      e.value = `${day}${month}${year}`;
+    } else if (month) {
+      e.value = `${day}${month}`;
+    } else if (day) {
+      e.value = day;
+    }
+  }
+
   function onlyLetters(e) {
     // Convertir el texto a mayúsculas y permitir solo letras y números
     e.value = e.value
@@ -73,7 +98,7 @@ if (isset($_GET['mensaje']) == 'exito') {
             <div class="form-group col-lg-6">
               <span class="form-group-addon">Cedula</span>
               <input type="text" class="form-control" placeholder="12658457" aria-describedby="cedula" id="cedula"
-                maxlength="11" oninput="onlyNumbers(this)"/>
+                maxlength="9" oninput="onlyNumbers(this)" />
             </div>
             <div class="form-group col-lg-6">
               <span class="form-group-addon">Nombres</span>
@@ -109,33 +134,40 @@ if (isset($_GET['mensaje']) == 'exito') {
             <div class="form-group col-lg-6">
               <span class="form-group-addon">Correo</span>
               <input type="mail" class="form-control" placeholder="usario@dominio.com" aria-describedby="correo"
-                id="correo" onkeyup="mayus(this);" oninput="validateMail(this);" readonly />
+                id="correo" onkeyup="mayus(this);" onchange="validateMail(this);" readonly />
             </div>
-            <!-- <div class="form-group col-lg-6" id="d_producto">
+            <div class="form-group col-lg-6">
+              <span class="form-group-addon">Fecha de venta</span>
+              <input type="mail" class="form-control" placeholder="20240101" aria-describedby="saleDate" id="saleDate"
+                oninput="formatDate_(this)" readonly />
+            </div>
+            <div class="form-group col-lg-6" id="d_producto">
               <span class="form-group-addon">Tipo de producto</span>
               <select class="form-control" name="producto" id="producto">
                 <option value='' disabled selected style='display:none;'>Seleccione...</option>
-                <?php foreach ($producto as $p) { ?>
-                <option value='<?php echo $p['id']; ?>'><?php echo $p['descripcion'];
+                <?php foreach ($productos as $p) { ?>
+                  <option value='<?php echo $p['id']; ?>'><?php echo $p['descripcion'];
                 } ?></option>
               </select>
-            </div> -->
-
-            <div class="container-fluid">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
               <button class="btn btn-md btn-primary btn-md" id="btn-buscar"><span
-                  class="glyphicon glyphicon-search"></span> Buscar</button>
+              class="glyphicon glyphicon-search"></span> Buscar</button>
               <button class="btn btn-md btn-success btn-md" id="btn-actualizar"><span
-                  class="glyphicon glyphicon-floppy-disk"></span> Actualizar</button>
+              class="glyphicon glyphicon-floppy-disk"></span> Actualizar</button>
               <button class="btn btn-md btn-warning btn-md" id="btn-limpiar"><span
-                  class="glyphicon glyphicon-refresh"></span> Limpiar</button>
+              class="glyphicon glyphicon-refresh"></span> Limpiar</button>
               <!-- <button class="btn btn-md btn-danger btn-md" id="btn-eliminar" data-toggle="modal" data-target="#modalRechazo"><span class="glyphicon glyphicon-remove"></span> Eliminar</button> -->
             </div>
-            <!--/form-->
           </div>
+          <!--/form-->
         </div>
       </div>
     </div>
   </div>
+</div>
 </div>
 
 <!-- Modal -->
@@ -192,7 +224,3 @@ if (isset($_GET['mensaje']) == 'exito') {
     </div>
   </div>
 </div>
-
-</body>
-
-</html>

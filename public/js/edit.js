@@ -59,7 +59,6 @@ $(document).ready(function(){
                 $('#servicio').show().html(h + datos.servicio + '</strong></h3>');
                 if(datos.genero == 'F'){$('#d_genero').show().html(i + '<option selected value=F selected>FEMENINO</option><option value=M>MASCULINO</option></select>');}
                 else{$('#d_genero').show().html(i + '<option selected value=F>FEMENINO</option><option value=M selected>MASCULINO</option></select>');}
-                $('#d_producto').show().val('select#'+datos.producto_id);                
                 $('#d_nacimiento').removeAttr('readonly').val(datos.nacimiento);
                 $('#id_resultado').val(datos.id_resultado);
                 $('#cod_servicio').val(datos.cod_servicio);
@@ -71,7 +70,8 @@ $(document).ready(function(){
                 $('#nombre').removeAttr('readonly').val(datos.nombre);
                 $('#apellido').removeAttr('readonly').val(datos.apellido);
                 $('#gestion').val(datos.id_gestion);
-                4('#producto')
+                $('#saleDate').removeAttr('readonly').val(datos.fecha_venta);
+                $('#d_producto').show();
               }
               else if(datos.response == 'eliminado'){
                 alert('Esta venta ya se encuentra rechazada');
@@ -121,7 +121,7 @@ $(document).ready(function(){
             type:'POST',
             url:'?view=configuracion&mode=actualiza',
             dataType: "json",
-            data:{cedula:$('#cedula').val(), nombre:$('#nombre').val(), apellido:$('#apellido').val(), telf_hab:$('#telf_hab').val(), telf_cel: $('#telf_cel').val(), correo:$('#correo').val(), cod_servicio:$('#cod_servicio').val(),id_resultado:$('#id_resultado').val(),genero:$('select#genero').val(),fecha_nac:$('#d_nacimiento').val()},
+            data:{fecha_venta:$('#saleDate').val(),cedula:$('#cedula').val(), nombre:$('#nombre').val(), apellido:$('#apellido').val(), telf_hab:$('#telf_hab').val(), telf_cel: $('#telf_cel').val(), correo:$('#correo').val(), cod_servicio:$('#cod_servicio').val(),id_resultado:$('#id_resultado').val(),genero:$('select#genero').val(),fecha_nac:$('#d_nacimiento').val()},
             
             success:function(datos){
               if(datos.response == 'true'){

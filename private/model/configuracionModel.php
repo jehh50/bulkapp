@@ -66,7 +66,7 @@ class database
 
   public function busquedaResultados($cedula)
   {
-    $sql = $this->db->query("SELECT a.id as resultado_id, a.gestion_id, a.nombre, a.apellido, a.genero, a.fecha_nacimiento, a.cedula, a.telf_hab, a.telf_ofi, a.telf_celular, a.correo, a.cuenta, b.descripcion, b.id as servicio_id, a.producto_id, p.descripcion as name_product FROM resultados a INNER JOIN servicios b  ON a.servicio_id = b.id INNER JOIN productos p ON a.producto_id = p.id WHERE a.cedula = '$cedula'");
+    $sql = $this->db->query("SELECT a.id as resultado_id, a.gestion_id, a.nombre, a.apellido, a.genero, a.fecha_nacimiento, a.cedula, a.telf_hab, a.telf_ofi, a.telf_celular, a.correo, a.cuenta, b.descripcion, b.id as servicio_id, a.producto_id, p.descripcion as name_product, a.fecha_venta FROM resultados a INNER JOIN servicios b  ON a.servicio_id = b.id INNER JOIN productos p ON a.producto_id = p.id WHERE a.cedula = '$cedula'");
     if ($this->db->rows($sql) > 0) {
       while ($data = $this->db->recorrer($sql)) {
         $respuesta[] = $data;
@@ -77,9 +77,21 @@ class database
     return $respuesta;
   }
 
-  public function updateResultados($idresultado, $nombre, $apellido, $cedula, $tlf_hab, $tlf_celu, $correo, $servicio, $genero, $fecha_nac)
+  public function productos($id)
   {
-    $this->db->query("UPDATE resultados SET nombre='$nombre', apellido='$apellido', genero='$genero', fecha_nacimiento='$fecha_nac', cedula=$cedula, telf_hab='$tlf_hab', telf_celular='$tlf_celu', correo='$correo' WHERE  id=$idresultado");
+    $sql = $this->db->query("SELECT id, descripcion FROM productos WHERE servicio_id = $id AND status_id = 2");
+    if ($this->db->rows($sql) > 0) {
+      while ($data = $this->db->recorrer($sql)) {
+        $respuesta[] = $data;
+      }
+    } else {
+      return false;
+    }
+    return $respuesta;
+  }
+  public function updateResultados($fecha_venta, $idresultado, $nombre, $apellido, $cedula, $tlf_hab, $tlf_celu, $correo, $servicio, $genero, $fecha_nac)
+  {
+    $this->db->query("UPDATE resultados SET nombre='$nombre', apellido='$apellido', genero='$genero', fecha_nacimiento='$fecha_nac', cedula=$cedula, telf_hab='$tlf_hab', telf_celular='$tlf_celu', correo='$correo', fecha_venta='$fecha_venta' WHERE  id=$idresultado");
     return true;
   }
 

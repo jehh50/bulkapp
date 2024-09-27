@@ -94,6 +94,7 @@ if (empty($_SESSION)) {
 				include(PUBLIC_DIR . 'general/header.php');
 				include(PUBLIC_DIR . 'general/navbar.php');
 				$servicio = $con->servicio();
+				$productos = $con->productos($_SESSION['servicio_id']);
 				include(HTML_DIR . 'configuracion/editarResultado.php');
 				include(PUBLIC_DIR . 'general/footer.php');
 				break;
@@ -119,6 +120,7 @@ if (empty($_SESSION)) {
 							$json['id_gestion'] = $b['gestion_id'];
 							$json['producto_id'] = $b['producto_id'];
 							$json['name_product'] = $b['name_product'];
+							$json['fecha_venta'] = $b['fecha_venta'];
 						} else {
 							$json['response'] = 'eliminado';
 						}
@@ -133,7 +135,7 @@ if (empty($_SESSION)) {
 				$nombre = str_replace(',', ' ', $_POST['nombre']);
 				$apellido = str_replace(',', ' ', $_POST['apellido']);
 
-				$ejecucion = $con->updateResultados($_POST['id_resultado'], $nombre, $apellido, $_POST['cedula'], $_POST['telf_hab'], $_POST['telf_cel'], $_POST['correo'], $_POST['cod_servicio'], $_POST['genero'], $_POST['fecha_nac']);
+				$ejecucion = $con->updateResultados($_POST['fecha_venta'],$_POST['id_resultado'], $nombre, $apellido, $_POST['cedula'], $_POST['telf_hab'], $_POST['telf_cel'], $_POST['correo'], $_POST['cod_servicio'], $_POST['genero'], $_POST['fecha_nac']);
 
 				if ($ejecucion) {
 					$json['response'] = 'true';
