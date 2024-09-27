@@ -34,6 +34,7 @@ class database
   public function insertTransaccion($id, $fecha, $id_resultado)
   {
     $this->db->query("INSERT INTO transacciones (id_transaccion, fecha, resultado_id) VALUES ($id, '$fecha', $id_resultado)");
+    return true;
   }
 
   public function servicio()

@@ -30,8 +30,7 @@ if (empty($_SESSION)) {
         //ajustar el codigo del servicio
         $datosXML = $conexion->datosXML($fecha_, 1);
 
-        $encabezado = '
-<bulk_sales xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="bulk_sales.xsd">
+        $encabezado = '<bulk_sales xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="bulk_sales.xsd">
   <company code="7">
     <company_name>SEGUROS CAPITAL C.A.</company_name>
       <agencies>
@@ -47,8 +46,8 @@ if (empty($_SESSION)) {
             $fecha = new Datetime($xml['fecha_venta']);
             $fecha->modify('+1 month');
             $proximoMes = $fecha->format('Ymd');
-            $fecha = new Datetime($xml['fecha_nacimiento']);
-            $birth = $fecha->format('Ymd');
+            $fecha = explode("-",$xml['fecha_nacimiento']);
+            $birth = $fecha[0].$fecha[1].$fecha[2];
 
             #PARAMETROS RELLENAR CON CERO  $xml['id_resultado']
             $long = strlen($k);
