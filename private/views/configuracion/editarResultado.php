@@ -17,9 +17,9 @@
     }
 
     if (year) {
-      e.value = `${day}/${month}/${year}`;
+      e.value = `${day}-${month}-${year}`;
     } else if (month) {
-      e.value = `${day}/${month}`;
+      e.value = `${day}-${month}`;
     } else if (day) {
       e.value = day;
     }

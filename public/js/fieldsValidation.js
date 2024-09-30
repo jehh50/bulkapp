@@ -54,9 +54,9 @@ function formatDate(e){
       }
 
     if (year) {
-        e.value = `${day}/${month}/${year}`;
+        e.value = `${day}-${month}-${year}`;
     } else if (month) {
-    	e.value = `${day}/${month}`;
+    	e.value = `${day}-${month}`;
     } else if (day) {
     	e.value = day;
     }
@@ -103,7 +103,7 @@ function validateForm() {
         let patron_tlf = /^[(]\d{4}[)]\d{3}.\d{2}.\d{2}$/;
         let patron_correo = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9]{2,4}$/;
         let patron_nom_ape = /^[a-zA-Z ñáéíóú]{2,60}$/i;
-        let patron_fecha = /^\d{2}\/\d{2}\/\d{4}$/;  // Expresión regular para validar formato dd/mm/yyyy
+        let patron_fecha = /^\d{2}\-\d{2}\-\d{4}$/;  // Expresión regular para validar formato dd/mm/yyyy
 
         // Validación de selección de producto
         if (venta == 0) {
@@ -134,13 +134,13 @@ function validateForm() {
 
         // Validación de fecha de nacimiento y cálculo de edad
         if (!fecha_nac.match(patron_fecha)) {
-            alert('El formato de la fecha de nacimiento debe ser dd/mm/yyyy.');
+            alert('El formato de la fecha de nacimiento debe ser dd-mm-yyyy.');
             document.getElementById('fecha_nac').focus();
             return false;
         }
 
         console.log('Cálculo de edad');
-        let [dia, mes, año] = fecha_nac.split('/').map(Number);  // Cambiado para dd/mm/yyyy
+        let [dia, mes, año] = fecha_nac.split('-').map(Number);  // Cambiado para dd/mm/yyyy
         let fechaNacimiento = new Date(año, mes - 1, dia);
         let fechaHoy = new Date();
 
