@@ -47,7 +47,7 @@ if (empty($_SESSION)) {
             $fecha->modify('+1 month');
             $proximoMes = $fecha->format('Ymd');
             $fecha = explode("-",$xml['fecha_nacimiento']);
-            $birth = $fecha[2].'-'.$fecha[1].'-'.$fecha[0];
+            $birth = $fecha[2].$fecha[1].$fecha[0];
 
             #PARAMETROS RELLENAR CON CERO  $xml['id_resultado']
             $long = strlen($k);
