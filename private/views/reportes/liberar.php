@@ -71,7 +71,7 @@ $(document).ready(function() {
               <input type="text" class="form-control" name="cliente" id="cliente" maxlength="11" autofocus />
            </div>
            <div class="form-group">
-              <button type="button" class="btn btn-md btn-success btn-block" id="btn-buscar" name="btn-buscar" data-toggle="tooltip" data-placement="left" title="Tooltip on left">Buscar</button>
+              <button type="button" class="btn btn-md btn-success btn-block" id="btn-buscar" name="btn-buscar">Buscar</button>
            </div>
            <div id="datosCliente" class="form-group" hidden>
            </div>
