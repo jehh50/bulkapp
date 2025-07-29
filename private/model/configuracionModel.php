@@ -89,20 +89,23 @@ class database
     }
     return $respuesta;
   }
-  public function updateResultados($fecha_venta, $idresultado, $nombre, $apellido, $cedula, $tlf_hab, $tlf_celu, $correo, $servicio, $genero, $fecha_nac)
+  public function updateResultados($id,$nombre,$apellido,$cedula,$genero,$fecha_nac,$hab,$cel,$correo,$venta)
   {
-    $this->db->query("UPDATE resultados SET nombre='$nombre', apellido='$apellido', genero='$genero', fecha_nacimiento='$fecha_nac', cedula=$cedula, telf_hab='$tlf_hab', telf_celular='$tlf_celu', correo='$correo', fecha_venta='$fecha_venta' WHERE  id=$idresultado");
+    echo ("UPDATE resultados SET nombre='$nombre', apellido='$apellido', genero='$genero', fecha_nacimiento='$fecha_nac', cedula=$cedula, telf_hab='$hab', telf_celular='$cel', correo='$correo', fecha_venta='$venta' WHERE  id=$id");
+    $this->db->query("UPDATE resultados SET nombre='$nombre', apellido='$apellido', genero='$genero', fecha_nacimiento='$fecha_nac', cedula=$cedula, telf_hab='$hab', telf_celular='$cel', correo='$correo', fecha_venta='$venta'  WHERE  id=$id");
     return true;
   }
 
-  public function eliminarVenta($motivo, $cedula, $servicio, $id_resultado, $user, $date, $id_gestion)
+  public function eliminarVenta($resultadoId)
   {
-    $this->db->query("UPDATE resultados SET status = 1 WHERE id_resultado = $id_resultado");
-    $this->db->query("UPDATE gestion SET status = 1 WHERE id_gestion = $id_gestion");
-    $this->db->query("UPDATE clientes SET status = 2 WHERE identificacion = $cedula");
-    $this->db->query("INSERT INTO rechazo_ventas (motivo,fecha,id_resultado,cod_servicio,id_usuario) VALUES ('$motivo','$date',$id_resultado,'$servicio',$user)");
-
-    return true;
+    try{
+      $stmt = $this->db->prepare("DELETE FROM resultados WHERE id = :resultadoId");
+      $stmt->bindParam(':resultadoId', $resultadoId, PDO::PARAM_INT);
+      $stmt->execute();
+      return true;
+    }catch(Exception $e){
+      return "Error al eliminar resultado con ID $resultadoId: ".$e->getMessage();
+    }
   }
 
   public function contactoEfectivo()
@@ -183,7 +186,7 @@ class database
     return $respuesta;
   }
 
-  public function products($id = null)
+    public function products($id = null)
   {
     $sql = $this->db->query("SELECT * FROM productos WHERE id = " . $id);
     if ($this->db->rows($sql) > 0) {

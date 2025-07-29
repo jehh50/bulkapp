@@ -165,8 +165,10 @@ if (empty($_SESSION)) {
                   <th>Nombre</th>
                   <th>Apellido</th>
                   <th>Cedula</th>
+                  <th>Fecha de nacimiento</th>
                   <th>Teléfono 1</th>
                   <th>Teléfono 2</th>
+                  <th>Correo</th>
                   <th>Producto</th>
                   <th>Agente</th>
                   <th>Fecha</th>
@@ -180,8 +182,10 @@ if (empty($_SESSION)) {
                     <td>'.$venta['nombre'].'</td>
                     <td>'.$venta['apellido'].'</td>
                     <td>'.$venta['cedula'].'</td>
+                    <td>'.$venta['fecha_nacimiento'].'</td>
                     <td>'.$venta['telf_hab'].'</td>
                     <td>'.$venta['telf_celular'].'</td>
+                    <td>'.$venta['correo'].'</td>
                     <td>'.$venta['descripcion'].'</td>
                     <td>'.$venta['agente'].'</td>
                     <td>'.$venta['fecha_venta'].'</td>
