@@ -4,8 +4,8 @@ date_default_timezone_set('America/Caracas');
 
 #Constantes de conexión a BDD
 define('DB_HOST','localhost');
-define('DB_USER','root');
-define('DB_PASS','');
+define('DB_USER','jehh');
+define('DB_PASS','12345678');
 define('DB_NAME','bulk2');
 define('DB_PORT','3306');
 

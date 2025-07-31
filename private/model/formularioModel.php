@@ -22,8 +22,8 @@ class database {
     return $respuesta;
   }
 
-  public function contactoNoEfectivo(){
-    $sql = $this->db->query("SELECT * FROM noefectivo");
+  public function contactoNoEfectivo($e){
+    $sql = $this->db->query("SELECT * FROM noefectivo where servicio_id = '$e'");
     if($this->db->rows($sql) > 0 ){
       while($data = $this->db->recorrer($sql)){
         $respuesta[] = $data;
@@ -49,6 +49,7 @@ class database {
   }
 
   public function buscaCliente($telefono,$servicio){
+    if($servicio == 1){
       $sql = $this->db->query("SELECT * FROM clientes WHERE (identificacion = '$telefono' OR telf_hab LIKE '%" . $telefono . "' or telf_ofi LIKE '%" . $telefono . "' OR telf_cel LIKE '%" . $telefono."') and servicio_id = '$servicio'");
       if($this->db->rows($sql) > 0 ){
         while($data = $this->db->recorrer($sql)){
@@ -59,6 +60,19 @@ class database {
         $respuesta = false;
       }
       return $respuesta;
+    }
+    if($servicio == 2){
+      $sql = $this->db->query("SELECT * FROM cashea_customers WHERE cedula = '$telefono'");
+      if($this->db->rows($sql) > 0 ){
+        while($data = $this->db->recorrer($sql)){
+          $respuesta[] = $data;
+        }
+      }
+      else{
+        $respuesta = false;
+      }
+      return $respuesta;
+    }
   }
 
   public function estado($servicio_id){
@@ -129,19 +143,30 @@ class database {
   }
  
   public function registroGestion($contacto, $efectivo, $producto, $noefectivo, $id_usuario, $date, $id_cliente, $status, $hora, $servicio){
+    if($servicio == 2){
+      $table = 'cashea_customers';
+      $field = 'cedula';
+    }else{
+      $table = 'clientes';
+      $field = 'id';
+    }
     
     if($efectivo == null && $producto == null){
       $this->db->query("INSERT INTO gestion (contacto_id, noefectivo_id, user_id, fecha, cliente_id, hora, servicio_id) VALUES ($contacto, $noefectivo, $id_usuario, '$date', $id_cliente, '$hora', '$servicio')");
-      $this->db->query("UPDATE clientes SET status_id = 8 WHERE id = $id_cliente");
+      $this->db->query("UPDATE $table SET status_id = 8 WHERE $field = $id_cliente");
 
     }else if($noefectivo == null && $producto == null){
-      $this->db->query("INSERT INTO gestion (contacto_id, efectivo_id, user_id, fecha, cliente_id, hora, servicio_id) VALUES ($contacto, $efectivo, $id_usuario, '$date', $id_cliente, '$hora', '$servicio')");
-      $this->db->query("UPDATE clientes SET status_id = 4 WHERE id = $id_cliente");
+      $this->db->query("INSERT INTO gestion (contacto_id, efectivo_id, producto_id, user_id, fecha, cliente_id, hora, servicio_id) VALUES ($contacto, $efectivo, null, $id_usuario, '$date', $id_cliente, '$hora', '$servicio')");
+      $this->db->query("UPDATE $table SET status_id = 4 WHERE $field = $id_cliente");
 
     }else{
       $this->db->query("INSERT INTO gestion (contacto_id, efectivo_id, producto_id, user_id, fecha, cliente_id, hora, servicio_id) VALUES ($contacto, $efectivo, $producto, $id_usuario, '$date', $id_cliente, '$hora', '$servicio')");
-      $this->db->query("UPDATE clientes SET status_id = 4 WHERE id = $id_cliente"); 
+      $this->db->query("UPDATE $table SET status_id = 4 WHERE $field = $id_cliente"); 
     }
+  }
+
+  public function registroResultadosCashea($paymentPlan,$paymentDate,$amount,$fullName,$relationship,$observaciones,$id_cliente,$status){
+    $this->db->query("INSERT INTO results_cashea (paymentPlan, paymentDate, amount, fullName, relationship, observaciones, cliente_id, status_id) VALUES ('$paymentPlan', '$paymentDate', $amount, '$fullName', '$relationship', '$observaciones', $id_cliente, $status)");
   }
 
   public function codigosProductos($servicio){
