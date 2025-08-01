@@ -11,7 +11,7 @@ if (empty($_SESSION)) {
       case 'index':
         include(PUBLIC_DIR . 'general/header.php');
         include(PUBLIC_DIR . 'general/navbar.php');
-        $noefectivo = $conn->contactoNoEfectivo($_SESSION['servicio_id']);
+        $noefectivo = $conn->contactoNoEfectivo();
         $efectivo = $conn->contactoEfectivo($_SESSION['servicio_id']);
         switch ($_SESSION['servicio_id']) {
           case 1:
