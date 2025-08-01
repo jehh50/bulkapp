@@ -11,40 +11,96 @@
               </label>
             </section>
             <div>
-              <table id="example" class="hover" style="width:100%">
-                <thead>
-                  <tr>
-                    <th style="text-align: center; width: 4%;">#</th>
-                    <th style="text-align: center; width: 20%;">Nombre</th>
-                    <th style="text-align: center; width: 12%;">Nacionalidad</th>
-                    <th style="text-align: center; width: 12%;">Teléfono</th>
-                    <th style="text-align: center; width: 12%;">Cédula</th>
-                    <th style="text-align: center; width: 20%;">Tipo de cuenta</th>
-                    <th style="text-align: center; width: 4%;">Género</th>
-                    <th style="text-align: center; width: 4%;">Edad</th>
-                    <th style="text-align: center; width: 12%;">Correo</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <?php $i = 1;
-                  foreach ($registros as $reg) { ?>
+              <?php
+              if ($_POST['servicio'] == 1) { ?>
+                <table id="example" class="hover" style="width:100%">
+                  <thead>
                     <tr>
-                      <td style="text-align: center; width: 4%;"><?= $i; ?></td>
-                      <td style="text-align: center; width: 20%;"><?= $reg['identificacion']; ?></td>
-                      <td style="text-align: center; width: 12%;"><?= $reg['nombre_legal']; ?></td>
-                      <td style="text-align: center; width: 12%;"><?= $reg['telf_hab']; ?></td>
-                      <td style="text-align: center; width: 12%;"><?= $reg['telf_ofi']; ?></td>
-                      <td style="text-align: center; width: 20%;"><?= $reg['telf_cel']; ?></td>
-                      <td style="text-align: center; width: 4%;"><?= $reg['correo']; ?></td>
-                      <td style="text-align: center; width: 4%;"><?= $reg['direccion']; ?></td>
-                      <td style="text-align: center; width: 12%;"><?= $reg['cuenta']; ?></td>
+                      <th style="text-align: center;">#</th>
+                      <th style="text-align: center;">Cédula</th>
+                      <th style="text-align: center;">Nombre</th>
+                      <th style="text-align: center;">Teléfono 1</th>
+                      <th style="text-align: center;">Teléfono 2</th>
+                      <th style="text-align: center;">Teléfono 3</th>
+                      <th style="text-align: center;">Correo</th>
+                      <th style="text-align: center;">Fecha de Nacimiento</th>
+                      <th style="text-align: center;">Cuenta</th>
                     </tr>
+                  </thead>
+                  <tbody>
+                    <?php $i = 1;
+                    foreach ($registros as $reg) { ?>
+                      <tr>
+                        <td style="text-align: center; width: 4%;"><?= $i; ?></td>
+                        <td style="text-align: center; width: 20%;"><?= $reg['identificacion']; ?></td>
+                        <td style="text-align: center; width: 12%;"><?= $reg['nombre_legal']; ?></td>
+                        <td style="text-align: center; width: 12%;"><?= $reg['telf_hab']; ?></td>
+                        <td style="text-align: center; width: 12%;"><?= $reg['telf_ofi']; ?></td>
+                        <td style="text-align: center; width: 20%;"><?= $reg['telf_cel']; ?></td>
+                        <td style="text-align: center; width: 4%;"><?= $reg['correo']; ?></td>
+                        <td style="text-align: center; width: 4%;"><?= $reg['direccion']; ?></td>
+                        <td style="text-align: center; width: 12%;"><?= $reg['cuenta']; ?></td>
+                      </tr>
                     <?php $i++;
-                  } ?>
-                </tbody>
-              </table>
+                    } ?>
+                  </tbody>
+                </table>
+              <?php } else { ?>
+                <table id="example" class="hover ">
+                  <thead>
+                    <tr>
+                      <th>Cédula</th>
+                      <th>ID Cuota</th>
+                      <th>Grupo</th>
+                      <th>Fecha a Pagar</th>
+                      <th>Monto Cuota</th>
+                      <th>N° Cuota</th>
+                      <th>Fee</th>
+                      <th>Por Cobrar</th>
+                      <th>Capital Asignado</th>
+                      <th>ID Orden</th>
+                      <th>Identificación Orden</th>
+                      <th>Fecha Creación Orden</th>
+                      <th>Email</th>
+                      <th>Teléfono</th>
+                      <th>Usuario</th>
+                      <th>Local</th>
+                      <th>Estado Deuda</th>
+                      <th>Tramo Inicial</th>
+                      <th>Tramo Actual</th>
+                      <th>Segmento</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php foreach ($registros as $reg){ ?>
+                      <tr>
+                        <td><?= $reg['cedula']; ?></td>
+                        <td><?= $reg['id_cuota']; ?></td>
+                        <td><?= $reg['nombre_grupo']; ?></td>
+                        <td><?= $reg['fecha_pagar']; ?></td>
+                        <td><?= $reg['monto_cuota']; ?></td>
+                        <td><?= $reg['numero_cuota']; ?></td>
+                        <td><?= $reg['fee']; ?></td>
+                        <td><?= $reg['plata_por_cobrar']; ?></td>
+                        <td><?= $reg['capital_asignado']; ?></td>
+                        <td><?= $reg['id_orden']; ?></td>
+                        <td><?= $reg['identificacion_orden']; ?></td>
+                        <td><?= $reg['fecha_creacion_orden']; ?></td>
+                        <td><?= $reg['email']; ?></td>
+                        <td><?= $reg['telefono']; ?></td>
+                        <td><?= $reg['nombre_usuario']; ?></td>
+                        <td><?= $reg['local_origen']; ?></td>
+                        <td><?= $reg['estado_deuda']; ?></td>
+                        <td><?= $reg['tramo_inicial']; ?></td>
+                        <td><?= $reg['tramo_actual']; ?></td>
+                        <td><?= $reg['segmento']; ?></td>
+                      </tr>
+                    <?php } ?>
+                  </tbody>
+                </table>
 
-              <!-- Alineación de los botones con Bootstrap 3 -->
+              <?php } ?>
+
               <div class="row" style="margin-top: 20px;">
                 <div class="col-sm-6 text-left">
                   <a href="?view=configuracion&mode=cargaArchivo" class="btn btn-sm btn-primary">Regresar</a>
@@ -68,12 +124,12 @@
         <h4>¿Está seguro de cargar los datos?</h4>
       </div>
       <div class="modal-body">
-          <form method="POST" action="?view=configuracion&mode=guardarRegistros">
-            <input type="hidden" id="data" name="data">
-            <input type="hidden" value="<?= $_POST['servicio'] ?>" name="servicio">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Descartar</button>
-            <input type="submit" class="btn btn-md btn-success" id="btn-guardar" data-dismiss="Modal" value="Iniciar">
-          </form>
+        <form method="POST" action="?view=configuracion&mode=guardarRegistros">
+          <input type="hidden" id="data" name="data">
+          <input type="hidden" value="<?= $_POST['servicio'] ?>" name="servicio">
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Descartar</button>
+          <input type="submit" class="btn btn-md btn-success" id="btn-guardar" data-dismiss="Modal" value="Iniciar">
+        </form>
       </div>
       <!-- <img src="public/images/refresh.gif" alt="refresh" height="50px" width="50px" /> -->
     </div>
@@ -94,7 +150,7 @@
 </div>
 
 <script type="text/javascript">
-  $(document).ready(function () {
+  $(document).ready(function() {
     $('#example').DataTable({
       "scrollY": "300px",
       "scrollCollapse": true,
@@ -117,7 +173,7 @@
     });
 
     // Manejar el evento de envío del formulario
-    $('#guardar-form').on('submit', function () {
+    $('#guardar-form').on('submit', function() {
       // Mostrar el loader
       $('#loader').show();
     });
@@ -128,11 +184,11 @@
   const data = <?php echo json_encode($registros); ?>;
   document.getElementById('data').value = JSON.stringify(data);
 
-  $('#btn-guardar').click(function(){
-      $('#modalConfirm').modal('hide');
-      $('#modalWait').modal('toggle');
-      $('#modalWait').modal('show')
-    })
+  $('#btn-guardar').click(function() {
+    $('#modalConfirm').modal('hide');
+    $('#modalWait').modal('toggle');
+    $('#modalWait').modal('show')
+  })
 </script>
 
 <script src="public/js/jquery.dataTables.min.js"></script>

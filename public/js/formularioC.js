@@ -22,11 +22,17 @@ $(document).ready(function () {
           $('#noefectivo').val("");
           $('#formTitle').show();
           $('#dPaymentPlan').show();
+            $('#paymentPlan').attr('required','required');
           $('#dAmount').show();
+            $('#amount').attr('required','required');
           $('#dPaymentDate').show();
+            $('#paymentDate').attr('required','required');
           $('#dFullName').hide();
+            $('#fullName').attr('required','required');
           $('#dRelationship').hide();
+            $('#relationship').attr('required','required');
           $('#dObservaciones').show();
+            $('#observaciones').attr('required','required');
         }
         else if($('#efectivo').val() == '13'){
           $('#d_noefectivo').hide();

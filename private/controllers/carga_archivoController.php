@@ -14,7 +14,7 @@ if(empty($_SESSION)){header('location:index.php');}else{
 			include(HTML_DIR.'carga_archivo/index.php');
 			include(PUBLIC_DIR.'general/footer.php');
 		break;
-	#####################################################################################################################################
+	
 		case 'registro':
 			$cod_servicio 		=	$_POST['servicio']; 
 			$archivo 			=	$_FILES["archivo"]['name'];
@@ -32,7 +32,7 @@ if(empty($_SESSION)){header('location:index.php');}else{
 							$datos[$i]=0;
 						}
 					}
-					print_r($datos);
+					
 					if(isset($datos[0])){
 						$tipo_persona 		=  $datos[0];
 						$tipo_documento 	=  $datos[1];
@@ -52,7 +52,7 @@ if(empty($_SESSION)){header('location:index.php');}else{
 			}
 			header('location:?view=carga_archivo&mode=index&mensaje=exito');
 		break;
-	#####################################################################################################################################
+
 		default:
 			header('location:'.HTML_DIR.'error.html');
 		break;

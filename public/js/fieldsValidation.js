@@ -193,7 +193,7 @@ function validateForm2() {
     let patron_name = /^[a-zA-Z ñáéíóú]{2,60}$/i;
 
     // Validación de nombre
-    if (!nombre.match(patron_name)) {
+    if (!fullName.match(patron_name)) {
         alert("Nombre inválido: " + fullName + ". El formato debe ser solo letras (ej. Pedro Luis).");
         document.getElementById('fullName').focus();
         return false;
@@ -207,16 +207,16 @@ function validateForm2() {
     }
     // Validación de fecha de pago
     if (paymentDate === ""  ) {
-        alert('Debe seleccinar una fecha de compromiso.');
+        alert('Debe seleccionar una fecha de compromiso.');
         document.getElementById('paymentDate').focus();
         return false;
     }
     // Validación de relación
-     if (relationship === "") {
+    if (relationship === "") {
         alert("Debe seleccionar un parentesco.");
         document.getElementById('relationship').focus();
         return false;
     }
 
-    return false; // Si todas las validaciones pasan, permite el envío del formulario
+    return true; // Si todas las validaciones pasan, permite el envío del formulario
 }

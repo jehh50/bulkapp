@@ -15,42 +15,42 @@
           </section>
           <div class="form-group">
             <h5>Nombre del cliente</h5>
-            <input type="text" class="form-control" aria-describedby="nombreCliente"  name="nombreCliente" id="nombreCliente" disabled/>
+            <input type="text" class="form-control" aria-describedby="name"  name="name" id="name" disabled/>
           </div>
 
           <div class="form-group">
-            <h5>Nacionalidad</h5>
-            <input type="text" class="form-control" aria-describedby="nacionalidadCliente"  name="nacionalidadCliente" id="nacionalidadCliente" disabled/>
-          </div>
-          
-          <div class="form-group">
             <h5>Cédula</h5>
-            <input type="text" class="form-control"  aria-describedby="cedulaCliente"  name="cedulaCliente" id="cedulaCliente" disabled/>
+            <input type="text" class="form-control"  aria-describedby="dni"  name="dni" id="dni" disabled/>
           </div>
 
           <div class="form-group">
             <h5>Teléfono 1</h5>
-            <input type="text" class="form-control" aria-describedby="telfCliente"  name="telfCliente" id="telfCliente" disabled/>
+            <input type="text" class="form-control" aria-describedby="phone1"  name="phone1" id="phone1" disabled/>
           </div>
 
           <div class="form-group">
-            <h5>Tipo de cuenta</h5>
-            <input type="text" class="form-control"  aria-describedby="tipoCuentaBancaria"  name="tipoCuentaBancaria" id="tipoCuentaBancaria" disabled/>
+            <h5>Teléfono 2</h5>
+            <input type="text" class="form-control" aria-describedby="phone2"  name="phone2" id="phone2" disabled/>
+          </div>
+          
+          <div class="form-group">
+            <h5>Teléfono 3</h5>
+            <input type="text" class="form-control"  aria-describedby="phone3"  name="phone3" id="phone3" disabled/>
           </div>
 
           <div class="form-group">
-            <h5>Genero</h5>
-            <input type="text" class="form-control"  aria-describedby="generoCliente"  name="generoCliente" id="generoCliente" disabled/>
+            <h5>Fecha de nacimiento</h5>
+            <input type="text" class="form-control"  aria-describedby="birthday"  name="birthday" id="birthday" disabled/>
           </div>
 
           <div class="form-group">
-            <h5>Edad<h5>
-            <input type="text" class="form-control"  aria-describedby="edadCliente"  name="edadCliente" id="edadCliente" disabled/>
+            <h5>Número de cuenta<h5>
+            <input type="text" class="form-control"  aria-describedby="account"  name="account" id="account" disabled/>
           </div>
 
           <div class="form-group">
             <h5>Correo electrónico</h5>
-            <input type="text" class="form-control"  aria-describedby="correoCliente"  name="correoCliente" id="correoCliente" disabled/>
+            <input type="text" class="form-control"  aria-describedby="email"  name="email" id="email" disabled/>
           </div>
          </div>
       </div>

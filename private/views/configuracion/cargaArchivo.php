@@ -98,8 +98,3 @@ if (isset($_GET['estatus'])==200) {
 	    </div>
 	</div>
 </div>
-
-</body>
-</html>
-
-

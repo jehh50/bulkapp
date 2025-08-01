@@ -35,7 +35,7 @@ if (empty($_SESSION)) {
 
       case 'buscarCliente':
         $cliente = $conn->buscaCliente($_POST['dni'], $_POST['servicioId']);
-        if ($cliente[0]['status_id']==4){$msg = 'Cliente ya atendido';}
+        if(!$cliente){}else{if ($cliente[0]['status_id']==4){$msg = 'Cliente ya atendido';}else{$msg='';}}
         include(PUBLIC_DIR . 'general/header.php');
         include(PUBLIC_DIR . 'general/navbar.php');
         $noefectivo = $conn->contactoNoEfectivo($_SESSION['servicio_id']);
@@ -54,14 +54,14 @@ if (empty($_SESSION)) {
             } else {
               $json['response'] = 'true';
               $json['id_cliente'] = $c['id'];
-              $json['nacionalidad'] = $c['nombre_legal'];
-              $json['nombre'] = $c['identificacion'];
-              $json['telf_hab'] = $c['telf_hab'];
-              $json['cedula'] = $c['telf_ofi'];
-              $json['tipo_cuenta'] = $c['telf_cel'];
-              $json['genero'] = ($c['correo'] == 'M') ? "Masculino" : "Femenino";
-              $json['edad'] = $c['direccion'];
-              $json['correo'] = $c['cuenta'];
+              $json['name'] = $c['nombre_legal'];
+              $json['dni'] = $c['identificacion'];
+              $json['phone1'] = $c['telf_hab'];
+              $json['phone2'] = $c['telf_ofi'];
+              $json['phone3'] = $c['telf_cel'];
+              $json['email'] = $c['correo'];
+              $json['birthday'] = $c['direccion'];
+              $json['account'] = $c['cuenta'];
             }
           }
         } else {
@@ -176,7 +176,11 @@ if (empty($_SESSION)) {
 
             break;
           case 2: // cashea
-            $results = $conn->registroResultadosCashea($_POST['paymentPlan'],$_POST['paymentDate'],$_POST['amount'],$_POST['fullName'],$_POST['relationship'],$_POST['observaciones'],$_POST['id_cliente'],$status);
+            var_dump($_POST);
+            if($efectivo == 12 || $efectivo == 13){
+              $status = 4;
+              $results = $conn->registroResultadosCashea($_POST['paymentPlan'],$_POST['paymentDate'],$_POST['amount'],$_POST['fullName'],$_POST['relationship'],$_POST['observaciones'],$_POST['id_cliente'],$status);
+            }
             header('location:?view=formulario&mode=index');
             break;
 

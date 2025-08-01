@@ -67,29 +67,64 @@ if (empty($_SESSION)) {
 				include(PUBLIC_DIR . 'general/header.php');
 				include(PUBLIC_DIR . 'general/navbar.php');
 				$registros = [];
+				var_dump($_POST);
 				$archivo = $_FILES["archivo"]['tmp_name'];
 				if (($fp = fopen($archivo, "r")) !== false) {
 					$encoding = mb_detect_encoding(file_get_contents($archivo), 'UTF-8, ISO-8859-1', true);
 					$header = fgetcsv($fp, 0, ";");
-					while (($datos = fgetcsv($fp, 0, ";")) !== false) {
-						if ($datos) {
-							$datos = array_map(function ($value) use ($encoding) {
-								return mb_convert_encoding($value, 'UTF-8', $encoding);
-							}, $datos);
-							$registro = [
-								'identificacion' => mb_convert_encoding($datos[0], 'UTF-8', 'auto'),
-								'nombre_legal' => mb_convert_encoding($datos[1], 'UTF-8', 'auto'),
-								'telf_hab' => mb_convert_encoding($datos[2], 'UTF-8', 'auto'),
-								'telf_ofi' => mb_convert_encoding($datos[3], 'UTF-8', 'auto'),
-								'telf_cel' => mb_convert_encoding($datos[4], 'UTF-8', 'auto'),
-								'correo' => mb_convert_encoding($datos[5], 'UTF-8', 'auto'),
-								'direccion' => mb_convert_encoding($datos[6], 'UTF-8', 'auto'),
-								'cuenta' => mb_convert_encoding($datos[7], 'UTF-8', 'auto')
-							];
-
-							$registros[] = $registro;
-						} else {
-							echo "Archivo vacio";
+					if($_POST['servicio'] == 1) {
+						while (($datos = fgetcsv($fp, 0, ";")) !== false) {
+							if ($datos) {
+								$datos = array_map(function ($value) use ($encoding) {
+									return mb_convert_encoding($value, 'UTF-8', $encoding);
+								}, $datos);
+								$registro = [
+									'identificacion' => $datos[0],
+									'nombre_legal' => $datos[1],
+									'telf_hab' => $datos[2],
+									'telf_ofi' => $datos[3],
+									'telf_cel' => $datos[4],
+									'correo' => $datos[5],
+									'direccion' => $datos[6],
+									'cuenta' => $datos[7]
+								];
+								$registros[] = $registro;
+							} else {
+								echo "Archivo vacio";
+							}
+						}
+					}else{
+						while (($datos = fgetcsv($fp, 0, ";")) !== false) {
+							if ($datos) {
+								$datos = array_map(function ($value) use ($encoding) {
+									return mb_convert_encoding($value, 'UTF-8', $encoding);
+								}, $datos);
+								$registro = [
+									'cedula' => $datos[0],
+									'id_cuota' => $datos[1],
+									'nombre_grupo' => $datos[2],
+									'fecha_pagar' => $datos[3],
+									'monto_cuota' => $datos[4],
+									'numero_cuota' => $datos[5],
+									'fee' => $datos[6],
+									'plata_por_cobrar' => $datos[7],
+									'capital_asignado' => $datos[8],
+									'id_orden' => $datos[9],
+									'identificacion_orden' => $datos[10],
+									'fecha_creacion_orden' => $datos[11],
+									'email' => $datos[12],
+									'telefono' => $datos[13],
+									'nombre_usuario' => $datos[14],
+									'local_origen' => $datos[15],
+									'estado_deuda' => $datos[16],
+									'tramo_inicial' => $datos[17],
+									'tramo_actual' => $datos[18],
+									'segmento' => $datos[19]
+								];
+								$registros[] = $registro;
+							} else {
+								echo "Archivo vacio";
+							}
 						}
 					}
 					fclose($fp);
@@ -98,27 +133,57 @@ if (empty($_SESSION)) {
 				include(HTML_DIR . 'configuracion/confirmaCargaArchivo.php');
 				include(PUBLIC_DIR . 'general/footer.php');
 
-				//				header('location:?view=configuracion&mode=cargaArchivo&mensaje=exito');
+				//header('location:?view=configuracion&mode=cargaArchivo&mensaje=exito');
 				break;
 
 			case 'guardarRegistros':
+				
 				if (isset($_POST['data'])) {
 					$registros = json_decode($_POST['data'], true);
 					if (json_last_error() === JSON_ERROR_NONE) {
-						foreach ($registros as $registro) {
-							$con->registro(
-								$registro['identificacion'],
-								$registro['nombre_legal'],
-								$registro['telf_hab'],
-								$registro['telf_ofi'],
-								$registro['telf_cel'],
-								$registro['correo'],
-								$registro['direccion'],
-								$registro['cuenta'],
-								$_POST['servicio']
-							);
+						if($_POST['servicio'] == 1) {
+							foreach ($registros as $registro) {
+								$con->registro(
+									$registro['identificacion'],
+									$registro['nombre_legal'],
+									$registro['telf_hab'],
+									$registro['telf_ofi'],
+									$registro['telf_cel'],
+									$registro['correo'],
+									$registro['direccion'],
+									$registro['cuenta'],
+									$_POST['servicio']
+								);
+							}
+							$var = 200;
+						} else {
+							foreach ($registros as $registro) {
+								$con->registroCashea(
+									$registro['cedula'],
+									$registro['id_cuota'],
+									$registro['nombre_grupo'],
+									$registro['fecha_pagar'],
+									$registro['monto_cuota'],
+									$registro['numero_cuota'],
+									$registro['fee'],
+									$registro['plata_por_cobrar'],
+									$registro['capital_asignado'],
+									$registro['id_orden'],
+									$registro['identificacion_orden'],
+									$registro['fecha_creacion_orden'],
+									$registro['email'],
+									$registro['telefono'],
+									$registro['nombre_usuario'],
+									$registro['local_origen'],
+									$registro['estado_deuda'],
+									$registro['tramo_inicial'],
+									$registro['tramo_actual'],
+									$registro['segmento'],
+									$_POST['servicio']
+								);
+							}
+							$var = 200;
 						}
-						$var = 200;
 					} else {
 						$var = 'Error al decodificar los datos JSON: ' . json_last_error_msg();
 						header("Location: ?view=configuracion&mode=cargaArchivo&estatus=$var");
