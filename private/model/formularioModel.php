@@ -22,8 +22,8 @@ class database {
     return $respuesta;
   }
 
-  public function contactoNoEfectivo($e){
-    $sql = $this->db->query("SELECT * FROM noefectivo where servicio_id = '$e'");
+  public function contactoNoEfectivo(){
+    $sql = $this->db->query("SELECT * FROM noefectivo");
     if($this->db->rows($sql) > 0 ){
       while($data = $this->db->recorrer($sql)){
         $respuesta[] = $data;
