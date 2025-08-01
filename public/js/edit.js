@@ -1,17 +1,9 @@
-$(document).ready(function(){
-  $('#btn-eliminar').hide();
-  $('#btn-actualizar').hide();
-  $('#servicio').hide();
-  $('#d_genero').hide();
-  $('#d_producto').hide();
-
-
+$(document).ready(function () {
   document.querySelectorAll('.telefono').forEach(function (element) {
     element.addEventListener('input', function (event) {
       let input = event.target.value.replace(/\D/g, ''); // Remueve todos los caracteres no numéricos
       let formattedInput = '(0'; // Asegura el '0' en la primera posición
 
-      // Controla la longitud del input para evitar concatenaciones incorrectas
       if (input.length > 1) {
         formattedInput += input.substring(1, 4); // Extrae los primeros 3 dígitos reales
       }
@@ -28,121 +20,220 @@ $(document).ready(function(){
       event.target.value = formattedInput;
     });
   });
-// FUNCIÓN QUE BUSCA LOS DATOS DE LA VENTA
 
-  $('#btn-buscar').click(function(){
-    if ($('#cedula').val() == "") {
+  $('#btn-buscar').click(function () {
+    if ($('#cedula').val() === "") {
       alert('Ingrese un número de cedula valido.');
-    }
-    else{
-       a = $('#telf_hab').val(); 
-       b = $('#telf_ofi').val(); 
-       c = $('#telf_cel').val(); 
-       d = $('#correo').val(); 
-       e = $('#cuenta').val(); 
-       f = $('#servicio').val(); 
-       g = $('#cedula').val(); 
-       h = '<h3 style="color: #ffffff; padding: 8px; background-color: #4cb957 ;height: 40px;border-radius: 5px;">SERVICIO: <strong>';
-       i = '<section><span class="form-group-addon">Sexo</span></section><select class="form-control" id="genero">';
-       p = '<span class="form-group-addon">Tipo de producto</span><select class="form-control" name="producto" id="producto">';
+    } else {
+      let gender = '';
 
-       $.ajax({
-            type:'POST',
-            url:'?view=configuracion&mode=buscar',
-            dataType: "json",
-            data:{telf_hab:a, telf_ofi:b, telf_cel:c, correo:d, cuenta:e, servicio:f, cedula:g },
-            success:function(datos){
-              if(datos.response == 'true'){
-                $('#btn-buscar').hide();
-                $('#btn-actualizar').show();
-                $('#btn-eliminar').show();
-                $('#servicio').show().html(h + datos.servicio + '</strong></h3>');
-                if(datos.genero == 'F'){$('#d_genero').show().html(i + '<option selected value=F selected>FEMENINO</option><option value=M>MASCULINO</option></select>');}
-                else{$('#d_genero').show().html(i + '<option selected value=F>FEMENINO</option><option value=M selected>MASCULINO</option></select>');}
-                $('#d_nacimiento').removeAttr('readonly').val(datos.nacimiento);
-                $('#id_resultado').val(datos.id_resultado);
-                $('#cod_servicio').val(datos.cod_servicio);
-                $('#telf_hab').removeAttr('readonly').val(datos.telf_hab);
-                $('#telf_cel').removeAttr('readonly').val(datos.telf_celular); 
-                $('#correo').removeAttr('readonly').val(datos.correo); 
-                $('#cuenta').removeAttr('readonly').val(datos.cuenta); 
-                $('#cedula').val(datos.cedula);
-                $('#nombre').removeAttr('readonly').val(datos.nombre);
-                $('#apellido').removeAttr('readonly').val(datos.apellido);
-                $('#gestion').val(datos.id_gestion);
-                $('#saleDate').removeAttr('readonly').val(datos.fecha_venta);
-                $('#d_producto').show();
+      $.ajax({
+        type: 'POST',
+        url: '?view=configuracion&mode=buscar',
+        dataType: "json",
+        data: { cedula: $('#cedula').val() },
+        success: function (datos) {
+          if (datos.response === 'true') {
+            for (let i = 0; i < datos.count; i++) {
+              if (datos.data[i].genero === 'F') {
+                gender = '<option selected value="F">FEMENINO</option><option value="M">MASCULINO</option></select></div>';
+              } else {
+                gender = '<option value="F">FEMENINO</option><option selected value="M">MASCULINO</option></select></div>';
               }
-              else if(datos.response == 'eliminado'){
-                alert('Esta venta ya se encuentra rechazada');
+
+              let openProduct = `<div class="form-group col-lg-3"><span class="form-group-addon">Producto</span><select class="form-control" id="producto${i}"></select>`;
+
+              let divHeader = `
+                <div class="panel panel-default">
+                  <div class="panel-heading" role="tab" id="heading${i}">
+                    <h4 class="panel-title">
+                      <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse${i}" aria-expanded="false" aria-controls="collapse${i}">
+              `;
+
+              let divBody = `</a></h4></div><div id="collapse${i}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading${i}"><div class="panel-body">`;
+
+              let divForm = `
+                ${openProduct}</div>
+                <div class="form-group col-lg-3">
+                  <span class="form-group-addon">Nombres</span>
+                  <input type="text" class="form-control" placeholder="Julio Cesar" aria-describedby="nombre" id="nombre${i}" oninput="onlyLetters(this);" value="${datos.data[i].nombre}">
+                </div>
+                <div class="form-group col-lg-3">
+                  <span class="form-group-addon">Apellidos</span>
+                  <input type="text" class="form-control" placeholder="Perez Gomez" aria-describedby="apellido" id="apellido${i}" oninput="onlyLetters(this);" value="${datos.data[i].apellido}">
+                </div>
+                <div class="form-group col-lg-3">
+                  <span class="form-group-addon">Cédula</span>
+                  <input type="text" class="form-control" placeholder="12345678" aria-describedby="cedula" id="cedula${i}" oninput="onlyNumbers(this);" value="${datos.data[i].cedula}">
+                </div>
+                <div class="form-group col-lg-3">
+                  <span class="form-group-addon">Sexo</span>
+                  <select class="form-control" id="genero${i}">${gender}</select>
+                  <div class="form-group col-lg-3">
+                    <span class="form-group-addon">Fecha de nacimiento</span>
+                    <input type="text" class="form-control" placeholder="01/01/2024" aria-describedby="d_nacimiento" id="d_nacimiento${i}" oninput="formatDate(this);" value="${datos.data[i].nacimiento}">
+                  </div>
+                  <div class="form-group col-lg-3">
+                    <span class="form-group-addon">Teléfono habitación</span>
+                    <input type="text" class="form-control telefono" placeholder="(0212)345.67.89" aria-describedby="tlf_hab" id="telf_hab${i}" value="${datos.data[i].telf_hab}">
+                  </div>
+                  <div class="form-group col-lg-3">
+                    <span class="form-group-addon">Teléfono celular</span>
+                    <input type="text" class="form-control telefono" placeholder="(0424)234.56.78" aria-describedby="tlf_celu" id="telf_cel${i}" value="${datos.data[i].telf_celular}">
+                  </div>
+                  <div class="form-group col-lg-3">
+                    <span class="form-group-addon">Correo</span>
+                    <input type="email" class="form-control" placeholder="usuario@dominio.com" aria-describedby="correo" id="correo${i}" onkeyup="mayus(this); validateMail(this);" value="${datos.data[i].correo}">
+                  </div>
+                  <div class="form-group col-lg-3">
+                    <span class="form-group-addon">Fecha de venta</span>
+                    <input type="text" class="form-control" placeholder="20240101" aria-describedby="saleDate" id="saleDate${i}" oninput="formatDate_(this)" value="${datos.data[i].fecha_venta}">
+                  </div>
+                  <input type="hidden" id="id_resultado${i}" value="${datos.data[i].id_resultado}">
+                  <input type="hidden" id="gestion${i}" value="${datos.data[i].id_gestion}">
+                </div>
+              `;
+
+              let buttonEdit = `
+                <div class="container" style="margin: -10px 0 10px 15px">
+                  <div class="btn-group">
+                    <button class="btn btn-md btn-warning" id="btn-actualizar" data-toggle="modal" data-target="#modalActualiza${i}">
+                      <span class="glyphicon glyphicon-edit"></span> Editar
+                    </button>
+              `;
+
+              let buttonDelete = `
+                <button class="btn btn-md btn-danger" id="btn-eliminar" data-toggle="modal" data-target="#modalRechazo${i}">
+                  <span class="glyphicon glyphicon-remove"></span> Eliminar
+                </button>
+              `;
+
+              let otherButton = `
+                <button class="btn btn-md btn-success" id="btn-show">
+                  <span class="glyphicon glyphicon-pencil"></span> Show
+                </button>
+              `;
+
+              let divClose = `</div></div></div></div>`;
+
+              $('#accordion').append(divHeader + datos.data[i].nombre + ' ' + datos.data[i].apellido + divBody + divForm + buttonEdit + buttonDelete + otherButton + divClose);
+
+              let idProducto = datos.data[i].producto_id;
+              let selectId = `#producto${i}`;
+
+              if ($(selectId).length) {
+                $.ajax({
+                  type: 'POST',
+                  url: '?view=configuracion&mode=productos',
+                  dataType: "json",
+                  data: { id: 1 },
+                  success: function (datos) {
+                    if (datos.response === 'true') {
+                      $(`#producto${i}`).append('<option value="">Seleccione...</option>');
+                      let result = String(datos.productos);
+                      let res = result.split("|");
+                      for (let j = 0; j < res.length - 1; j++) {
+                        let res_1 = res[j].split(",");
+                        if (idProducto == res_1[0]) {
+                          $(selectId).append(`<option value="${res_1[0]}" selected>${res_1[1]}</option>`);
+                        } else {
+                          $(selectId).append(`<option value="${res_1[0]}">${res_1[1]}</option>`);
+                        }
+                      }
+                    } else {
+                      alert('No entro');
+                    }
+                  }
+                });
+              } else {
+                console.error(`No se encontró el elemento con ID ${selectId}`);
               }
-              else{
-                alert('Esta venta no existe.');
-              }
+
+            function generarUrlActualizacion(i, datos){
+              let productoId = $("select#producto" + i).val();
+              let nombre = $("#nombre" + i).val();
+              let apellido = $("#apellido" + i).val();
+              let cedula = $("#cedula" + i).val();
+              let sexo = $("select#genero" + i).val();
+              let nacimiento = $("#d_nacimiento" + i).val();
+              let hab = $("#telf_hab" + i).val();
+              let cel = $("#telf_cel" + i).val();
+              let correo = $("#correo" + i).val();
+              let venta = $("#saleDate" + i).val();
+
+              return `?view=configuracion&mode=actualiza&productoId=${productoId}&id=${datos.data[i].id_resultado}&nombre=${nombre}&apellido=${apellido}&cedula=${cedula}&sexo=${sexo}&nacimiento=${nacimiento}&hab=${hab}&cel=${cel}&correo=${correo}&venta=${venta}`;
             }
+
+            let url = generarUrlActualizacion(i, datos);
+
+              let modalDelete = `
+                <div class="modal fade" id="modalRechazo${i}" tabindex="-1" role="dialog" aria-labelledby="modalRechazo${i}">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title">¿Está seguro de eliminar la venta?</h4>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                        <a href="?view=configuracion&mode=eliminar&id=${datos.data[i].id_resultado}" class="btn btn-md btn-danger" id="btn-eliminar">
+                          <span class="glyphicon glyphicon-remove"></span> Eliminar
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              `;
+
+              let modalUpdate = `
+                <div class="modal fade" id="modalActualiza${i}" tabindex="-1" role="dialog" aria-labelledby="modalActualiza${i}">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title">¿Está seguro de actualizar la venta ${datos.data[i].nombre} ${datos.data[i].apellido}?</h4>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                        <a href="${url}" class="btn btn-md btn-warning" id="btn-eliminar">
+                          <span class="glyphicon glyphicon-edit"></span> Actualizar
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              `;
+
+              $('#modals').append(modalDelete);
+              $('#modals').append(modalUpdate);
+
+              $(`#producto${i}`).on('click', function () {
+                // Event handler for product select
+                let updatedValues = {
+                  // Suponiendo que tienes campos de entrada con IDs específicos
+                  nombre: $(`#nombre${i}`).val(),
+                };
+
+                console.log(updatedValues + '-' + url);
+              });
+
+            }
+            $('#btn-buscar').hide();
+          } else if (datos.response === 'eliminado') {
+            alert('Esta venta ya se encuentra rechazada');
+          } else {
+            alert('Esta venta no existe.');
+          }
+        }
       });
-     }
-    });
-
-// FIN FUNCION BUSCAR
-// FUNCION QUE ELIMINA LA VENTA
-
-    $('#btn-guardar').click(function(){
-      if($('select#eliminar_venta').val() == null){
-        alert('Debe elegir un motivo de rechazo de venta');
-      }
-      else{
-        console.log($('#cod_servicio').val());
-        $.ajax({
-              type:'POST',
-              url:'?view=configuracion&mode=eliminar',
-              dataType: "json",
-              data:{rechazo: $('select#eliminar_venta').val(), cedula: $('#cedula').val(), servicio: $('#cod_servicio').val(), id_resultado: $('#id_resultado').val(), id_gestion: $('#gestion').val()},
-              success:function(datos){
-                if(datos.response == 'true'){
-                  $('#modalRechazo').modal('hide');
-                  $('#modalConfirm').modal('toggle');
-                  setTimeout(function(){ $('#modalConfirm').modal('show') }, 1000);
-                  setTimeout(function(){$(location).attr('href','?view=configuracion&mode=editarResultado')}, 2000);
-                }
-                else{
-                  alert('NO ENTRO');
-                }
-              }
-        });
-      }
-    })
-
-// FIN FUNCION ELIMINA
-// FUNCION QUE ACTUALIZA LA INFORMACIÓN
-
-  $('#btn-actualizar').click(function(){
-    $.ajax({
-            type:'POST',
-            url:'?view=configuracion&mode=actualiza',
-            dataType: "json",
-            data:{fecha_venta:$('#saleDate').val(),cedula:$('#cedula').val(), nombre:$('#nombre').val(), apellido:$('#apellido').val(), telf_hab:$('#telf_hab').val(), telf_cel: $('#telf_cel').val(), correo:$('#correo').val(), cod_servicio:$('#cod_servicio').val(),id_resultado:$('#id_resultado').val(),genero:$('select#genero').val(),fecha_nac:$('#d_nacimiento').val()},
-            
-            success:function(datos){
-              if(datos.response == 'true'){
-                $('#modalActualiza').modal('toggle');
-                setTimeout(function(){ $('#modalActualiza').modal('show') }, 1000);
-                setTimeout(function(){$(location).attr('href','?view=configuracion&mode=editarResultado')}, 1000);
-              }
-              else{
-                alert('Error. Por favor contacte al administrador del sistema.');
-              }
-            }
-      });   
-
-
-
+    }
   });
 
-// FIN FUNCION ACTUALIZA
-// FUNCION REFRESCA
-  $('#btn-limpiar').click(function(){
-    $(location).attr('href','?view=configuracion&mode=editarResultado');
+  $('#btn-limpiar').click(function () {
+    $(location).attr('href', '?view=configuracion&mode=editarResultado');
   });
-// FIN FUNCION REFRESCA
-})
+});

@@ -110,14 +110,14 @@ $(document).ready(function() {
           if(datos.response == 'true'){
             console.log(datos);
             $('#formularioCliente').show();
-            $('#nombreCliente').val(datos.nombre).attr('readonly','readonly');
-            $('#nacionalidadCliente').val(datos.nacionalidad).attr('readonly','readonly');
-            $('#telfCliente').val(datos.telf_hab).attr('readonly','readonly');
-            $('#cedulaCliente').val(datos.cedula).attr('readonly','readonly');
-            $('#tipoCuentaBancaria').val(datos.tipo_cuenta).attr('readonly','readonly');
-            $('#generoCliente').val(datos.genero).attr('readonly','readonly');
-            $('#edadCliente').val(datos.edad).attr('readonly','readonly');
-            $('#correoCliente').val(datos.correo).attr('readonly','readonly');
+            $('#name').val(datos.name).attr('readonly','readonly');
+            $('#dni').val(datos.dni).attr('readonly','readonly');
+            $('#phone1').val(datos.phone1).attr('readonly','readonly');
+            $('#phone2').val(datos.phone2).attr('readonly','readonly');
+            $('#phone3').val(datos.phone3).attr('readonly','readonly');
+            $('#email').val(datos.email).attr('readonly','readonly');
+            $('#birthday').val(datos.birthday).attr('readonly','readonly');
+            $('#account').val(datos.account).attr('readonly','readonly');
             $('#id_cliente').val(datos.id_cliente);
           }
           else if(datos.response == 'atendido'){

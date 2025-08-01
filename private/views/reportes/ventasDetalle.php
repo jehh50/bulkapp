@@ -53,15 +53,17 @@
               <table class="table table-hover table-condensed">
                 <thead>
                   <tr class="bg-success">
-                    <th style="text-align: center; width: 4%;">#</th>
-                    <th style="text-align: center; width: 12%;">Nombre</th>
-                    <th style="text-align: center; width: 12%;">Apellido</th>
-                    <th style="text-align: center; width: 12%;">Cédula</th>
-                    <th style="text-align: center; width: 12%;">Teléfono 1</th>
-                    <th style="text-align: center; width: 12%;">Teléfono 2</th>
-                    <th style="text-align: center; width: 12%;">Producto</th>
-                    <th style="text-align: center; width: 12%;">Agente</th>
-                    <th style="text-align: center; width: 12%;">Fecha</th>
+                    <th style="text-align: center;">#</th>
+                    <th style="text-align: center;">Nombre</th>
+                    <th style="text-align: center;">Apellido</th>
+                    <th style="text-align: center;">Cédula</th>
+                    <th style="text-align: center;">Fecha de Nacimiento</th>
+                    <th style="text-align: center;">Teléfono 1</th>
+                    <th style="text-align: center;">Teléfono 2</th>
+                    <th style="text-align: center;">Correo</th>
+                    <th style="text-align: center;">Producto</th>
+                    <th style="text-align: center;">Agente</th>
+                    <th style="text-align: center;">Fecha</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -72,8 +74,10 @@
                         <td><?= $venta['nombre']; ?></td>
                         <td><?= $venta['apellido']; ?></td>
                         <td><?= $venta['cedula']; ?></td>
+                        <td><?= $venta['fecha_nacimiento']; ?></td>
                         <td><?= $venta['telf_hab']; ?></td>
                         <td><?= $venta['telf_celular']; ?></td>
+                        <td><?= $venta['correo']; ?></td>
                         <td><?= $venta['descripcion']; ?></td>
                         <td><?= $venta['agente']; ?></td>
                         <td><?= date('d-m-Y', strtotime($venta['fecha_venta'])); ?></td>

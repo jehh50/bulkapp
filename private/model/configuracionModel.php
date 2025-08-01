@@ -64,6 +64,47 @@ class database
     }
   }
 
+  public function registroCashea(
+    $cedula, $id_cuota, $nombre_grupo, $fecha_pagar, $monto_cuota, $numero_cuota, $fee, $plata_por_cobrar,
+    $capital_asignado, $id_orden, $identificacion_orden, $fecha_creacion_orden, $email, $telefono,
+    $nombre_usuario, $local_origen, $estado_deuda, $tramo_inicial, $tramo_actual, $segmento
+) {
+    // Conversión de encoding si es necesario
+    $cedula = iconv(mb_detect_encoding($cedula, mb_detect_order(), true), "UTF-8", $cedula);
+    $nombre_grupo = iconv(mb_detect_encoding($nombre_grupo, mb_detect_order(), true), "UTF-8", $nombre_grupo);
+    $email = iconv(mb_detect_encoding($email, mb_detect_order(), true), "UTF-8", $email);
+    $telefono = iconv(mb_detect_encoding($telefono, mb_detect_order(), true), "UTF-8", $telefono);
+    $nombre_usuario = iconv(mb_detect_encoding($nombre_usuario, mb_detect_order(), true), "UTF-8", $nombre_usuario);
+    $local_origen = iconv(mb_detect_encoding($local_origen, mb_detect_order(), true), "UTF-8", $local_origen);
+    $estado_deuda = iconv(mb_detect_encoding($estado_deuda, mb_detect_order(), true), "UTF-8", $estado_deuda);
+    $tramo_inicial = iconv(mb_detect_encoding($tramo_inicial, mb_detect_order(), true), "UTF-8", $tramo_inicial);
+    $tramo_actual = iconv(mb_detect_encoding($tramo_actual, mb_detect_order(), true), "UTF-8", $tramo_actual);
+    $segmento = iconv(mb_detect_encoding($segmento, mb_detect_order(), true), "UTF-8", $segmento);
+
+    $query = "INSERT INTO cashea_customers (
+        cedula, id_cuota, nombre_grupo, fecha_pagar, monto_cuota, numero_cuota, fee, plata_por_cobrar,
+        capital_asignado, id_orden, identificacion_orden, fecha_creacion_orden, email, telefono,
+        nombre_usuario, local_origen, estado_deuda, tramo_inicial, tramo_actual, segmento
+    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+    $params = [
+        $cedula, $id_cuota, $nombre_grupo, $fecha_pagar, $monto_cuota, $numero_cuota, $fee, $plata_por_cobrar,
+        $capital_asignado, $id_orden, $identificacion_orden, $fecha_creacion_orden, $email, $telefono,
+        $nombre_usuario, $local_origen, $estado_deuda, $tramo_inicial, $tramo_actual, $segmento
+    ];
+
+    // Tipos de datos: ajusta según los tipos reales de tus columnas
+    $paramTypes = 'ssssssssssssssssssss';
+
+    try {
+        $stmt = $this->db->preparedQuery($query, $params, $paramTypes);
+        $stmt->close();
+        return true;
+    } catch (Exception $e) {
+        echo "Error al guardar en cashea_customers => " . $e->getMessage();
+    }
+}
+
   public function busquedaResultados($cedula)
   {
     $sql = $this->db->query("SELECT a.id as resultado_id, a.gestion_id, a.nombre, a.apellido, a.genero, a.fecha_nacimiento, a.cedula, a.telf_hab, a.telf_ofi, a.telf_celular, a.correo, a.cuenta, b.descripcion, b.id as servicio_id, a.producto_id, p.descripcion as name_product, a.fecha_venta FROM resultados a INNER JOIN servicios b  ON a.servicio_id = b.id INNER JOIN productos p ON a.producto_id = p.id WHERE a.cedula = '$cedula'");
@@ -89,20 +130,25 @@ class database
     }
     return $respuesta;
   }
-  public function updateResultados($fecha_venta, $idresultado, $nombre, $apellido, $cedula, $tlf_hab, $tlf_celu, $correo, $servicio, $genero, $fecha_nac)
+  public function updateResultados($id,$nombre,$apellido,$cedula,$genero,$fecha_nac,$hab,$cel,$correo,$venta)
   {
-    $this->db->query("UPDATE resultados SET nombre='$nombre', apellido='$apellido', genero='$genero', fecha_nacimiento='$fecha_nac', cedula=$cedula, telf_hab='$tlf_hab', telf_celular='$tlf_celu', correo='$correo', fecha_venta='$fecha_venta' WHERE  id=$idresultado");
+    echo ("UPDATE resultados SET nombre='$nombre', apellido='$apellido', genero='$genero', fecha_nacimiento='$fecha_nac', cedula=$cedula, telf_hab='$hab', telf_celular='$cel', correo='$correo', fecha_venta='$venta' WHERE  id=$id");
+    $this->db->query("UPDATE resultados SET nombre='$nombre', apellido='$apellido', genero='$genero', fecha_nacimiento='$fecha_nac', cedula=$cedula, telf_hab='$hab', telf_celular='$cel', correo='$correo', fecha_venta='$venta'  WHERE  id=$id");
     return true;
   }
 
-  public function eliminarVenta($motivo, $cedula, $servicio, $id_resultado, $user, $date, $id_gestion)
+  public function eliminarVenta($resultadoId)
   {
-    $this->db->query("UPDATE resultados SET status = 1 WHERE id_resultado = $id_resultado");
-    $this->db->query("UPDATE gestion SET status = 1 WHERE id_gestion = $id_gestion");
-    $this->db->query("UPDATE clientes SET status = 2 WHERE identificacion = $cedula");
-    $this->db->query("INSERT INTO rechazo_ventas (motivo,fecha,id_resultado,cod_servicio,id_usuario) VALUES ('$motivo','$date',$id_resultado,'$servicio',$user)");
-
-    return true;
+    try {
+      $query = "DELETE FROM resultados WHERE id = ?";
+      $params = [$resultadoId];
+      $paramTypes = 'i';
+      $stmt = $this->db->preparedQuery($query, $params, $paramTypes);
+      $stmt->close();
+      return true;
+    } catch (Exception $e) {
+      return "Error al eliminar resultado con ID $resultadoId: " . $e->getMessage();
+    }
   }
 
   public function contactoEfectivo()
@@ -183,7 +229,7 @@ class database
     return $respuesta;
   }
 
-  public function products($id = null)
+    public function products($id = null)
   {
     $sql = $this->db->query("SELECT * FROM productos WHERE id = " . $id);
     if ($this->db->rows($sql) > 0) {

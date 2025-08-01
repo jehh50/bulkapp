@@ -39,8 +39,8 @@ function validacion(){
 
 <div class="container">
 <?php
-if (isset($_GET['mensaje'])=='exito') {
-  echo '  <script type="text/javascript">alert("REGISTRO EXITOSO"); $(location).attr("href","?view=configuracion&mode=cargaArchivo");</script>';
+if (isset($_GET['estatus'])==200) {
+  echo '  <script type="text/javascript">alert("REGISTRO EXITOSO");</script>';
 }
 ?>
 	<div class="row">
@@ -98,8 +98,3 @@ if (isset($_GET['mensaje'])=='exito') {
 	    </div>
 	</div>
 </div>
-
-</body>
-</html>
-
-
