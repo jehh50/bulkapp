@@ -134,8 +134,8 @@ if (empty($_SESSION)) {
             } else {
               $nacionalidad = null;
             }
-            if (isset($_POST['cuenta2'])) {
-              $cuenta = $_POST['cuenta2'];
+            if (isset($_POST['pan'])) {
+              $cuenta = $_POST['pan'];
             } else {
               $cuenta = '00000000000000000000';
             }
@@ -173,7 +173,7 @@ if (empty($_SESSION)) {
                 $status = 4;
                 $registro = $conn->registroGestion($contacto, $efectivo, $producto, $noefectivo, $id_usuario, $date, $id_cliente, $status, $hora, $servicio);
               }
-
+            header('location:?view=formulario&mode=index');
             break;
           case 2: // cashea
             var_dump($_POST);

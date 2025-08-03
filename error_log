@@ -1,0 +1,93 @@
+[01-Aug-2025 02:06:29 America/Caracas] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'id_user' in 'WHERE' in /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php:59
+Stack trace:
+#0 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php(59): mysqli->query()
+#1 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/controllers/usuariosController.php(87): database->updatePass()
+#2 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/index.php(7): include('/home/ddremwdt/...')
+#3 {main}
+  thrown in /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php on line 59
+[01-Aug-2025 02:06:30 America/Caracas] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'id_user' in 'WHERE' in /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php:59
+Stack trace:
+#0 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php(59): mysqli->query()
+#1 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/controllers/usuariosController.php(87): database->updatePass()
+#2 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/index.php(7): include('/home/ddremwdt/...')
+#3 {main}
+  thrown in /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php on line 59
+[01-Aug-2025 02:06:32 America/Caracas] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'id_user' in 'WHERE' in /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php:59
+Stack trace:
+#0 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php(59): mysqli->query()
+#1 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/controllers/usuariosController.php(87): database->updatePass()
+#2 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/index.php(7): include('/home/ddremwdt/...')
+#3 {main}
+  thrown in /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php on line 59
+[01-Aug-2025 02:06:32 America/Caracas] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'id_user' in 'WHERE' in /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php:59
+Stack trace:
+#0 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php(59): mysqli->query()
+#1 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/controllers/usuariosController.php(87): database->updatePass()
+#2 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/index.php(7): include('/home/ddremwdt/...')
+#3 {main}
+  thrown in /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php on line 59
+[01-Aug-2025 02:06:33 America/Caracas] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'id_user' in 'WHERE' in /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php:59
+Stack trace:
+#0 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php(59): mysqli->query()
+#1 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/controllers/usuariosController.php(87): database->updatePass()
+#2 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/index.php(7): include('/home/ddremwdt/...')
+#3 {main}
+  thrown in /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php on line 59
+[01-Aug-2025 02:06:33 America/Caracas] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'id_user' in 'WHERE' in /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php:59
+Stack trace:
+#0 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php(59): mysqli->query()
+#1 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/controllers/usuariosController.php(87): database->updatePass()
+#2 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/index.php(7): include('/home/ddremwdt/...')
+#3 {main}
+  thrown in /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php on line 59
+[01-Aug-2025 02:06:33 America/Caracas] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'id_user' in 'WHERE' in /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php:59
+Stack trace:
+#0 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php(59): mysqli->query()
+#1 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/controllers/usuariosController.php(87): database->updatePass()
+#2 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/index.php(7): include('/home/ddremwdt/...')
+#3 {main}
+  thrown in /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php on line 59
+[01-Aug-2025 02:06:33 America/Caracas] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'id_user' in 'WHERE' in /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php:59
+Stack trace:
+#0 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php(59): mysqli->query()
+#1 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/controllers/usuariosController.php(87): database->updatePass()
+#2 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/index.php(7): include('/home/ddremwdt/...')
+#3 {main}
+  thrown in /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php on line 59
+[01-Aug-2025 02:06:33 America/Caracas] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'id_user' in 'WHERE' in /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php:59
+Stack trace:
+#0 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php(59): mysqli->query()
+#1 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/controllers/usuariosController.php(87): database->updatePass()
+#2 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/index.php(7): include('/home/ddremwdt/...')
+#3 {main}
+  thrown in /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php on line 59
+[01-Aug-2025 02:06:33 America/Caracas] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'id_user' in 'WHERE' in /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php:59
+Stack trace:
+#0 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php(59): mysqli->query()
+#1 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/controllers/usuariosController.php(87): database->updatePass()
+#2 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/index.php(7): include('/home/ddremwdt/...')
+#3 {main}
+  thrown in /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php on line 59
+[01-Aug-2025 02:06:42 America/Caracas] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'id_user' in 'WHERE' in /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php:59
+Stack trace:
+#0 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php(59): mysqli->query()
+#1 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/controllers/usuariosController.php(87): database->updatePass()
+#2 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/index.php(7): include('/home/ddremwdt/...')
+#3 {main}
+  thrown in /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php on line 59
+[01-Aug-2025 09:35:31 America/Caracas] PHP Warning:  Undefined array key "userid" in /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/controllers/usuariosController.php on line 85
+[01-Aug-2025 09:35:31 America/Caracas] PHP Fatal error:  Uncaught mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '' at line 1 in /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php:59
+Stack trace:
+#0 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php(59): mysqli->query()
+#1 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/controllers/usuariosController.php(87): database->updatePass()
+#2 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/index.php(7): include('/home/ddremwdt/...')
+#3 {main}
+  thrown in /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php on line 59
+[01-Aug-2025 16:43:44 America/Caracas] PHP Warning:  Undefined array key "userid" in /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/controllers/usuariosController.php on line 85
+[01-Aug-2025 16:43:44 America/Caracas] PHP Fatal error:  Uncaught mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '' at line 1 in /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php:59
+Stack trace:
+#0 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php(59): mysqli->query()
+#1 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/controllers/usuariosController.php(87): database->updatePass()
+#2 /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/index.php(7): include('/home/ddremwdt/...')
+#3 {main}
+  thrown in /home/ddremwdt/crmapp.ddrealtech.com/bulkapp/private/model/usuariosModel.php on line 59

@@ -205,6 +205,7 @@
             <section>
               <h2><span><strong>Datos de bancarios</strong></span></h2>
             </section>
+            
             <div class="form-group">
               <section>
                 <span class="form-group-addon">Tipo de cuenta</span>
@@ -217,6 +218,11 @@
               </select>
             </div>
 
+            <div class="form-group">
+              <span class="form-group-addon">Número de cuenta</span>
+              <input type="text" class="form-control" placeholder="123456********7890" aria-describedby="pan" name="pan" id="pan" oninput="onliNumbers(this);" required/>
+            </div>
+            
             <div class="form-group">
               <span class="form-group-addon" id="">Observaciones</span>
               <textarea class="form-control" rows=3 maxlength="250" name="observaciones" id="observaciones" oninput="upperCase(this);" ></textarea>

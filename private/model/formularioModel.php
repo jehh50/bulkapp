@@ -200,7 +200,7 @@ class database {
   }
 
   public function cuentasBancarias(){
-    $sql = $this->db->query("SELECT * FROM tipo_cuentas");
+    $sql = $this->db->query("SELECT * FROM tipo_cuentas where status_id = 2");
     if($this->db->rows($sql) > 0 ){
       while($data = $this->db->recorrer($sql)){
         $respuesta[] = $data;
