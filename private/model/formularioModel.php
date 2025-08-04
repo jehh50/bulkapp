@@ -160,9 +160,11 @@ class database {
     if($servicio == 2){
       $table = 'cashea_customers';
       $field = 'cedula';
+      $value = $dni;
     }else{
       $table = 'clientes';
       $field = 'id';
+      $value = $id_cliente;
     }
     $efectivo = ($efectivo === null) ? 'null' : $efectivo;
     $noefectivo = ($noefectivo === null) ? 'null' : $noefectivo;
@@ -171,7 +173,7 @@ class database {
     
     $this->db->query("INSERT INTO gestion (contacto_id, efectivo_id, producto_id, noefectivo_id, subContacto_id, user_id, fecha, cliente_id, status_id, hora, servicio_id) VALUES ($contacto, $efectivo, $producto, $noefectivo, $subcontacto, $id_usuario, '$date', $id_cliente, '$status','$hora', '$servicio')");
 
-    $this->db->query("UPDATE $table SET status_id = $status WHERE $field = $dni"); 
+    $this->db->query("UPDATE $table SET status_id = $status WHERE $field = $value"); 
   }
 
   public function registroResultadosCashea($paymentPlan,$paymentDate,$amount,$fullName,$relationship,$observaciones,$id_cliente,$status){

@@ -40,6 +40,8 @@ $(document).ready(function() {
                   $('#tipo_cuenta').attr('required','required');
                   $('#cuenta2').attr('required','required');
                   $('#observaciones').attr('required','required');
+                  $('#pan').attr('required','required');
+
               }
               else{
                 $('#formulario').hide();
@@ -65,6 +67,7 @@ $(document).ready(function() {
                 $('#tipo_cuenta').removeAttr('required').val("");
                 $('#cuenta2').removeAttr('required').val("");
                 $('#observaciones').removeAttr('required').val("");
+                $('#pan').removeAttr('required').val("");
               }
           })
         }
@@ -91,6 +94,7 @@ $(document).ready(function() {
          $('#municipio').removeAttr('required').val("");
          $('#tipo_cuenta').removeAttr('required').val("");
          $('#cuenta2').removeAttr('required').val("");
+         $('#pan').removeAttr('required').val("");
          $('#observaciones').removeAttr('required').val("");
         }  
       });
