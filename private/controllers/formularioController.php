@@ -176,7 +176,7 @@ if (empty($_SESSION)) {
 
                 $registro = $conn->registroResultados($_POST['contacto'], $efectivo, $producto, $noefectivo, $_POST['usuario'], $date, $nombre, $apellido, $genero, $fecha_nac, $nacionalidad, $cedula, $telf_hab, $telf_cel, $correo, $estado, $ciudad, $municipio, $cuenta, $tipocuenta, $obs, $fecha, $status, $_POST['id_cliente'], $var, $hora, $_POST['servicio']);
               } else {
-                $registro = $conn->registroGestion($_POST['contacto'], $efectivo, $producto, $noefectivo, $subcontacto, $_POST['usuario'], $date, $_POST['id_cliente'], $status, $hora, $_POST['servicio'],$dni);
+                $registro = $conn->registroGestion($_POST['contacto'], $efectivo, $producto, $noefectivo, $subContacto, $_POST['usuario'], $date, $_POST['id_cliente'], $status, $hora, $_POST['servicio'],$dni);
               }
             header('location:?view=formulario&mode=index');
             break;

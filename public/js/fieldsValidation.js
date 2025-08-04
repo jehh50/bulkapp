@@ -103,6 +103,7 @@ function validateForm() {
         let telf_hab = document.getElementById('telf_hab').value;
         let telf_cel = document.getElementById('telf_cel').value;
         let correo2 = document.getElementById('correo2').value;
+        let pan = document.getElementById('pan').value;
 
         let patron_tlf = /^[(]\d{4}[)]\d{3}.\d{2}.\d{2}$/;
         let patron_correo = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9]{2,4}$/;
@@ -171,6 +172,13 @@ function validateForm() {
         if (!correo2.match(patron_correo)) {
             alert('La dirección de correo es inválida. El formato debe ser dirección@dominio.com.');
             document.getElementById('correo2').focus();
+            return false;
+        }
+
+        // Validación de PAN
+        if (pan === "") {
+            alert('El campo PAN no puede estar vacío.');
+            document.getElementById('pan').focus();
             return false;
         }
 
