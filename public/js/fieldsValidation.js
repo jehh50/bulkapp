@@ -185,38 +185,38 @@ function validateForm() {
 function validateForm2() {
     console.log('Comienza la validación del segundo formulario...');
 
-    let paymentPlan = document.getElementById('paymentPlan').value;
-    let paymentDate = document.getElementById('paymentDate').value;
-    let fullName = document.getElementById('fullName').value;
-    let relationship = document.getElementById('relationship').value;
+    // let paymentPlan = document.getElementById('paymentPlan').value;
+    // // let paymentDate = document.getElementById('paymentDate').value;
+    // let fullName = document.getElementById('fullName').value;
+    // let relationship = document.getElementById('relationship').value;
 
-    let patron_name = /^[a-zA-Z ñáéíóú]{2,60}$/i;
+    // let patron_name = /^[a-zA-Z ñáéíóú]{2,60}$/i;
 
-    // Validación de nombre
-    if (!fullName.match(patron_name)) {
-        alert("Nombre inválido: " + fullName + ". El formato debe ser solo letras (ej. Pedro Luis).");
-        document.getElementById('fullName').focus();
-        return false;
-    }
+    // // Validación de nombre
+    // // if (!fullName.match(patron_name)) {
+    // //     alert("Nombre inválido: " + fullName + ". El formato debe ser solo letras (ej. Pedro Luis).");
+    // //     document.getElementById('fullName').focus();
+    // //     return false;
+    // // }
 
-    // Validación de payment plan
-    if (paymentPlan === "") {
-        alert("Debe seleccionar un plan de pago.");
-        document.getElementById('paymentPlan').focus();
-        return false;
-    }
-    // Validación de fecha de pago
-    if (paymentDate === ""  ) {
-        alert('Debe seleccionar una fecha de compromiso.');
-        document.getElementById('paymentDate').focus();
-        return false;
-    }
-    // Validación de relación
-    if (relationship === "") {
-        alert("Debe seleccionar un parentesco.");
-        document.getElementById('relationship').focus();
-        return false;
-    }
+    // // // Validación de payment plan
+    // // if (paymentPlan === "") {
+    // //     alert("Debe seleccionar un plan de pago.");
+    // //     document.getElementById('paymentPlan').focus();
+    // //     return false;
+    // // }
+    // // Validación de fecha de pago
+    // // if (paymentDate === ""  ) {
+    // //     alert('Debe seleccionar una fecha de compromiso.');
+    // //     document.getElementById('paymentDate').focus();
+    // //     return false;
+    // // }
+    // // Validación de relación
+    // if (relationship === "") {
+    //     alert("Debe seleccionar un parentesco.");
+    //     document.getElementById('relationship').focus();
+    //     return false;
+    // }
 
-    return true; // Si todas las validaciones pasan, permite el envío del formulario
+    // return true; // Si todas las validaciones pasan, permite el envío del formulario
 }

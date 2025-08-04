@@ -118,6 +118,7 @@ $(document).ready(function() {
             $('#email').val(datos.email).attr('readonly','readonly');
             $('#birthday').val(datos.birthday).attr('readonly','readonly');
             $('#account').val(datos.account).attr('readonly','readonly');
+            $('#oferta').val(datos.oferta).attr('readonly','readonly');
             $('#id_cliente').val(datos.id_cliente);
           }
           else if(datos.response == 'atendido'){

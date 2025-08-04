@@ -11,7 +11,7 @@ if (empty($_SESSION)) {
       case 'index':
         include(PUBLIC_DIR . 'general/header.php');
         include(PUBLIC_DIR . 'general/navbar.php');
-        $noefectivo = $conn->contactoNoEfectivo();
+        $noefectivo = $conn->contactoNoEfectivo($_SESSION['servicio_id']);
         $efectivo = $conn->contactoEfectivo($_SESSION['servicio_id']);
         switch ($_SESSION['servicio_id']) {
           case 1:
@@ -62,6 +62,7 @@ if (empty($_SESSION)) {
               $json['email'] = $c['correo'];
               $json['birthday'] = $c['direccion'];
               $json['account'] = $c['cuenta'];
+              $json['oferta'] = $c['oferta'];
             }
           }
         } else {
@@ -99,36 +100,41 @@ if (empty($_SESSION)) {
         echo json_encode($json);
 
         break;
+      
+      case 'subContacto':
+        $subContacto = $conn->contactoSecundario($_POST['efectivo_id']);
+        $json['subContacto'] = "";
+        if ($subContacto) {
+          foreach ($subContacto as $s) {
+            $json['response'] = 'true';
+            $json['subContacto'] = $json['subContacto'] . $s['id'] . "," . strtoupper($s['descripcion']) . "|";
+          }
+        } else {
+          $json['response'] = 'false';
+        }
+        echo json_encode($json);                                                                                                   
+        break;
 
       case 'registro':
-        $id_cliente = $_POST['id_cliente'];
-        $id_usuario = $_POST['usuario'];
-        $contacto = $_POST['contacto'];
-        $servicio = $_POST['servicio'];
+        
+        // $_POST['id_cliente'] = $_POST['id_cliente'];
+        // $_POST['usuario'] = $_POST['usuario'];
+        // $_POST['contacto'] = $_POST['contacto'];
+        // $_POST['servicio'] = $_POST['servicio'];
         $date = date('Y-m-d');
         $hora = date('H:i:s');
-        if (isset($_POST['efectivo'])) {
-          $efectivo = $_POST['efectivo'];
-          $status = 4;
-        } else {
-          $efectivo = null;
-        }
-        if (isset($_POST['noefectivo'])) {
-          $noefectivo = $_POST['noefectivo'];
-          $status = 3;
-        }else {
-          $noefectivo = null;
-        }
-        if (isset($_POST['venta'])) {
-          $producto = $_POST['venta'];
-        } else {
-          $producto = null;
-        }
+        $efectivo = isset($_POST['efectivo']) ? $_POST['efectivo'] : null;
+        $status = isset($_POST['efectivo']) ? 4 : null;
+        $noefectivo = isset($_POST['noefectivo']) ? $_POST['noefectivo'] : null;
+        $status = isset($_POST['noefectivo']) ? 3 : $status;
+        $producto = isset($_POST['venta']) ? $_POST['venta'] : null;
+        $subContacto = isset($_POST['subContacto']) ? $_POST['subContacto'] : null;
+        $dni = isset($_POST['dni_cliente']) ? $_POST['dni_cliente'] : null;
+        $paymentDate = isset($_POST['paymentDate']) ? $_POST['paymentDate'] : null;
         
-        $registro = $conn->registroGestion($contacto, $efectivo, $producto, $noefectivo, $id_usuario, $date, $id_cliente, $status, $hora, $servicio);
-
-        switch ($servicio) {
-          case 1: // bancamiga       
+        
+        switch ($_POST['servicio']) {
+          case 1: // bancamiga bancaribe      
             if (isset($_POST['nacionalidad'])) {
               $nacionalidad = $_POST['nacionalidad'];
             } else {
@@ -168,20 +174,25 @@ if (empty($_SESSION)) {
                 $status = 7;
                 $var = 0;
 
-                $registro = $conn->registroResultados($contacto, $efectivo, $producto, $noefectivo, $id_usuario, $date, $nombre, $apellido, $genero, $fecha_nac, $nacionalidad, $cedula, $telf_hab, $telf_cel, $correo, $estado, $ciudad, $municipio, $cuenta, $tipocuenta, $obs, $fecha, $status, $id_cliente, $var, $hora, $servicio);
+                $registro = $conn->registroResultados($_POST['contacto'], $efectivo, $producto, $noefectivo, $_POST['usuario'], $date, $nombre, $apellido, $genero, $fecha_nac, $nacionalidad, $cedula, $telf_hab, $telf_cel, $correo, $estado, $ciudad, $municipio, $cuenta, $tipocuenta, $obs, $fecha, $status, $_POST['id_cliente'], $var, $hora, $_POST['servicio']);
               } else {
-                $status = 4;
-                $registro = $conn->registroGestion($contacto, $efectivo, $producto, $noefectivo, $id_usuario, $date, $id_cliente, $status, $hora, $servicio);
+                $registro = $conn->registroGestion($_POST['contacto'], $efectivo, $producto, $noefectivo, $subcontacto, $_POST['usuario'], $date, $_POST['id_cliente'], $status, $hora, $_POST['servicio'],$dni);
               }
             header('location:?view=formulario&mode=index');
             break;
+
           case 2: // cashea
             var_dump($_POST);
-            if($efectivo == 12 || $efectivo == 13){
-              $status = 4;
+            if($subContacto == 1 || $subContacto == 10 || $subContacto == 20 || $subContacto == 21 ){
+              echo "Registro de resultados para Cashea";
+              $status = 7;
               $results = $conn->registroResultadosCashea($_POST['paymentPlan'],$_POST['paymentDate'],$_POST['amount'],$_POST['fullName'],$_POST['relationship'],$_POST['observaciones'],$_POST['id_cliente'],$status);
+            
+              $registro = $conn->registroGestion($_POST['contacto'], $efectivo, $producto, $noefectivo, $subContacto, $_POST['usuario'], $date, $_POST['id_cliente'], $status, $hora, $_POST['servicio'], $dni);
+            }else{
+              $registro = $conn->registroGestion($_POST['contacto'], $efectivo, $producto, $noefectivo, $subContacto, $_POST['usuario'], $date, $_POST['id_cliente'], $status, $hora, $_POST['servicio'], $dni);
             }
-            header('location:?view=formulario&mode=index');
+              header('location:?view=formulario&mode=index');
             break;
 
 

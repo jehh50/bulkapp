@@ -47,7 +47,7 @@
                     <strong>Datos del cliente:</strong>
                     <span id="customer">
                       <?php
-                      $ultimoNombre = $ultimoEmail = $ultimoTelefono = $ultimoSegmento = '';
+                      $ultimoNombre = $ultimoEmail = $ultimoTelefono = $ultimoSegmento = $ultimoCedula = '';
                       foreach ($cliente as $c) {
                         if ($c['nombre_usuario'] !== $ultimoNombre) {
                           echo strtoupper($c['nombre_usuario']) . ' - ';
@@ -61,9 +61,9 @@
                           echo $c['telefono'] . ' - ';
                           $ultimoTelefono = $c['telefono'];
                         }
-                        if ($c['segmento'] !== $ultimoSegmento) {
-                          echo '<strong style="color:red">' . strtoupper($c['segmento']) . '</strong>';
-                          $ultimoSegmento = $c['segmento'];
+                        if ($c['cedula'] !== $ultimoCedula) {
+                          echo $c['cedula'];
+                          $ultimoCedula = $c['cedula'];
                         }
                       }
                       ?>
@@ -98,10 +98,11 @@
                         echo '<thead>
                           <tr>
                             <th class="text-center"><h5><strong>#</strong></h5></th>
-                            <th class="text-center"><h5><strong>Fecha de compra</strong></h5></th>
-                            <th class="text-center"><h5><strong>Monto de cuota</strong></h5></th>
-                            <th class="text-center"><h5><strong>Número de cuota</strong></h5></th>
+                            <th class="text-center"><h5><strong>Fecha de pago</strong></h5></th>
+                            <th class="text-center"><h5><strong>Monto</strong></h5></th>
+                            <th class="text-center"><h5><strong>Cuota</strong></h5></th>
                             <th class="text-center"><h5><strong>Tramo</strong></h5></th>
+                            <th class="text-center"><h5><strong>Segmento</strong></h5></th>
                           </tr>
                           </thead>
                           <tbody>';
@@ -109,20 +110,23 @@
                         $suma_monto = 0;
                         foreach ($cliente as $row) {
                           if ($row['local_origen'] == $c['local_origen']) {
+                          $quote = round((float)(str_replace(",",".",$row['monto_cuota'])),2);
+                          $fechaFormateada = DateTime::createFromFormat('d/m/Y H:i', $row['fecha_pagar'])->format('d/m/Y');
                             echo '<tr>
                                       <th class="text-center" scope="row">' . $i . '</th>
-                                      <td class="text-center">' . (DateTime::createFromFormat(DateTime::ISO8601, $row['fecha_pagar']) ? DateTime::createFromFormat(DateTime::ISO8601, $row['fecha_pagar'])->format('d-m-Y') : (new DateTime($row['fecha_pagar']))->format('d-m-Y')) . '</td>
-                                      <td class="text-center">' . $row['monto_cuota'] . '</td>
+                                      <td class="text-center">' . $fechaFormateada. '</td>
+                                      <td class="text-center">' . $quote . '</td>
                                       <td class="text-center">' . $row['numero_cuota'] . '</td>
                                       <td class="text-center">' . $row['tramo_inicial'] . '</td>
+                                      <td class="text-center">' . $row['segmento'] . '</td>
                                     </tr>';
-                            $suma_monto += floatval($row['monto_cuota']);
+                            $suma_monto += $quote;
                             $i++;
                           }
                         }
                         echo '<tr>
                                     <td colspan="2" class="text-right"><strong>Total</strong></td>
-                                    <td class="text-center"><strong>' . number_format($suma_monto, 2, ',', '.') . '</strong></td>
+                                    <td class="text-center"><strong>' .$suma_monto . '</strong></td>
                                     <td colspan="2"></td>
                                   </tr>';
                         echo '</tbody></table></div>';
@@ -139,7 +143,8 @@
               <div class="panel panel-default">
                 <div class="panel-body">
                   <form name="form2" enctype="multipart/form-data" method="POST" onsubmit="return validateForm2();" action="?view=formulario&mode=registro" autocomplete="off">
-                    <input type="hidden" id="id_cliente" name="id_cliente" value="<?php echo $cliente[0]['cedula']; ?>">
+                    <input type="hidden" id="dni_cliente" name="dni_cliente" value="<?php echo $cliente[0]['cedula']; ?>">
+                    <input type="hidden" id="id_cliente" name="id_cliente" value="<?php echo $cliente[0]['id']; ?>">
                     <input type="hidden" id="usuario" name="usuario" value="<?php echo $_SESSION['id']; ?>">
                     <input type="hidden" id="servicio" name="servicio" value="<?php echo isset($_SESSION['servicio_id']) ? $_SESSION['servicio_id'] : ''; ?>">
 
@@ -154,11 +159,21 @@
                     </div>
 
                     <div class="form-group mb-3" id="d_efectivo">
-                      <label class="form-label">Motivo de contacto</label>
+                      <label class="form-label">Tipo de contacto</label>
                       <select class="form-control" name="efectivo" id="efectivo">
                         <?php foreach ($efectivo as $e) { ?>
                           <option value='' disabled selected style='display:none;'>Seleccione...</option>
                           <option value='<?php echo $e['id']; ?>'><?php echo $e['descripcion']; ?></option>
+                        <?php } ?>
+                      </select>
+                    </div>
+
+                    <div class="form-group mb-3" id="d_subContacto">
+                      <label class="form-label">Motivo de contacto</label>
+                      <select class="form-control" name="subContacto" id="subContacto">
+                        <?php foreach ($subContacto as $s) { ?>
+                          <option value='' disabled selected style='display:none;'>Seleccione...</option>
+                          <option value='<?php echo $s['id']; ?>'><?php echo $s['descripcion']; ?></option>
                         <?php } ?>
                       </select>
                     </div>
@@ -201,7 +216,7 @@
                             $fecha = date('Y-m-d', strtotime("+$i day"));
                             $label = date('d/m/Y', strtotime("+$i day"));
                             echo "<li class='mb-2'>
-                                      <input type='radio' name='paymentDate' value='$fecha' onclick=\"document.getElementById('paymentDate').value=this.value;\"> $label
+                                      <input type='radio' id='paymentDate' name='paymentDate' value='$fecha' onclick=\"document.getElementById('paymentDate').value=this.value;\"> $label
                                     </li>";
                           }
                           ?>
@@ -217,12 +232,12 @@
                         <label class="form-label">Parentesco</label>
                         <select class="form-control" name="relationship" id="relationship">
                           <option value=''>Seleccione...</option>
-                          <option value='1'>Padre</option>
-                          <option value='2'>Madre</option>
-                          <option value='3'>Hijo/Hija</option>
-                          <option value='4'>Hermano/Hermana</option>
-                          <option value='5'>Esposo/Esposa</option>
-                          <option value='6'>Otro</option>
+                          <option value='PADRE'>Padre</option>
+                          <option value='MADRE'>Madre</option>
+                          <option value='HIJO'>Hijo/Hija</option>
+                          <option value='HERMANO'>Hermano/Hermana</option>
+                          <option value='ESPOSA'>Esposo/Esposa</option>
+                          <option value='OTRO'>Otro</option>
                         </select>
                       </div>
 

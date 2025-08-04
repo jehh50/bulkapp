@@ -25,6 +25,7 @@
                       <th style="text-align: center;">Correo</th>
                       <th style="text-align: center;">Fecha de Nacimiento</th>
                       <th style="text-align: center;">Cuenta</th>
+                      <th style="text-align: center;">Oferta</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -40,6 +41,7 @@
                         <td style="text-align: center; width: 4%;"><?= $reg['correo']; ?></td>
                         <td style="text-align: center; width: 4%;"><?= $reg['direccion']; ?></td>
                         <td style="text-align: center; width: 12%;"><?= $reg['cuenta']; ?></td>
+                        <td style="text-align: center; width: 12%;"><?= $reg['oferta']; ?></td>
                       </tr>
                     <?php $i++;
                     } ?>
