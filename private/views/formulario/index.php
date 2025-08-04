@@ -13,6 +13,12 @@
           <section>
             <h2><strong>Datos de cliente</strong></h2>
           </section>
+          
+          <div class="form-group">
+            <h5>Producto a ofrecer</h5>
+            <input type="text" class="form-control success" aria-describedby="oferta"  name="oferta" id="oferta" disabled/>
+          </div>
+          
           <div class="form-group">
             <h5>Nombre del cliente</h5>
             <input type="text" class="form-control" aria-describedby="name"  name="name" id="name" disabled/>

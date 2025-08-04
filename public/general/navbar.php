@@ -22,7 +22,8 @@
                 <ul class="dropdown-menu">
                   <li><a href="?view=configuracion&mode=agregarProducto">Agregar Productos</a></li>
                   <li><a href="?view=configuracion&mode=consultarProducto">Listar Productos</a></li>
-                  <li><a href="?view=configuracion&mode=cargaArchivo">Carga BBDD</a></li>
+                  <li><a href="?view=carga_archivo&mode=index">Carga BBDD</a></li>
+                  <!-- <li><a href="?view=configuracion&mode=cargaArchivo">Carga BBDD</a></li> -->
                   <li><a href="?view=configuracion&mode=editarResultado">Editar resultados</a></li>
                   <li><a href="?view=usuarios&mode=index">Bandeja de usuarios</a></li>
                   <li><a href="?view=usuarios&mode=new">Nuevo usuario</a></li>

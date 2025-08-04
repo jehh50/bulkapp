@@ -68,7 +68,7 @@ if (isset($_GET['mensaje'])=='exito') {
 									                    <select class="form-control" name="servicio" id="servicio" required>
 										                      <?php foreach ($servicio as $s) { ?>
 									    	                  <option value='0' disabled selected style='display:none;'>Seleccione...</option>
-									        	              <option value='<?php echo $s['cod_servicio'];?>'><?php echo $s['descripcion'];}?></option>
+									        	              <option value='<?php echo $s['id'];?>'><?php echo $s['descripcion'];}?></option>
 									                    </select>
 								                    </div>
 													<br>

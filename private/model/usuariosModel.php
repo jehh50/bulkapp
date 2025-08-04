@@ -12,7 +12,7 @@ class database{
   public function newUser($nombre,$apellido,$user,$pass,$tipo,$cliente){
   	$sql = $this->db->query("SELECT * FROM users WHERE user = '$user'");
   	if($this->db->rows($sql) == 0 ){
-  		$sql = $this->db->query("INSERT INTO users (nombre,apellido,user,password,usertype_id,status_id,servicio_id) VALUES ('$nombre','$apellido','$user','$pass','$tipo',1,'$cliente')");
+  		$sql = $this->db->query("INSERT INTO users (nombre,apellido,user,password,usertype_id,status_id,servicio_id) VALUES ('$nombre','$apellido','$user','$pass','$tipo',2,'$cliente')");
   		$respuesta = true;
   	}
   	else{

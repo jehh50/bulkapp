@@ -35,23 +35,24 @@ class database
     }
     return $respuesta;
   }
-  public function registro($identificacion, $nombre_legal, $telf_hab, $telf_ofi, $telf_cel, $correo, $direccion, $cuenta, $servicio_id)
+  public function registro($identificacion, $nombre_legal, $telf_hab, $telf_ofi, $telf_cel, $correo, $direccion, $cuenta, $servicio_id,$oferta)
   {
-    $identificacion = iconv(mb_detect_encoding($identificacion, mb_detect_order(), true), "UTF-8", $identificacion);
-    $nombre_legal = iconv(mb_detect_encoding($nombre_legal, mb_detect_order(), true), "UTF-8", $nombre_legal);
-    $telf_hab = iconv(mb_detect_encoding($telf_hab, mb_detect_order(), true), "UTF-8", $telf_hab);
-    $telf_ofi = iconv(mb_detect_encoding($telf_ofi, mb_detect_order(), true), "UTF-8", $telf_ofi);
-    $telf_cel = iconv(mb_detect_encoding($telf_cel, mb_detect_order(), true), "UTF-8", $telf_cel);
-    $correo = iconv(mb_detect_encoding($correo, mb_detect_order(), true), "UTF-8", $correo);
-    $direccion = iconv(mb_detect_encoding($direccion, mb_detect_order(), true), "UTF-8", $direccion);
-    $cuenta = iconv(mb_detect_encoding($cuenta, mb_detect_order(), true), "UTF-8", $cuenta);
-    $servicio_id = iconv(mb_detect_encoding($servicio_id, mb_detect_order(), true), "UTF-8", $servicio_id);
+    // $identificacion = iconv(mb_detect_encoding($identificacion, mb_detect_order(), true), "UTF-8", $identificacion);
+    // $nombre_legal = iconv(mb_detect_encoding($nombre_legal, mb_detect_order(), true), "UTF-8", $nombre_legal);
+    // $telf_hab = iconv(mb_detect_encoding($telf_hab, mb_detect_order(), true), "UTF-8", $telf_hab);
+    // $telf_ofi = iconv(mb_detect_encoding($telf_ofi, mb_detect_order(), true), "UTF-8", $telf_ofi);
+    // $telf_cel = iconv(mb_detect_encoding($telf_cel, mb_detect_order(), true), "UTF-8", $telf_cel);
+    // $correo = iconv(mb_detect_encoding($correo, mb_detect_order(), true), "UTF-8", $correo);
+    // $direccion = iconv(mb_detect_encoding($direccion, mb_detect_order(), true), "UTF-8", $direccion);
+    // $cuenta = iconv(mb_detect_encoding($cuenta, mb_detect_order(), true), "UTF-8", $cuenta);
+    // $servicio_id = iconv(mb_detect_encoding($servicio_id, mb_detect_order(), true), "UTF-8", $servicio_id);
+    // $oferta = iconv(mb_detect_encoding($oferta, mb_detect_order(), true), "UTF-8", $oferta);
 
-    $query =("INSERT INTO clientes (identificacion, nombre_legal, telf_hab, telf_ofi, telf_cel, correo, direccion, cuenta,status_id,servicio_id) VALUES (?,?,?,?,?,?,?,?,?,?)");
-    $params = [$identificacion, $nombre_legal, $telf_hab, $telf_ofi, $telf_cel, $correo, $direccion, $cuenta,3,$servicio_id];
+    $query =("INSERT INTO clientes (identificacion, nombre_legal, telf_hab, telf_ofi, telf_cel, correo, direccion, cuenta, oferta, status_id,servicio_id) VALUES (?,?,?,?,?,?,?,?,?,?,?)");
+    $params = [$identificacion, $nombre_legal, $telf_hab, $telf_ofi, $telf_cel, $correo, $direccion, $cuenta,$oferta, 3,$servicio_id];
     // Tipos de datos: 
     // 's' -> string, 'i' -> integer, 'd' -> double (float)
-    $paramTypes = 'ssssssssii';
+    $paramTypes = 'ssssssssiis';
   
     try{
       $stmt = $this->db->preparedQuery($query,$params,$paramTypes);

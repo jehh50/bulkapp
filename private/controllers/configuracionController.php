@@ -86,7 +86,8 @@ if (empty($_SESSION)) {
 									'telf_cel' => $datos[4],
 									'correo' => $datos[5],
 									'direccion' => $datos[6],
-									'cuenta' => $datos[7]
+									'cuenta' => $datos[7],
+									'oferta' => $datos[8]
 								];
 								$registros[] = $registro;
 							} else {
@@ -152,6 +153,7 @@ if (empty($_SESSION)) {
 									$registro['correo'],
 									$registro['direccion'],
 									$registro['cuenta'],
+									$registro['oferta'],
 									$_POST['servicio']
 								);
 							}
