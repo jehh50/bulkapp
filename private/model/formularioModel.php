@@ -75,7 +75,7 @@ class database {
       return $respuesta;
     }
     if($servicio == 2){
-      $sql = $this->db->query("SELECT * FROM cashea_customers WHERE cedula = '$telefono' ORDER BY id ASC");
+      $sql = $this->db->query("SELECT * FROM cashea_customers WHERE cedula = '$telefono' ORDER BY id_cuota ASC");
       if($this->db->rows($sql) > 0 ){
         while($data = $this->db->recorrer($sql)){
           $respuesta[] = $data;

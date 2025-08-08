@@ -113,7 +113,7 @@
                           $quote = round((float)(str_replace(",",".",$row['plata_por_cobrar'])),2);
                           $fechaFormateada = DateTime::createFromFormat('d/m/Y H:i', $row['fecha_pagar'])->format('d/m/Y');
                             echo '<tr>
-                                      <th class="text-center" scope="row">' . $row['id'] . '</th>
+                                      <th class="text-center" scope="row">' . $row['id_cuota'] . '</th>
                                       <td class="text-center">' . $fechaFormateada. '</td>
                                       <td class="text-center">' . $quote . '</td>
                                       <td class="text-center">' . $row['numero_cuota'] . '</td>
