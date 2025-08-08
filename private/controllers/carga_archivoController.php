@@ -60,28 +60,23 @@ if (empty($_SESSION)) {
 							$paramTypes = str_repeat('s', 8) . 'i'; // Tipos para el servicio 1
 						} else {
 							$fila = array_slice($datos, 0, 20);
-							$paramTypes = str_repeat('s', 19) . 'i'; // Tipos para el servicio 2
+							$paramTypes = str_repeat('s', 20); // Tipos para el servicio 2
 						}
 
-						// 3. CORRECCIÓN DEL LOTE: Añadir la fila al lote (array de arrays)
 						$paramsBatch[] = $fila;
 
-						// Si el lote alcanza el tamaño definido, insertarlo en la BD
 						if (count($paramsBatch) >= $batchSize) {
 							$response = $con->guardarRegistrosBatch($paramsBatch, $paramTypes, $servicio);
-							$paramsBatch = []; // Reiniciar el lote para el siguiente grupo de filas
+							$paramsBatch = [];
 						}
 					}
 
-					// 4. CORRECCIÓN DE LÓGICA: Mover el cierre y la inserción final FUERA del bucle
 					fclose($fp);
 
-					// Insertar cualquier fila restante que no completó un lote
 					if (!empty($paramsBatch)) {
 						$response = $con->guardarRegistrosBatch($paramsBatch, $paramTypes, $servicio);
 					}
 
-					// Puedes usar una respuesta más informativa si lo deseas
 					header('Location: ?view=carga_archivo&mode=index&mensaje=exito');
 				} else {
 					echo json_encode(['error' => 'No se pudo abrir el archivo.']);
