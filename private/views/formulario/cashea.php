@@ -97,7 +97,7 @@
                         echo '<table class="table table-responsive table-striped table-condensed">';
                         echo '<thead>
                           <tr>
-                            <th class="text-center"><h5><strong>#</strong></h5></th>
+                            <th class="text-center"><h5><strong>ID Cuota</strong></h5></th>
                             <th class="text-center"><h5><strong>Fecha de pago</strong></h5></th>
                             <th class="text-center"><h5><strong>Monto</strong></h5></th>
                             <th class="text-center"><h5><strong>Cuota</strong></h5></th>
@@ -110,10 +110,10 @@
                         $suma_monto = 0;
                         foreach ($cliente as $row) {
                           if ($row['local_origen'] == $c['local_origen']) {
-                          $quote = round((float)(str_replace(",",".",$row['monto_cuota'])),2);
+                          $quote = round((float)(str_replace(",",".",$row['plata_por_cobrar'])),2);
                           $fechaFormateada = DateTime::createFromFormat('d/m/Y H:i', $row['fecha_pagar'])->format('d/m/Y');
                             echo '<tr>
-                                      <th class="text-center" scope="row">' . $i . '</th>
+                                      <th class="text-center" scope="row">' . $row['id'] . '</th>
                                       <td class="text-center">' . $fechaFormateada. '</td>
                                       <td class="text-center">' . $quote . '</td>
                                       <td class="text-center">' . $row['numero_cuota'] . '</td>

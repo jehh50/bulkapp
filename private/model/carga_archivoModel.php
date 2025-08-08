@@ -12,44 +12,42 @@ class database
 	}
 
 
-public function registro($identificacion, $nombreLegal, $telfHab, $telfOfi, $telfCel, $correo, $direccion, $cuenta, $oferta, $servicio_id)
-{
-	$query = "INSERT INTO clientes (
-		identificacion,
-		nombre_legal,
-		telf_hab,
-		telf_ofi,
-		telf_cel,
-		correo,
-		direccion,
-		cuenta,
-		oferta,
-		status_id
-	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 3)";
+	public function guardarRegistrosBatch($batch, $types, $servicio)
+	{
+		// CORRECCIÓN 1: Verificar la variable correcta ($batch)
+		if (empty($batch)) {
+			return false;
+		}
 
-	$params = [
-		$identificacion,
-		$nombreLegal,
-		$telfHab,
-		$telfOfi,
-		$telfCel,
-		$correo,
-		$direccion,
-		$cuenta,
-		$oferta
-	];
+		if ($servicio == 1) {
+			$query = "INSERT INTO clientes (identificacion, nombre_legal, telf_hab, telf_ofi, telf_cel, correo, direccion, cuenta, oferta) VALUES ";
+		} else {
+			$query = "INSERT INTO cashea_customers (cedula, id_cuota, nombre_grupo, fecha_pagar, monto_cuota, numero_cuota, fee, plata_por_cobrar, capital_asignado, id_orden, identificacion_orden, fecha_creacion_orden, email, telefono, nombre_usuario, local_origen, estado_deuda, tramo_inicial, tramo_actual, segmento) VALUES ";
+		}
 
-	$paramTypes = 'sssssssss'; // ajusta si algún campo es int o float
+		$placeHolders = [];
+		$flatennedParams = [];
 
-	try {
-		$stmt = $this->db->preparedQuery($query, $params, $paramTypes);
-		$stmt->close();
-		return true;
-	} catch (Exception $e) {
-		echo "❌ Error al guardar en clientes => " . $e->getMessage();
-		return false;
+		foreach ($batch as $row) {
+			// CORRECCIÓN 2: Usar count($row) para obtener el número de columnas
+			$placeHolders[] = '(' . implode(',', array_fill(0, count($row), '?')) . ')';
+			$flatennedParams = array_merge($flatennedParams, $row);
+		}
+
+		try {
+			$query .= implode(',', $placeHolders);
+			$stmt = $this->db->preparedQuery($query, $flatennedParams, str_repeat($types, count($batch)));
+
+			if ($stmt) {
+				$stmt->close();
+			}
+
+			return true;
+		} catch (Exception $e) {
+			error_log("Error en guardarRegistrosTemporalBatch: " . $e->getMessage());
+			return false;
+		}
 	}
-}
 
 
 	public function registroCashea(

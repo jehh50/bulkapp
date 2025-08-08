@@ -12,12 +12,12 @@
             </section>
             <div>
               <?php
-              if ($_POST['servicio'] == 1) { ?>
-                <table id="example" class="hover" style="width:100%">
+              if ($_GET['servicio'] == 1) { ?>
+                <table id="example" class="hover">
                   <thead>
                     <tr>
                       <th style="text-align: center;">#</th>
-                      <th style="text-align: center;">Cédula</th>
+                      <th style="text-align: center;">CédulaX</th>
                       <th style="text-align: center;">Nombre</th>
                       <th style="text-align: center;">Teléfono 1</th>
                       <th style="text-align: center;">Teléfono 2</th>
@@ -31,9 +31,9 @@
                   <tbody>
                     <?php $i = 1;
                     foreach ($registros as $reg) { ?>
-                      <tr>
+                       <tr>
                         <td style="text-align: center; width: 4%;"><?= $i; ?></td>
-                        <td style="text-align: center; width: 20%;"><?= $reg['identificacion']; ?></td>
+                        <td style="text-align: center; width: 12%;"><?= $reg['identificacion']; ?></td>
                         <td style="text-align: center; width: 12%;"><?= $reg['nombre_legal']; ?></td>
                         <td style="text-align: center; width: 12%;"><?= $reg['telf_hab']; ?></td>
                         <td style="text-align: center; width: 12%;"><?= $reg['telf_ofi']; ?></td>
@@ -51,53 +51,37 @@
                 <table id="example" class="hover ">
                   <thead>
                     <tr>
+                      <th>#</th>
                       <th>Cédula</th>
                       <th>ID Cuota</th>
-                      <th>Grupo</th>
                       <th>Fecha a Pagar</th>
-                      <th>Monto Cuota</th>
                       <th>N° Cuota</th>
-                      <th>Fee</th>
                       <th>Por Cobrar</th>
-                      <th>Capital Asignado</th>
-                      <th>ID Orden</th>
-                      <th>Identificación Orden</th>
-                      <th>Fecha Creación Orden</th>
                       <th>Email</th>
                       <th>Teléfono</th>
                       <th>Usuario</th>
                       <th>Local</th>
-                      <th>Estado Deuda</th>
                       <th>Tramo Inicial</th>
-                      <th>Tramo Actual</th>
                       <th>Segmento</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <?php foreach ($registros as $reg){ ?>
+                    <?php $i=1;foreach ($registros as $reg){ ?>
                       <tr>
+                        <td><?= $i; ?></td>
                         <td><?= $reg['cedula']; ?></td>
                         <td><?= $reg['id_cuota']; ?></td>
                         <td><?= $reg['nombre_grupo']; ?></td>
                         <td><?= $reg['fecha_pagar']; ?></td>
-                        <td><?= $reg['monto_cuota']; ?></td>
-                        <td><?= $reg['numero_cuota']; ?></td>
-                        <td><?= $reg['fee']; ?></td>
                         <td><?= $reg['plata_por_cobrar']; ?></td>
-                        <td><?= $reg['capital_asignado']; ?></td>
-                        <td><?= $reg['id_orden']; ?></td>
-                        <td><?= $reg['identificacion_orden']; ?></td>
-                        <td><?= $reg['fecha_creacion_orden']; ?></td>
                         <td><?= $reg['email']; ?></td>
                         <td><?= $reg['telefono']; ?></td>
                         <td><?= $reg['nombre_usuario']; ?></td>
                         <td><?= $reg['local_origen']; ?></td>
-                        <td><?= $reg['estado_deuda']; ?></td>
                         <td><?= $reg['tramo_inicial']; ?></td>
-                        <td><?= $reg['tramo_actual']; ?></td>
                         <td><?= $reg['segmento']; ?></td>
                       </tr>
-                    <?php } ?>
+                    <?php $i++;} ?>
                   </tbody>
                 </table>
 
