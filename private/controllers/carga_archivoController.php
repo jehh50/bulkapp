@@ -5,105 +5,88 @@ if (empty($_SESSION)) {
 } else {
 
 	include_once(MODEL_DIR . 'carga_archivoModel.php');
-	$conexion = new database();
+	$con = new database();
 	if (isset($_GET['mode'])) {
 
 		switch ($_GET['mode']) {
 			case 'index':
 				include(PUBLIC_DIR . 'general/header.php');
 				include(PUBLIC_DIR . 'general/navbar.php');
-				$servicio = $conexion->servicio();
+				$servicio = $con->servicio();
 				include(HTML_DIR . 'carga_archivo/index.php');
 				include(PUBLIC_DIR . 'general/footer.php');
 				break;
 
 			case 'registro':
-				$servicio_id = $_POST['servicio'];
-
-				// Validación de archivo
-				if (!isset($_FILES["archivo"]) || $_FILES["archivo"]["error"] !== UPLOAD_ERR_OK) {
-					die("⚠️ Error: El archivo no se ha subido correctamente o no existe.");
+				ob_clean(); // Limpia el buffer de salida
+				$time = date('H:i:s');
+				// Validaciones básicas de seguridad y existencia del archivo
+				if (empty($_FILES["archivo"]) || $_FILES["archivo"]['error'] !== UPLOAD_ERR_OK) {
+					echo json_encode(['error' => 'No se recibió el archivo o hubo un error al subirlo.']);
+					break;
 				}
+				$archivo = $_FILES["archivo"]['tmp_name'];
+				$servicio = $_POST['servicio'];
+				$batchSize = 500; // Tamaño del lote para inserciones
+				$response = json_encode(['mensaje' => 'No se procesaron filas.']); // Respuesta por defecto
 
-				// Limpieza y normalización del nombre del archivo
-				$archivo = $_FILES["archivo"]['name'];
-				$resultado = str_replace(" ", "", $archivo);
-				$array = explode(".", $resultado);
-				$nombre_aleatorio = $array[0] . "." . $array[1];
-				$ruta_destino = __DIR__ . '/../../public/carga_bbdd/' . $nombre_aleatorio;
+				if (($fp = fopen($archivo, "r")) !== false) {
+					// Detectar la codificación del archivo una sola vez
+					$encoding = mb_detect_encoding(file_get_contents($archivo), 'UTF-8, ISO-8859-1', true);
 
-				// Mover archivo
-				if (!move_uploaded_file($_FILES["archivo"]["tmp_name"], $ruta_destino)) {
-					die("❌ No se pudo mover el archivo a $ruta_destino. Verifica permisos.");
-				}
+					// 1. LEER Y DESCARTAR LA CABECERA (HEADER) ANTES DEL BUCLE
+					// Esto posiciona el puntero del archivo en la primera fila de datos.
+					fgetcsv($fp, 0, ";");
 
-				// Validación de existencia y apertura
-				if (!file_exists($ruta_destino)) {
-					die("❌ Archivo no encontrado en: $ruta_destino");
-				}
+					$paramsBatch = [];
+					$paramTypes = '';
 
-				$fp = fopen($ruta_destino, "r");
-				if (!$fp) {
-					die("❌ No se pudo abrir el archivo: $ruta_destino");
-				}
+					// 2. CORRECCIÓN DEL BUCLE: Leer una nueva línea del archivo en cada iteración
+					while (($datos = fgetcsv($fp, 0, ";")) !== false) {
 
-				$nombre_campo = fgetcsv($fp, 0, ";");
+						// Omitir filas vacías que fgetcsv a veces puede retornar
+						if (empty($datos) || $datos[0] === null) {
+							continue;
+						}
 
-				while (($datos = fgetcsv($fp, 0, ";")) !== false) {
-					for ($i = 0; $i < count($datos); $i++) {
-						if (empty($datos[$i])) {
-							$datos[$i] = 0;
+						// Convertir la codificación de cada celda a UTF-8
+						$datos = array_map(function ($value) use ($encoding) {
+							return mb_convert_encoding($value, 'UTF-8', $encoding);
+						}, $datos);
+
+						// Preparar la fila actual según el servicio
+						if ($servicio == 1) {
+							$fila = array_slice($datos, 0, 9);
+							$paramTypes = str_repeat('s', 8) . 'i'; // Tipos para el servicio 1
+						} else {
+							$fila = array_slice($datos, 0, 20);
+							$paramTypes = str_repeat('s', 19) . 'i'; // Tipos para el servicio 2
+						}
+
+						// 3. CORRECCIÓN DEL LOTE: Añadir la fila al lote (array de arrays)
+						$paramsBatch[] = $fila;
+
+						// Si el lote alcanza el tamaño definido, insertarlo en la BD
+						if (count($paramsBatch) >= $batchSize) {
+							$response = $con->guardarRegistrosBatch($paramsBatch, $paramTypes, $servicio);
+							$paramsBatch = []; // Reiniciar el lote para el siguiente grupo de filas
 						}
 					}
 
-					if ($servicio_id == 1) {
-						if (isset($datos[0])) {
-							$registro = $conexion->registro(
-								$datos[0], // identificacion
-								$datos[1], // nombre_legal
-								$datos[2], // telf_hab
-								$datos[3], // telf_ofi
-								$datos[4], // telf_cel
-								$datos[5], // correo
-								$datos[6], // edad
-								$datos[7], // cuenta
-								$datos[8], // oferta
-								date('Y-m-d'), // fecha
-								$servicio_id
-							);
-						}
-					} else {
-						if (isset($datos[0])) {
-							$registro = $conexion->registroCashea(
-								$datos[0],  // cedula
-								$datos[1],  // id_cuota
-								$datos[2],  // nombre_grupo
-								$datos[3],  // fecha_pagar
-								$datos[4],  // monto_cuota
-								$datos[5],  // numero_cuota
-								$datos[6],  // fee
-								$datos[7],  // plata_por_cobrar
-								$datos[8],  // capital_asignado
-								$datos[9],  // id_orden
-								$datos[10], // identificacion_orden
-								$datos[11], // fecha_creacion_orden
-								$datos[12], // email
-								$datos[13], // telefono
-								$datos[14], // nombre_usuario
-								$datos[15], // local_origen
-								$datos[16], // estado_deuda
-								$datos[17], // tramo_inicial
-								$datos[18], // tramo_actual
-								$datos[19]  // segmento
-							);
-						}
+					// 4. CORRECCIÓN DE LÓGICA: Mover el cierre y la inserción final FUERA del bucle
+					fclose($fp);
+
+					// Insertar cualquier fila restante que no completó un lote
+					if (!empty($paramsBatch)) {
+						$response = $con->guardarRegistrosBatch($paramsBatch, $paramTypes, $servicio);
 					}
+
+					// Puedes usar una respuesta más informativa si lo deseas
+					header('Location: ?view=carga_archivo&mode=index&mensaje=exito');
+				} else {
+					echo json_encode(['error' => 'No se pudo abrir el archivo.']);
 				}
 
-				fclose($fp);
-
-				// Redirección final con éxito
-				header('Location:?view=carga_archivo&mode=index&mensaje=exito');
 				break;
 
 

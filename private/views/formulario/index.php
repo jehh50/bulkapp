@@ -226,7 +226,7 @@
 
             <div class="form-group">
               <span class="form-group-addon">Número de cuenta</span>
-              <input type="text" class="form-control" placeholder="123456********7890" aria-describedby="pan" name="pan" id="pan" oninput="onliNumbers(this);" required/>
+              <input type="text" class="form-control" placeholder="123456********7890" aria-describedby="pan" name="pan" id="pan" oninput="onliNumbers(this);" maxlength="20"/>
             </div>
             
             <div class="form-group">

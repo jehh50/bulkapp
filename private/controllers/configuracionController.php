@@ -41,7 +41,7 @@ if (empty($_SESSION)) {
 			case 'guardarProductos':
 				$servicio = $_POST['venta'];
 				$gestion = $con->updateStatus($servicio);
-				for ($i = 0; $i < count($_POST['producto']); ) {
+				for ($i = 0; $i < count($_POST['producto']);) {
 					$gestion = $con->guardarProductos($_POST['producto'][$i], $_POST['codigo'][$i], $_POST['costo'][$i], $servicio, $_POST['plan'][$i]);
 					$i++;
 				}
@@ -63,72 +63,94 @@ if (empty($_SESSION)) {
 				break;
 
 			case 'registro':
+				ob_clean(); // Limpia el buffer de salida
+				$time = date('H:i:s');
+				// Validaciones básicas de seguridad y existencia del archivo
+				if (empty($_FILES["archivo"]) || $_FILES["archivo"]['error'] !== UPLOAD_ERR_OK) {
+					echo json_encode(['error' => 'No se recibió el archivo o hubo un error al subirlo.']);
+					break;
+				}
+				$archivo = $_FILES["archivo"]['tmp_name'];
+				$servicio = $_POST['servicio'];
+				$batchSize = 500; // Tamaño del lote para inserciones
+				$response = json_encode(['mensaje' => 'No se procesaron filas.']); // Respuesta por defecto
+
+				if (($fp = fopen($archivo, "r")) !== false) {
+					// Detectar la codificación del archivo una sola vez
+					$encoding = mb_detect_encoding(file_get_contents($archivo), 'UTF-8, ISO-8859-1', true);
+
+					// 1. LEER Y DESCARTAR LA CABECERA (HEADER) ANTES DEL BUCLE
+					// Esto posiciona el puntero del archivo en la primera fila de datos.
+					fgetcsv($fp, 0, ";");
+
+					$paramsBatch = [];
+					$paramTypes = '';
+
+					// 2. CORRECCIÓN DEL BUCLE: Leer una nueva línea del archivo en cada iteración
+					while (($datos = fgetcsv($fp, 0, ";")) !== false) {
+
+						// Omitir filas vacías que fgetcsv a veces puede retornar
+						if (empty($datos) || $datos[0] === null) {
+							continue;
+						}
+
+						// Convertir la codificación de cada celda a UTF-8
+						$datos = array_map(function ($value) use ($encoding) {
+							return mb_convert_encoding($value, 'UTF-8', $encoding);
+						}, $datos);
+
+						// Preparar la fila actual según el servicio
+						if ($servicio == 1) {
+							$fila = array_slice($datos, 0, 9);
+							$paramTypes = str_repeat('s', 8) . 'i'; // Tipos para el servicio 1
+						} else {
+							$fila = array_slice($datos, 0, 20);
+							$paramTypes = str_repeat('s', 19) . 'i'; // Tipos para el servicio 2
+						}
+
+						// 3. CORRECCIÓN DEL LOTE: Añadir la fila al lote (array de arrays)
+						$paramsBatch[] = $fila;
+
+						// Si el lote alcanza el tamaño definido, insertarlo en la BD
+						if (count($paramsBatch) >= $batchSize) {
+							$response = $con->guardarRegistrosTemporalBatch($paramsBatch, $paramTypes, $servicio);
+							$paramsBatch = []; // Reiniciar el lote para el siguiente grupo de filas
+						}
+					}
+
+					// 4. CORRECCIÓN DE LÓGICA: Mover el cierre y la inserción final FUERA del bucle
+					fclose($fp);
+
+					// Insertar cualquier fila restante que no completó un lote
+					if (!empty($paramsBatch)) {
+						$response = $con->guardarRegistrosTemporalBatch($paramsBatch, $paramTypes, $servicio);
+					}
+
+					// Puedes usar una respuesta más informativa si lo deseas
+					header('Location: ?view=configuracion&mode=preload&servicio=' . $servicio.'paginaActual=1');
+				} else {
+					echo json_encode(['error' => 'No se pudo abrir el archivo.']);
+				}
+
+				break;
+
+			case 'preload':
 				ob_clean();
 				include(PUBLIC_DIR . 'general/header.php');
 				include(PUBLIC_DIR . 'general/navbar.php');
-				$registros = [];
-				var_dump($_POST);
-				$archivo = $_FILES["archivo"]['tmp_name'];
-				if (($fp = fopen($archivo, "r")) !== false) {
-					$encoding = mb_detect_encoding(file_get_contents($archivo), 'UTF-8, ISO-8859-1', true);
-					$header = fgetcsv($fp, 0, ";");
-					if($_POST['servicio'] == 1) {
-						while (($datos = fgetcsv($fp, 0, ";")) !== false) {
-							if ($datos) {
-								$datos = array_map(function ($value) use ($encoding) {
-									return mb_convert_encoding($value, 'UTF-8', $encoding);
-								}, $datos);
-								$registro = [
-									'identificacion' => $datos[0],
-									'nombre_legal' => $datos[1],
-									'telf_hab' => $datos[2],
-									'telf_ofi' => $datos[3],
-									'telf_cel' => $datos[4],
-									'correo' => $datos[5],
-									'direccion' => $datos[6],
-									'cuenta' => $datos[7],
-									'oferta' => $datos[8]
-								];
-								$registros[] = $registro;
-							} else {
-								echo "Archivo vacio";
-							}
-						}
-					}else{
-						while (($datos = fgetcsv($fp, 0, ";")) !== false) {
-							if ($datos) {
-								$datos = array_map(function ($value) use ($encoding) {
-									return mb_convert_encoding($value, 'UTF-8', $encoding);
-								}, $datos);
-								$registro = [
-									'cedula' => $datos[0],
-									'id_cuota' => $datos[1],
-									'nombre_grupo' => $datos[2],
-									'fecha_pagar' => $datos[3],
-									'monto_cuota' => $datos[4],
-									'numero_cuota' => $datos[5],
-									'fee' => $datos[6],
-									'plata_por_cobrar' => $datos[7],
-									'capital_asignado' => $datos[8],
-									'id_orden' => $datos[9],
-									'identificacion_orden' => $datos[10],
-									'fecha_creacion_orden' => $datos[11],
-									'email' => $datos[12],
-									'telefono' => $datos[13],
-									'nombre_usuario' => $datos[14],
-									'local_origen' => $datos[15],
-									'estado_deuda' => $datos[16],
-									'tramo_inicial' => $datos[17],
-									'tramo_actual' => $datos[18],
-									'segmento' => $datos[19]
-								];
-								$registros[] = $registro;
-							} else {
-								echo "Archivo vacio";
-							}
-						}
-					}
-					fclose($fp);
+
+				$paginaActual = isset($_GET['paginaActual']) ? $_GET['paginaActual'] : 1;
+				$registrosPorPagina = 1; // Puedes ajustar este valor según tus necesidades
+				
+				$registros = $con->listarTemporal($_GET['servicio'],$paginaActual, $registrosPorPagina);
+				var_dump($registros);
+				 if (isset($registros['registros'])) {
+					$registros = $registros['registros'];
+					$totalPaginas = $registros['totalPaginas'];
+					$paginaActual = $registros['paginaActual'];
+
+				} else {
+					$registros = [];
 				}
 
 				include(HTML_DIR . 'configuracion/confirmaCargaArchivo.php');
@@ -137,12 +159,13 @@ if (empty($_SESSION)) {
 				//header('location:?view=configuracion&mode=cargaArchivo&mensaje=exito');
 				break;
 
+
 			case 'guardarRegistros':
-				
+
 				if (isset($_POST['data'])) {
 					$registros = json_decode($_POST['data'], true);
 					if (json_last_error() === JSON_ERROR_NONE) {
-						if($_POST['servicio'] == 1) {
+						if ($_POST['servicio'] == 1) {
 							foreach ($registros as $registro) {
 								$con->registro(
 									$registro['identificacion'],
@@ -193,7 +216,6 @@ if (empty($_SESSION)) {
 				} else {
 					$var = 'No se enviaron datos para guardar.';
 					header("Location: ?view=configuracion&mode=cargaArchivo&estatus=$var");
-
 				}
 				header("Location: ?view=configuracion&mode=cargaArchivo&estatus=$var");
 				break;
@@ -244,10 +266,11 @@ if (empty($_SESSION)) {
 
 
 			case 'actualiza':
-				var_dump($_GET);echo '<br>';
+				var_dump($_GET);
+				echo '<br>';
 				// echo $_GET['nombre'].'-'.$_GET['apellido'];
 
-				$result = $con->updateResultados($_GET['id'],$_GET['nombre'],$_GET['apellido'],$_GET['cedula'], $_GET['sexo'],$_GET['nacimiento'],$_GET['hab'],$_GET['cel'],$_GET['correo'],$_GET['venta']);
+				$result = $con->updateResultados($_GET['id'], $_GET['nombre'], $_GET['apellido'], $_GET['cedula'], $_GET['sexo'], $_GET['nacimiento'], $_GET['hab'], $_GET['cel'], $_GET['correo'], $_GET['venta']);
 
 				// if ($ejecucion) {
 				// 	$json['response'] = 'true';
@@ -277,21 +300,21 @@ if (empty($_SESSION)) {
 				}
 				echo json_encode($json);
 				break;
-			
+
 			case 'productos':
 				$productos = $con->listarProductos();
 				// var_dump($productos);
 				$json['productos'] = "";
-					if ($productos) {
-						foreach ($productos as $c) {
-							$json['response'] = 'true';
-							$json['productos'] = $json['productos'] . $c['id'] . "," . strtoupper($c['descripcion']) . "|";
-						}
-					} else {
-						$json['response'] = 'false';
+				if ($productos) {
+					foreach ($productos as $c) {
+						$json['response'] = 'true';
+						$json['productos'] = $json['productos'] . $c['id'] . "," . strtoupper($c['descripcion']) . "|";
 					}
-					echo json_encode($json);
-					break;
+				} else {
+					$json['response'] = 'false';
+				}
+				echo json_encode($json);
+				break;
 
 			default:
 				header('location:' . HTML_DIR . 'error.html');
