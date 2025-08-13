@@ -186,42 +186,8 @@ if (empty($_SESSION)) {
             }else{
               $registro = $conn->registroGestion($_POST['contacto'], $efectivo, $producto, $noefectivo, $subContacto, $_POST['usuario'], $date, $_POST['id_cliente'], $status, $hora, $_POST['servicio'], $dni,$idQuote);
             }
-              header('location:?view=formulario&mode=index');
+              //header('location:?view=formulario&mode=index');
             break;
-
-
-          // case 'nuevocliente':
-          //   $telefono = $_POST['telefono'];
-          //   $cliente = $conn->buscaNuevocliente($telefono);
-          //   if ($cliente) {
-          //     foreach ($cliente as $c) {
-          //       if ($c['status'] == 1) {
-          //         $json['response'] = 'atendido';
-          //       } else {
-          //         if ($c['genero'] == 'M') {
-          //           $genero = 'Masculino';
-          //         } else {
-          //           $genero = 'Femenino';
-          //         }
-          //         $json['response'] = 'true';
-          //         $json['id_cliente'] = $c['id_cliente'];
-          //         $json['nombre'] = $c['nombre'] . ' ' . $c['apellido'];
-          //         $json['cedula'] = $c['cedula'];
-          //         $json['genero'] = $genero;
-          //         $json['fecha_nac'] = $c['fecha_nacimiento'];
-          //         $json['telf1'] = $c['telefono'];
-          //         $json['telf2'] = $c['telefono2'];
-          //         $json['telf3'] = $c['telefono3'];
-          //         $json['estado'] = $c['estado'];
-          //         $json['referido'] = $c['referido'];
-          //       }
-          //     }
-          //   } else {
-          //     $json['response'] = 'false';
-          //   }
-          //   echo json_encode($json);
-
-          //   break;
 
           default:
             header('location:' . HTML_DIR . 'error.html');
