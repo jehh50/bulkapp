@@ -32,7 +32,15 @@ if (empty($_SESSION)) {
 
       case 'buscarCliente':
         $cliente = $conn->buscaCliente($_POST['dni'], $_POST['servicioId']);
-        if(!$cliente){$msg='Cliente sin deuda';}else{if ($cliente[0]['status_id']==9){$msg = 'Cliente ya atendido';}else{$msg='';}}
+        if (!$cliente) {
+          $msg = 'Cliente sin deuda';
+        } else {
+          if ($cliente[0]['status_id'] == 9) {
+            $msg = 'Cliente ya atendido';
+          } else {
+            $msg = '';
+          }
+        }
         include(PUBLIC_DIR . 'general/header.php');
         include(PUBLIC_DIR . 'general/navbar.php');
         $noefectivo = $conn->contactoNoEfectivo($_SESSION['servicio_id']);
@@ -97,7 +105,7 @@ if (empty($_SESSION)) {
         echo json_encode($json);
 
         break;
-      
+
       case 'subContacto':
         $subContacto = $conn->contactoSecundario($_POST['efectivo_id']);
         $json['subContacto'] = "";
@@ -109,7 +117,7 @@ if (empty($_SESSION)) {
         } else {
           $json['response'] = 'false';
         }
-        echo json_encode($json);                                                                                                   
+        echo json_encode($json);
         break;
 
       case 'registro':
@@ -125,8 +133,8 @@ if (empty($_SESSION)) {
         $dni = isset($_POST['dni_cliente']) ? $_POST['dni_cliente'] : null;
         $idQuote = isset($_POST['idQuote']) ? $_POST['idQuote'] : null;
         $paymentDate = isset($_POST['paymentDate']) ? $_POST['paymentDate'] : null;
-        
-        
+
+
         switch ($_POST['servicio']) {
           case 1: // bancamiga bancaribe      
             if (isset($_POST['nacionalidad'])) {
@@ -151,42 +159,41 @@ if (empty($_SESSION)) {
             }
 
             if ($efectivo == 1) {
-                $nombre = str_replace(',', ' ', $_POST['nombre2']);
-                $apellido = str_replace(',', ' ', $_POST['apellido2']);
-                $genero = $_POST['genero'];
-                $fecha_nac = $_POST['fecha_nac'];
-                $cedula = $_POST['cedula2'];
-                $correo = $_POST['correo2'];
-                $telf_hab = $_POST['telf_hab'];
-                // $telf_ofi = $_POST['telf_ofi'];
-                $telf_cel = $_POST['telf_cel'];
-                $estado = $_POST['estado'];
-                $ciudad = $_POST['ciudad'];
-                $municipio = $_POST['municipio'];
-                $obs = $_POST['observaciones'];
-                $fecha = date('Ymd');
-                $status = 7;
-                $var = 0;
+              $nombre = str_replace(',', ' ', $_POST['nombre2']);
+              $apellido = str_replace(',', ' ', $_POST['apellido2']);
+              $genero = $_POST['genero'];
+              $fecha_nac = $_POST['fecha_nac'];
+              $cedula = $_POST['cedula2'];
+              $correo = $_POST['correo2'];
+              $telf_hab = $_POST['telf_hab'];
+              // $telf_ofi = $_POST['telf_ofi'];
+              $telf_cel = $_POST['telf_cel'];
+              $estado = $_POST['estado'];
+              $ciudad = $_POST['ciudad'];
+              $municipio = $_POST['municipio'];
+              $obs = $_POST['observaciones'];
+              $fecha = date('Ymd');
+              $status = 7;
+              $var = 0;
 
-                $registro = $conn->registroResultados($_POST['contacto'], $efectivo, $producto, $noefectivo, $_POST['usuario'], $date, $nombre, $apellido, $genero, $fecha_nac, $nacionalidad, $cedula, $telf_hab, $telf_cel, $correo, $estado, $ciudad, $municipio, $cuenta, $tipocuenta, $obs, $fecha, $status, $_POST['id_cliente'], $var, $hora, $_POST['servicio']);
-              } else {
-                $registro = $conn->registroGestion($_POST['contacto'], $efectivo, $producto, $noefectivo, $subContacto, $_POST['usuario'], $date, $_POST['id_cliente'], $status, $hora, $_POST['servicio'],$dni,$idQuote);
-              }
+              $registro = $conn->registroResultados($_POST['contacto'], $efectivo, $producto, $noefectivo, $_POST['usuario'], $date, $nombre, $apellido, $genero, $fecha_nac, $nacionalidad, $cedula, $telf_hab, $telf_cel, $correo, $estado, $ciudad, $municipio, $cuenta, $tipocuenta, $obs, $fecha, $status, $_POST['id_cliente'], $var, $hora, $_POST['servicio']);
+            } else {
+              $registro = $conn->registroGestion($_POST['contacto'], $efectivo, $producto, $noefectivo, $subContacto, $_POST['usuario'], $date, $_POST['id_cliente'], $status, $hora, $_POST['servicio'], $dni, $idQuote);
+            }
             header('location:?view=formulario&mode=index');
             break;
 
           case 2: // cashea
-            if($subContacto == 1 || $subContacto == 10 || $subContacto == 20 || $subContacto == 21 ){
+            if ($subContacto == 1 || $subContacto == 10 || $subContacto == 20 || $subContacto == 21) {
               $status = 7;
 
               $gestionId = $conn->registroGestion($_POST['contacto'], $efectivo, $producto, $noefectivo, $subContacto, $_POST['usuario'], $date, $_POST['id_cliente'], $status, $hora, $_POST['servicio'], $dni, $idQuote);
 
-              $results = $conn->registroResultadosCashea($_POST['paymentPlan'],$_POST['paymentDate'],$idQuote,$_POST['amount'],$_POST['fullName'],$_POST['relationship'],$_POST['observaciones'],$_POST['id_cliente'],$status,$gestionId);
-              
-            }else{
-              $registro = $conn->registroGestion($_POST['contacto'], $efectivo, $producto, $noefectivo, $subContacto, $_POST['usuario'], $date, $_POST['id_cliente'], $status, $hora, $_POST['servicio'], $dni,$idQuote);
+              $results = $conn->registroResultadosCashea($_POST['paymentPlan'], $_POST['paymentDate'], $idQuote, $_POST['amount'], $_POST['fullName'], $_POST['relationship'], $_POST['observaciones'], $_POST['id_cliente'], $status, $gestionId);
+            } else {
+              $registro = $conn->registroGestion($_POST['contacto'], $efectivo, $producto, $noefectivo, $subContacto, $_POST['usuario'], $date, $_POST['id_cliente'], $status, $hora, $_POST['servicio'], $dni, $idQuote);
             }
-              //header('location:?view=formulario&mode=index');
+            header('location:?view=formulario&mode=index');
             break;
 
           default:
