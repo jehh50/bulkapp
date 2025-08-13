@@ -14,7 +14,7 @@ if (empty($_SESSION)) {
         include(HTML_DIR . 'reportes/index.php');
         include(PUBLIC_DIR . 'general/footer.php');
         break;
-      #-------------------------------------------------------------------------------------------
+
       case 'acumulado':
         include(PUBLIC_DIR . 'general/header.php');
         include(PUBLIC_DIR . 'general/navbar.php');
@@ -36,7 +36,7 @@ if (empty($_SESSION)) {
         include(HTML_DIR . 'reportes/index.php');
         include(PUBLIC_DIR . 'general/footer.php');
         break;
-      #-------------------------------------------------------------------------------------------
+
       case 'contactabilidad':
         include(PUBLIC_DIR . 'general/header.php');
         include(PUBLIC_DIR . 'general/navbar.php');
@@ -58,7 +58,7 @@ if (empty($_SESSION)) {
         include(HTML_DIR . 'reportes/contactabilidad.php');
         include(PUBLIC_DIR . 'general/footer.php');
         break;
-      #-------------------------------------------------------------------------------------------
+
       case 'liberar':
         include(PUBLIC_DIR . 'general/header.php');
         include(PUBLIC_DIR . 'general/navbar.php');
@@ -114,7 +114,6 @@ if (empty($_SESSION)) {
         if (isset($_POST['fecha_d']) || isset($_POST['fecha_h'])) {
           $desde = date('Ymd', strtotime($_POST['fecha_d']));
           $hasta = date('Ymd', strtotime($_POST['fecha_h']));
-
         } else {
           $desde = date('Ymd');
           $hasta = $desde;
@@ -157,7 +156,7 @@ if (empty($_SESSION)) {
       case 'download':
         $ventas = $conn->ventaDetallada($_GET['from'], $_GET['to'], $_GET['servicio']);
         header("Content-type: application/vnd.ms-excel");
-				header("Content-Disposition: attachment; filename=ventasDetalladas.xls");
+        header("Content-Disposition: attachment; filename=ventasDetalladas.xls");
 
         echo '<table class="table table-responsive table-hover table-condensed">';
         echo '<thead>
@@ -179,23 +178,38 @@ if (empty($_SESSION)) {
         if (!empty($ventas)) {
           foreach ($ventas as $venta) {
             echo '<tr>
-                    <td>'.$venta['nombre'].'</td>
-                    <td>'.$venta['apellido'].'</td>
-                    <td>'.$venta['cedula'].'</td>
-                    <td>'.$venta['fecha_nacimiento'].'</td>
-                    <td>'.$venta['telf_hab'].'</td>
-                    <td>'.$venta['telf_celular'].'</td>
-                    <td>'.$venta['correo'].'</td>
-                    <td>'.$venta['descripcion'].'</td>
-                    <td>'.$venta['agente'].'</td>
-                    <td>'.$venta['fecha_venta'].'</td>
+                    <td>' . $venta['nombre'] . '</td>
+                    <td>' . $venta['apellido'] . '</td>
+                    <td>' . $venta['cedula'] . '</td>
+                    <td>' . $venta['fecha_nacimiento'] . '</td>
+                    <td>' . $venta['telf_hab'] . '</td>
+                    <td>' . $venta['telf_celular'] . '</td>
+                    <td>' . $venta['correo'] . '</td>
+                    <td>' . $venta['descripcion'] . '</td>
+                    <td>' . $venta['agente'] . '</td>
+                    <td>' . $venta['fecha_venta'] . '</td>
                   </tr>';
           }
         }
 
         echo '</tbody></table>';
 
-        exit;
+        break;
+      
+      case 'gestionCashea':
+        include(PUBLIC_DIR . 'general/header.php');
+        include(PUBLIC_DIR . 'general/navbar.php');
+        $servicio = $conn->servicio();
+
+        if (isset($_POST['fecha_d']) || isset($_POST['fecha_h'])) {
+          $desde = date('Ymd', strtotime($_POST['fecha_d']));
+          $hasta = date('Ymd', strtotime($_POST['fecha_h']));
+          $ventas = $conn->ventaDetallada($desde, $hasta, $_POST['servicio']);
+        }
+
+        include(HTML_DIR . 'reportes/gestionCashea.php');
+        include(PUBLIC_DIR . 'general/footer.php');
+        break;
 
       default:
         header('location:' . HTML_DIR . 'error.html');
@@ -203,4 +217,3 @@ if (empty($_SESSION)) {
     }
   }
 }
-?>

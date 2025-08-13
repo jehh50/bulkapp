@@ -192,11 +192,17 @@ function validateForm() {
 
 function validateForm2() {
     console.log('Comienza la validación del segundo formulario...');
+    if(!$('#formulario2').is(':visible')) {
+        console.log('El formulario2 no está visible, no se realizará la validación.');
+        return true; // Si el formulario no está visible, no se valida
+    }
 
-    // let paymentPlan = document.getElementById('paymentPlan').value;
-    // // let paymentDate = document.getElementById('paymentDate').value;
-    // let fullName = document.getElementById('fullName').value;
-    // let relationship = document.getElementById('relationship').value;
+
+    let paymentPlan = document.getElementById('paymentPlan').value;
+    let paymentDate = document.getElementById('paymentDate').value;
+    let fullName = document.getElementById('fullName').value;
+    let relationship = document.getElementById('relationship').value;
+    let amount = document.getElementById('amount').value;
 
     // let patron_name = /^[a-zA-Z ñáéíóú]{2,60}$/i;
 
@@ -207,12 +213,12 @@ function validateForm2() {
     // //     return false;
     // // }
 
-    // // // Validación de payment plan
-    // // if (paymentPlan === "") {
-    // //     alert("Debe seleccionar un plan de pago.");
+    // Validación de payment plan
+    // if (paymentPlan === "") {
+        //  alert("Debe seleccionar un plan de pago.");
     // //     document.getElementById('paymentPlan').focus();
-    // //     return false;
-    // // }
+        // return false;
+    // }
     // // Validación de fecha de pago
     // // if (paymentDate === ""  ) {
     // //     alert('Debe seleccionar una fecha de compromiso.');
@@ -225,6 +231,15 @@ function validateForm2() {
     //     document.getElementById('relationship').focus();
     //     return false;
     // }
+
+    console.log('Valor de contacto: ' + $('#contacto').val());
+    console.log('Valor de noefectivo: ' + $('#noefectivo').val());
+    // // Validación de monto
+    if (amount === "" || isNaN(amount) || parseFloat(amount) <= 0) {
+        alert("El monto debe ser un número válido y mayor a cero.");
+        document.getElementById('amount').focus();
+        return false;
+    }
 
     // return true; // Si todas las validaciones pasan, permite el envío del formulario
 }

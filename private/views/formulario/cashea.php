@@ -10,7 +10,7 @@
               <div class="row ">
                 <div class="col-sm-6 col-md-4 col-lg-3">
                   <h5>Número de cédula</h5>
-                  <input type="text" class="form-control" placeholder="12624422" aria-describedby="dni" name="dni" id="dni" maxlength="11" autofocus style="margin-bottom: 5px;" />
+                  <input type="text" class="form-control" placeholder="12624422" aria-describedby="dni" name="dni" id="dni" maxlength="11" autofocus style="margin-bottom: 5px;" required />
                   <input type="hidden" name="servicioId" id="servicioId" value="<?php echo $_SESSION['servicio_id']; ?>" />
                   <input type="submit" class="btn btn-success" value="Buscar" id="btn-buscar">
                 </div>
@@ -23,8 +23,17 @@
         <!-- INICIO DEL FORMULARIO -->
 
         <?php
-        if (empty($cliente)) {
-        } else {
+        if (empty($cliente) && empty($msg)){ } elseif($msg) {?>
+          <div class="panel-body">
+              <div class="form-group">
+                <div class="row">
+                  <div class="col-xs-10 col-sm-11 col-md-12 col-lg-12">
+                    <div class='alert alert-success' role='alert'><?= $msg; ?></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        <?php } else {
           if ($msg) { ?>
             <div class="panel-body">
               <div class="form-group">
@@ -201,6 +210,11 @@
                           <option value='2'>Cuota</option>
                           <option value='3'>Pago personalizado</option>
                         </select>
+                      </div>
+
+                      <div class="form-group mb-3" id="dQuote">
+                        <label class="form-label">ID de la cuota</label>
+                        <input type="text" class="form-control" placeholder="5511223" aria-describedby="idQuote" name="idQuote" id="idQuote" />
                       </div>
 
                       <div class="form-group mb-3" id="dAmount">

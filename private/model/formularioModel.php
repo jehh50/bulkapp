@@ -75,7 +75,7 @@ class database {
       return $respuesta;
     }
     if($servicio == 2){
-      $sql = $this->db->query("SELECT * FROM cashea_customers WHERE cedula = '$telefono' ORDER BY id_cuota ASC");
+      $sql = $this->db->query("SELECT * FROM cashea_customers WHERE cedula = '$telefono' and status_id != 7 ORDER BY id_cuota ASC");
       if($this->db->rows($sql) > 0 ){
         while($data = $this->db->recorrer($sql)){
           $respuesta[] = $data;
@@ -156,15 +156,19 @@ class database {
     
   }
  
-  public function registroGestion($contacto, $efectivo, $producto, $noefectivo, $subcontacto, $id_usuario, $date, $id_cliente, $status, $hora, $servicio, $dni){
+  public function registroGestion($contacto, $efectivo, $producto, $noefectivo, $subcontacto, $id_usuario, $date, $id_cliente, $status, $hora, $servicio, $dni,$idQuote){
     if($servicio == 2){
       $table = 'cashea_customers';
-      $field = 'cedula';
-      $value = $dni;
+      if(!$idQuote){
+        $where = 'cedula = '.$dni;
+      }else{
+        $where = 'cedula = '.$dni .' AND id_cuota = '.$idQuote;
+      }
     }else{
       $table = 'clientes';
-      $field = 'id';
-      $value = $id_cliente;
+      // $field = 'id';
+      // $value = $id_cliente;
+      $where = 'id = '.$id_cliente;
     }
     $efectivo = ($efectivo === null) ? 'null' : $efectivo;
     $noefectivo = ($noefectivo === null) ? 'null' : $noefectivo;
@@ -173,14 +177,14 @@ class database {
     
     $this->db->query("INSERT INTO gestion (contacto_id, efectivo_id, producto_id, noefectivo_id, subContacto_id, user_id, fecha, cliente_id, status_id, hora, servicio_id) VALUES ($contacto, $efectivo, $producto, $noefectivo, $subcontacto, $id_usuario, '$date', $id_cliente, '$status','$hora', '$servicio')");
 
-    $this->db->query("UPDATE $table SET status_id = $status WHERE $field = $value"); 
+    $id_gestion = $this->db->insert_id;
+    $this->db->query("UPDATE $table SET status_id = $status WHERE $where"); 
+
+    return $id_gestion;
   }
 
-  public function registroResultadosCashea($paymentPlan,$paymentDate,$amount,$fullName,$relationship,$observaciones,$id_cliente,$status){
-    
-    echo 'registroResultadosCashea: '.("INSERT INTO results_cashea (paymentPlan, paymentDate, amount, fullName, relationship, observaciones, cliente_id, status_id) VALUES ('$paymentPlan', '$paymentDate', $amount, '$fullName', '$relationship', '$observaciones', $id_cliente, $status)");
-
-    $this->db->query("INSERT INTO results_cashea (paymentPlan, paymentDate, amount, fullName, relationship, observaciones, cliente_id, status_id) VALUES ('$paymentPlan', '$paymentDate', $amount, '$fullName', '$relationship', '$observaciones', $id_cliente, $status)");
+  public function registroResultadosCashea($paymentPlan,$paymentDate,$idQuote, $amount,$fullName,$relationship,$observaciones,$id_cliente,$status,$gestionId){
+    $this->db->query("INSERT INTO results_cashea (gestion_id,paymentPlan, paymentDate, idQuote, amount, fullName, relationship, observaciones, cliente_id, status_id) VALUES ($gestionId,'$paymentPlan', '$paymentDate', '$idQuote', $amount, '$fullName', '$relationship', '$observaciones', $id_cliente, $status)");
   }
 
   public function codigosProductos($servicio){
