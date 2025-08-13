@@ -38,6 +38,7 @@
                   <li><a href="?view=reportes&mode=contactabilidad">Motivos de contacto</a></li>
                   <li><a href="?view=reportes&mode=ventas">Ventas por estado</a></li>
                   <li><a href="?view=reportes&mode=detalleventas">Detalle de ventas</a></li>
+                  <!-- <li><a href="?view=reportes&mode=gestionCashea">Gestión Cashea</a></li> -->
                   <li><a href="?view=reportes&mode=liberar">Liberar cliente</a></li>
                   <li><a href="?view=xml&mode=index">XML</a></li>
                 </ul>
@@ -51,6 +52,7 @@
                   <li><a href="?view=reportes&mode=contactabilidad">Motivos de contacto</a></li>
                   <li><a href="?view=reportes&mode=ventas">Ventas por estado</a></li>
                   <li><a href="?view=reportes&mode=detallada">Gestión detallada</a></li>
+                  <!-- <li><a href="?view=reportes&mode=gestionCashea">Gestión Cashea</a></li> -->
                 </ul>
               </li>
             <?php } ?>

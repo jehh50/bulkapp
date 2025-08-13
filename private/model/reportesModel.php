@@ -3,8 +3,6 @@ class database
 {
 
   private $db;
-  private $id;
-  private $nombre;
 
   public function __construct()
   {
@@ -17,7 +15,6 @@ class database
     if ($this->db->rows($sql) > 0) {
       while ($data = $this->db->recorrer($sql)) {
         $conexion = new database();
-
         $id_user = $data['id'];
         $nombre = $data['nombre'];
         $gestion = $data['gestion'];
@@ -47,19 +44,23 @@ class database
     return $respuesta;
   }
 
-  public function ventaDetallada($desde,$hasta,$servicio)
+  public function ventaDetallada($desde, $hasta, $servicio)
   {
-    $sql = $this->db->query("SELECT r.nombre, r.apellido, r.cedula, r.fecha_nacimiento, r.telf_hab, r.telf_celular, r.correo, p.descripcion, CONCAT(u.nombre,' ',u.apellido) as agente, r.fecha_venta FROM `resultados` r INNER JOIN productos p ON r.producto_id = p.id INNER JOIN gestion g ON r.gestion_id = g.id INNER JOIN users u ON g.user_id = u.id WHERE r.fecha_venta BETWEEN $desde AND $hasta AND r.servicio_id = $servicio ORDER BY r.fecha_venta DESC");
-    if ($this->db->rows($sql) > 0) {
-      while ($data = $this->db->recorrer($sql)) {
-        $respuesta[] = $data;
+    if($servicio == 1){
+      $sql = $this->db->query("SELECT r.nombre, r.apellido, r.cedula, r.fecha_nacimiento, r.telf_hab, r.telf_celular, r.correo, p.descripcion, CONCAT(u.nombre,' ',u.apellido) as agente, r.fecha_venta FROM `resultados` r INNER JOIN productos p ON r.producto_id = p.id INNER JOIN gestion g ON r.gestion_id = g.id INNER JOIN users u ON g.user_id = u.id WHERE r.fecha_venta BETWEEN $desde AND $hasta AND r.servicio_id = $servicio ORDER BY r.fecha_venta DESC");
+      if ($this->db->rows($sql) > 0) {
+        while ($data = $this->db->recorrer($sql)) {
+          $respuesta[] = $data;
+        }
+      } else {
+        $respuesta = false;
       }
-    } else {
-      $respuesta = false;
+      return $respuesta;
+    }else{
+      echo 1;
     }
-    return $respuesta;
   }
-
+  
   public function clientesEfectivos($id_user, $desde, $hasta, $servicio)
   {
     $sql = $this->db->query("SELECT COUNT(gestion.contacto_id) AS efectivos FROM gestion WHERE gestion.user_id = " . $id_user . " AND contacto_id = 1 AND fecha BETWEEN '$desde' AND '$hasta' AND servicio_id = $servicio");
@@ -108,7 +109,7 @@ class database
     // if (empty($serv)) {
     //   $sql = $this->db->query("SELECT n.descripcion, COUNT(g.noefectivo_id) AS total FROM gestion g INNER JOIN noefectivo n ON g.noefectivo_id = n.id WHERE g.fecha BETWEEN '$desde' AND '$hasta' GROUP BY n.descripcion");
     // } else {
-      $sql = $this->db->query("SELECT n.descripcion, COUNT(g.noefectivo_id) AS total FROM gestion g INNER JOIN noefectivo n ON g.noefectivo_id = n.id WHERE g.fecha BETWEEN '$desde' AND '$hasta' AND g.servicio_id = '$serv' GROUP BY n.descripcion");
+    $sql = $this->db->query("SELECT n.descripcion, COUNT(g.noefectivo_id) AS total FROM gestion g INNER JOIN noefectivo n ON g.noefectivo_id = n.id WHERE g.fecha BETWEEN '$desde' AND '$hasta' AND g.servicio_id = '$serv' GROUP BY n.descripcion");
     // }
 
     if ($this->db->rows($sql) > 0) {
@@ -119,7 +120,6 @@ class database
       $respuesta = false;
     }
     return $respuesta;
-
   }
 
   public function gestionContactoefectivo($desde, $hasta, $serv)
@@ -231,5 +231,4 @@ class database
     }
     return $respuesta;
   }
-
 }

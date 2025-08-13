@@ -15,7 +15,7 @@ if (empty($_SESSION)) {
         $efectivo = $conn->contactoEfectivo($_SESSION['servicio_id']);
         switch ($_SESSION['servicio_id']) {
           case 1:
-            // bancamiga
+            // bancamiga bancaribe
             $estado = $conn->estado($_SESSION['servicio_id']);
             $producto = $conn->ventaProducto($_SESSION['servicio_id']);
             $cuentas = $conn->cuentasBancarias();
@@ -26,16 +26,13 @@ if (empty($_SESSION)) {
             $cliente = null;
             include(HTML_DIR . 'formulario/cashea.php');
             break;
-          case 3:
-            // bancaribe
-            break;
         }
         include(PUBLIC_DIR . 'general/footer.php');
         break;
 
       case 'buscarCliente':
         $cliente = $conn->buscaCliente($_POST['dni'], $_POST['servicioId']);
-        if(!$cliente){}else{if ($cliente[0]['status_id']==4){$msg = 'Cliente ya atendido';}else{$msg='';}}
+        if(!$cliente){$msg='Cliente sin deuda';}else{if ($cliente[0]['status_id']==9){$msg = 'Cliente ya atendido';}else{$msg='';}}
         include(PUBLIC_DIR . 'general/header.php');
         include(PUBLIC_DIR . 'general/navbar.php');
         $noefectivo = $conn->contactoNoEfectivo($_SESSION['servicio_id']);
@@ -116,11 +113,7 @@ if (empty($_SESSION)) {
         break;
 
       case 'registro':
-        
-        // $_POST['id_cliente'] = $_POST['id_cliente'];
-        // $_POST['usuario'] = $_POST['usuario'];
-        // $_POST['contacto'] = $_POST['contacto'];
-        // $_POST['servicio'] = $_POST['servicio'];
+        // datos comunes
         $date = date('Y-m-d');
         $hora = date('H:i:s');
         $efectivo = isset($_POST['efectivo']) ? $_POST['efectivo'] : null;
@@ -130,6 +123,7 @@ if (empty($_SESSION)) {
         $producto = isset($_POST['venta']) ? $_POST['venta'] : null;
         $subContacto = isset($_POST['subContacto']) ? $_POST['subContacto'] : null;
         $dni = isset($_POST['dni_cliente']) ? $_POST['dni_cliente'] : null;
+        $idQuote = isset($_POST['idQuote']) ? $_POST['idQuote'] : null;
         $paymentDate = isset($_POST['paymentDate']) ? $_POST['paymentDate'] : null;
         
         
@@ -176,21 +170,21 @@ if (empty($_SESSION)) {
 
                 $registro = $conn->registroResultados($_POST['contacto'], $efectivo, $producto, $noefectivo, $_POST['usuario'], $date, $nombre, $apellido, $genero, $fecha_nac, $nacionalidad, $cedula, $telf_hab, $telf_cel, $correo, $estado, $ciudad, $municipio, $cuenta, $tipocuenta, $obs, $fecha, $status, $_POST['id_cliente'], $var, $hora, $_POST['servicio']);
               } else {
-                $registro = $conn->registroGestion($_POST['contacto'], $efectivo, $producto, $noefectivo, $subContacto, $_POST['usuario'], $date, $_POST['id_cliente'], $status, $hora, $_POST['servicio'],$dni);
+                $registro = $conn->registroGestion($_POST['contacto'], $efectivo, $producto, $noefectivo, $subContacto, $_POST['usuario'], $date, $_POST['id_cliente'], $status, $hora, $_POST['servicio'],$dni,$idQuote);
               }
             header('location:?view=formulario&mode=index');
             break;
 
           case 2: // cashea
-            var_dump($_POST);
             if($subContacto == 1 || $subContacto == 10 || $subContacto == 20 || $subContacto == 21 ){
-              echo "Registro de resultados para Cashea";
               $status = 7;
-              $results = $conn->registroResultadosCashea($_POST['paymentPlan'],$_POST['paymentDate'],$_POST['amount'],$_POST['fullName'],$_POST['relationship'],$_POST['observaciones'],$_POST['id_cliente'],$status);
-            
-              $registro = $conn->registroGestion($_POST['contacto'], $efectivo, $producto, $noefectivo, $subContacto, $_POST['usuario'], $date, $_POST['id_cliente'], $status, $hora, $_POST['servicio'], $dni);
+
+              $gestionId = $conn->registroGestion($_POST['contacto'], $efectivo, $producto, $noefectivo, $subContacto, $_POST['usuario'], $date, $_POST['id_cliente'], $status, $hora, $_POST['servicio'], $dni, $idQuote);
+
+              $results = $conn->registroResultadosCashea($_POST['paymentPlan'],$_POST['paymentDate'],$idQuote,$_POST['amount'],$_POST['fullName'],$_POST['relationship'],$_POST['observaciones'],$_POST['id_cliente'],$status,$gestionId);
+              
             }else{
-              $registro = $conn->registroGestion($_POST['contacto'], $efectivo, $producto, $noefectivo, $subContacto, $_POST['usuario'], $date, $_POST['id_cliente'], $status, $hora, $_POST['servicio'], $dni);
+              $registro = $conn->registroGestion($_POST['contacto'], $efectivo, $producto, $noefectivo, $subContacto, $_POST['usuario'], $date, $_POST['id_cliente'], $status, $hora, $_POST['servicio'], $dni,$idQuote);
             }
               header('location:?view=formulario&mode=index');
             break;

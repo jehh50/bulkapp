@@ -2,6 +2,7 @@ $(document).ready(function () {
   $('#d_efectivo').hide();
   $('#d_noefectivo').hide();
   $('#dPaymentPlan').hide();
+  $('#dQuote').hide();
   $('#dAmount').hide();
   $('#dPaymentDate').hide();
   $('#dFullName').hide();
@@ -26,6 +27,8 @@ $(document).ready(function () {
             $('#paymentPlan').attr('required','required');
           $('#dAmount').show();
             $('#amount').attr('required','required');
+          $('#dQuote').show();
+            $('#idQuote').attr('required','required');
           $('#dPaymentDate').show();
             $('#paymentDate').attr('required','required');
           $('#dFullName').hide();
@@ -42,6 +45,8 @@ $(document).ready(function () {
           $('#paymentPlan').attr('required','required');
           $('#dAmount').show();
           $('#amount').attr('required','required');
+          $('#dQuote').show();
+          $('#idQuote').attr('required','required');
           $('#dPaymentDate').show();
           $('#paymentDate').attr('required','required');
           $('#dFullName').show();
@@ -56,6 +61,8 @@ $(document).ready(function () {
           $('#formTitle').show();
           $('#dPaymentPlan').hide();
           $('#paymentPlan').removeAttr('required').val("");
+          $('#dQuote').hide();
+          $('#idQuote').removeAttr('required').val("");
           $('#amount').removeAttr('required').val("");
           $('#paymentDate').removeAttr('required').val("");
           $('#fullName').removeAttr('required').val("");
@@ -75,6 +82,7 @@ $(document).ready(function () {
       $('#d_efectivo').hide();
       $('#formTitle').hide();
       $('#dPaymentPlan').hide();
+      $('#dQuote').hide();
       $('#dAmount').hide();
       $('#dPaymentDate').hide();
       $('#dFullName').hide();
@@ -110,7 +118,7 @@ $(document).ready(function () {
             }
         }
         else{
-          alert('No entro');
+          alert('Error al cargar los subcontactos');
         }
       }
     })

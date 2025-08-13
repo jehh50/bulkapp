@@ -57,7 +57,7 @@ if (empty($_SESSION)) {
 						// Preparar la fila actual según el servicio
 						if ($servicio == 1) {
 							$fila = array_slice($datos, 0, 9);
-							$paramTypes = str_repeat('s', 8) . 'i'; // Tipos para el servicio 1
+							$paramTypes = str_repeat('s', 9) ; // Tipos para el servicio 1
 						} else {
 							$fila = array_slice($datos, 0, 20);
 							$paramTypes = str_repeat('s', 20); // Tipos para el servicio 2
