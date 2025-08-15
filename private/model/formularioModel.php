@@ -163,13 +163,29 @@ class database
       $table = 'cashea_customers';
       if (!$idQuote) {
         $where = 'cedula = ' . $dni;
-      } else {
-        $where = 'cedula = ' . $dni . ' AND id_cuota = ' . $idQuote;
+
+      } else{
+        $cliente = [];
+        $cliente = explode(",", $idQuote);
+        $where = 'cedula = ' . $dni . ' AND id_cuota in ';
+        if(count($cliente) == 1) {
+          $where .= "($cliente[0])";
+        }else{
+          for($i=0; $i < count($cliente); $i++) { 
+            if($i == 0){
+            $where .= "($cliente[$i],";
+            } else if($i == (count($cliente) - 1)){
+              $where .= "$cliente[$i])";
+            } else {
+              $where .= "$cliente[$i],";
+            }
+          }
+        }
       }
-    } else {
+    }else {
       $table = 'clientes';
       $where = 'id = ' . $id_cliente;
-    }
+      }
     $efectivo = ($efectivo === null) ? 'null' : $efectivo;
     $noefectivo = ($noefectivo === null) ? 'null' : $noefectivo;
     $producto = ($producto === null) ? 'null' : $producto;

@@ -230,7 +230,7 @@
                             $fecha = date('Y-m-d', strtotime("+$i day"));
                             $label = date('d/m/Y', strtotime("+$i day"));
                             echo "<li class='mb-2'>
-                                      <input type='radio' id='paymentDate' name='paymentDate' value='$fecha' onclick=\"document.getElementById('paymentDate').value=this.value;\"> $label
+                                      <input type='radio' id='paymentDate' name='paymentDate' value='$fecha' onclick=\"document.getElementById('paymentDate').value=this.value; required\"> $label
                                     </li>";
                           }
                           ?>
