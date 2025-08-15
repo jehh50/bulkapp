@@ -66,7 +66,7 @@ class database
   public function buscaCliente($telefono, $servicio)
   {
     if ($servicio == 1) {
-      $sql = $this->db->query("SELECT cedula,id_cuota,fecha_pagar,numero_cuota, ONVERT(REPLACE(plata_por_cobrar, ',', '.'), FLOAT) AS plata_por_cobrar, email, telefono,nombre_usuario,local_origen,tramo_inicial,segmento FROM clientes WHERE (identificacion = '$telefono' OR telf_hab LIKE '%" . $telefono . "' or telf_ofi LIKE '%" . $telefono . "' OR telf_cel LIKE '%" . $telefono . "') and servicio_id = '$servicio'");
+      $sql = $this->db->query("SELECT * FROM clientes WHERE (identificacion = '$telefono' OR telf_hab LIKE '%" . $telefono . "' or telf_ofi LIKE '%" . $telefono . "' OR telf_cel LIKE '%" . $telefono . "') and servicio_id = '$servicio'");
       if ($this->db->rows($sql) > 0) {
         while ($data = $this->db->recorrer($sql)) {
           $respuesta[] = $data;
@@ -161,26 +161,31 @@ class database
   {
     if ($servicio == 2) {
       $table = 'cashea_customers';
-      $cliente = [];
-      $cliente = explode(",", $idQuote);
       if (!$idQuote) {
         $where = 'cedula = ' . $dni;
-      } else {
+
+      } else{
+        $cliente = [];
+        $cliente = explode(",", $idQuote);
         $where = 'cedula = ' . $dni . ' AND id_cuota in ';
-        for($i=0; $i < count($cliente); $i++) { 
-          if($i == 0){
+        if(count($cliente) == 1) {
+          $where .= "($cliente[0])";
+        }else{
+          for($i=0; $i < count($cliente); $i++) { 
+            if($i == 0){
             $where .= "($cliente[$i],";
-          } else if($i == (count($cliente) - 1)){
-            $where .= "$cliente[$i])";
-          } else {
-            $where .= "$cliente[$i],";
+            } else if($i == (count($cliente) - 1)){
+              $where .= "$cliente[$i])";
+            } else {
+              $where .= "$cliente[$i],";
+            }
           }
         }
       }
-    } else {
+    }else {
       $table = 'clientes';
       $where = 'id = ' . $id_cliente;
-    }
+      }
     $efectivo = ($efectivo === null) ? 'null' : $efectivo;
     $noefectivo = ($noefectivo === null) ? 'null' : $noefectivo;
     $producto = ($producto === null) ? 'null' : $producto;
