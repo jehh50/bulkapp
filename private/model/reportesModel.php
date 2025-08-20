@@ -46,7 +46,7 @@ class database
 
   public function ventaDetallada($desde, $hasta, $servicio)
   {
-    if($servicio == 1){
+    if ($servicio == 1) {
       $sql = $this->db->query("SELECT r.nombre, r.apellido, r.cedula, r.fecha_nacimiento, r.telf_hab, r.telf_celular, r.correo, p.descripcion, CONCAT(u.nombre,' ',u.apellido) as agente, r.fecha_venta FROM `resultados` r INNER JOIN productos p ON r.producto_id = p.id INNER JOIN gestion g ON r.gestion_id = g.id INNER JOIN users u ON g.user_id = u.id WHERE r.fecha_venta BETWEEN $desde AND $hasta AND r.servicio_id = $servicio ORDER BY r.fecha_venta DESC");
       if ($this->db->rows($sql) > 0) {
         while ($data = $this->db->recorrer($sql)) {
@@ -55,12 +55,57 @@ class database
       } else {
         $respuesta = false;
       }
-      return $respuesta;
-    }else{
-      echo 1;
+    } else {
+        $sql = $this->db->query("SELECT
+            rc.id AS 'idResultado',
+            rc.gestion_id AS 'idGestion',
+            CASE rc.paymentPlan
+                WHEN '1' THEN 'Monto total'
+                WHEN '2' THEN 'Cuota'
+                WHEN '3' THEN 'Pago personalizado'
+                ELSE rc.paymentPlan
+            END AS 'planDePago',
+            rc.paymentDate AS 'fechaPago',
+            rc.idQuote AS 'idCuota',
+            rc.amount AS 'monto',
+            rc.fullName AS 'nombreEncargado',
+            CASE rc.relationship
+                WHEN 'PADRE' THEN 'Padre'
+                WHEN 'MADRE' THEN 'Madre'
+                WHEN 'HIJO' THEN 'Hijo/Hija'
+                WHEN 'HERMANO' THEN 'Hermano/Hermana'
+                WHEN 'ESPOSA' THEN 'Esposo/Esposa'
+                WHEN 'OTRO' THEN 'Otro'
+                ELSE 'No especificado'
+            END AS 'parentesco',
+            rc.observaciones AS 'observaciones',
+            CONCAT(u.nombre, ' ', u.apellido) AS 'operador',
+            cc.nombre_usuario AS 'nombreCliente',
+            rc.created_at AS 'fechaCreacion',
+            s.name AS 'estadoGestion'
+        FROM
+            results_cashea AS rc
+        LEFT JOIN
+            gestion AS g ON rc.gestion_id = g.id
+        LEFT JOIN
+            users AS u ON g.user_id = u.id
+        LEFT JOIN
+            cashea_customers AS cc ON rc.cliente_id = cc.id
+        LEFT JOIN
+            status AS s ON rc.status_id = s.id
+        WHERE
+            DATE(rc.created_at) >= '$desde 00:00:00' and DATE(rc.created_at) <= '$hasta 23:59:59'");
     }
+    if ($this->db->rows($sql) > 0) {
+      while ($data = $this->db->recorrer($sql)) {
+        $respuesta[] = $data;
+      }
+    } else {
+      $respuesta = false;
+    }
+    return $respuesta;
   }
-  
+
   public function clientesEfectivos($id_user, $desde, $hasta, $servicio)
   {
     $sql = $this->db->query("SELECT COUNT(gestion.contacto_id) AS efectivos FROM gestion WHERE gestion.user_id = " . $id_user . " AND contacto_id = 1 AND fecha BETWEEN '$desde' AND '$hasta' AND servicio_id = $servicio");
@@ -167,9 +212,9 @@ class database
     return $respuesta;
   }
 
-  public function servicio()
+  public function servicio($id)
   {
-    $sql = $this->db->query("SELECT * FROM servicios WHERE status_id = 2 ORDER BY descripcion");
+    $sql = $this->db->query("SELECT * FROM servicios WHERE status_id = 2 and id in $id ORDER BY descripcion");
     if ($this->db->rows($sql) > 0) {
       while ($data = $this->db->recorrer($sql)) {
         $respuesta[] = $data;

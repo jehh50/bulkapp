@@ -9,7 +9,7 @@
       </section>
       <section>
         <label>
-          <h1>Detalle de ventas para el estado <strong><a href="?view=reportes&mode=ventas"><?= $estado; ?></a></strong>
+          <h1 style="color:#ffffff">Detalle de ventas para el estado <strong><a href="?view=reportes&mode=ventas"><?= $estado; ?></a></strong>
           </h1>
         </label>
       </section>

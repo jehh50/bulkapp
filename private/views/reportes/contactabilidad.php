@@ -103,7 +103,7 @@
               </tr>
             </thead>
 
-            <?php $total2 = 0;
+            <?php $total2 = 0; if(!$resulte){}else{
             foreach ($resulte as $efectivo) { ?>
               <tbody>
                 <tr align="center">
@@ -126,6 +126,7 @@
                 </td>
               </tr>
             </tbody>
+            <?php } ?>
           </table>
         </div>
         <div id="chart_ef"></div>
