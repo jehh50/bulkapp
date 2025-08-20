@@ -52,7 +52,9 @@ if (empty($_SESSION)) {
         } else {
           $serv = $_POST['servicio'];
         }
-        $servicio = $conn->servicio();
+        $id = '(1,2)';
+
+        $servicio = $conn->servicio($id);
         $resultn = $conn->gestionContactonoefectivo($desde, $hasta, $serv);
         $resulte = $conn->gestionContactoefectivo($desde, $hasta, $serv);
         include(HTML_DIR . 'reportes/contactabilidad.php');
@@ -119,7 +121,9 @@ if (empty($_SESSION)) {
           $hasta = $desde;
           $d = $h = date('Y-m-d');
         }
-        $servicio = $conn->servicio();
+
+        $id = '(1)';
+        $servicio = $conn->servicio($id);
         $result = $conn->ventasEstado($desde, $hasta, $serv);
         include(HTML_DIR . 'reportes/ventas.php');
         include(PUBLIC_DIR . 'general/footer.php');
@@ -141,7 +145,8 @@ if (empty($_SESSION)) {
       case 'detalleventas':
         include(PUBLIC_DIR . 'general/header.php');
         include(PUBLIC_DIR . 'general/navbar.php');
-        $servicio = $conn->servicio();
+        $id = '(1)';
+        $servicio = $conn->servicio($id);
 
         if (isset($_POST['fecha_d']) || isset($_POST['fecha_h'])) {
           $desde = date('Ymd', strtotime($_POST['fecha_d']));
@@ -154,45 +159,82 @@ if (empty($_SESSION)) {
         break;
 
       case 'download':
-        $ventas = $conn->ventaDetallada($_GET['from'], $_GET['to'], $_GET['servicio']);
         header("Content-type: application/vnd.ms-excel");
-        header("Content-Disposition: attachment; filename=ventasDetalladas.xls");
+        header("Content-Disposition: attachment; filename=gestionDetalladas.xls");
+        $ventas = $conn->ventaDetallada($_GET['from'], $_GET['to'], $_GET['servicio']);
+        if($_GET['servicio'] == 1) {
+          echo '<table class="table table-responsive table-hover table-condensed">';
+          echo '<thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Cedula</th>
+                    <th>Fecha de nacimiento</th>
+                    <th>Teléfono 1</th>
+                    <th>Teléfono 2</th>
+                    <th>Correo</th>
+                   <th>Producto</th>
+                    <th>Agente</th>
+                    <th>Fecha</th>
+                  </tr>
+                </thead>
+                <tbody>';
 
-        echo '<table class="table table-responsive table-hover table-condensed">';
-        echo '<thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Apellido</th>
-                  <th>Cedula</th>
-                  <th>Fecha de nacimiento</th>
-                  <th>Teléfono 1</th>
-                  <th>Teléfono 2</th>
-                  <th>Correo</th>
-                  <th>Producto</th>
-                  <th>Agente</th>
-                  <th>Fecha</th>
-                </tr>
-              </thead>
-              <tbody>';
-
-        if (!empty($ventas)) {
-          foreach ($ventas as $venta) {
-            echo '<tr>
-                    <td>' . $venta['nombre'] . '</td>
-                    <td>' . $venta['apellido'] . '</td>
-                    <td>' . $venta['cedula'] . '</td>
-                    <td>' . $venta['fecha_nacimiento'] . '</td>
-                    <td>' . $venta['telf_hab'] . '</td>
-                    <td>' . $venta['telf_celular'] . '</td>
-                    <td>' . $venta['correo'] . '</td>
-                    <td>' . $venta['descripcion'] . '</td>
-                    <td>' . $venta['agente'] . '</td>
-                    <td>' . $venta['fecha_venta'] . '</td>
-                  </tr>';
+          if (!empty($ventas)) {
+            foreach ($ventas as $venta) {
+              echo '<tr>
+                      <td>' . $venta['nombre'] . '</td>
+                      <td>' . $venta['apellido'] . '</td>
+                      <td>' . $venta['cedula'] . '</td>
+                      <td>' . $venta['fecha_nacimiento'] . '</td>
+                      <td>' . $venta['telf_hab'] . '</td>
+                      <td>' . $venta['telf_celular'] . '</td>
+                      <td>' . $venta['correo'] . '</td>
+                      <td>' . $venta['descripcion'] . '</td>
+                      <td>' . $venta['agente'] . '</td>
+                      <td>' . $venta['fecha_venta'] . '</td>
+                    </tr>';
+            }
           }
-        }
 
-        echo '</tbody></table>';
+          echo '</tbody></table>';
+        }else{
+          echo '<table class="table table-responsive table-hover table-condensed">';
+          echo '<thead>
+                  <tr>
+                    <th>Nombre del cliente</th>
+                    <th>ID Cuota</th>
+                    <th>Monto</th>
+                    <th>Fecha de pago</th>
+                    <th>Plan de pago</th>
+                    <th>Parentesco</th>
+                    <th>Nombre del contacto</th>
+                    <th>Operador</th>
+                    <th>Observaciones</th>
+                    <th>Fecha</th>
+                  </tr>
+                </thead>
+                <tbody>';
+
+          if (!empty($ventas)) {
+            foreach ($ventas as $venta) {
+              echo '<tr>
+                      <td>' . $venta['nombreCliente'] . '</td>
+                      <td>' . $venta['idCuota'] . '</td>
+                      <td>' . $venta['monto'] . '</td>
+                      <td>' . $venta['fechaPago'] . '</td>
+                      <td>' . $venta['planDePago'] . '</td>
+                      <td>' . $venta['parentesco'] . '</td>
+                      <td>' . $venta['nombreEncargado'] . '</td>
+                      <td>' . $venta['operador'] . '</td>
+                      <td>' . $venta['observaciones'] . '</td>
+                      <td>' . $venta['fechaCreacion'] . '</td>
+                    </tr>';
+            }
+          }
+
+          echo '</tbody></table>';
+        }
 
         break;
       
@@ -204,7 +246,7 @@ if (empty($_SESSION)) {
         if (isset($_POST['fecha_d']) || isset($_POST['fecha_h'])) {
           $desde = date('Ymd', strtotime($_POST['fecha_d']));
           $hasta = date('Ymd', strtotime($_POST['fecha_h']));
-          $ventas = $conn->ventaDetallada($desde, $hasta, $_POST['servicio']);
+          $ventas = $conn->ventaDetallada($_POST['fecha_d'], $_POST['fecha_h'], $_POST['servicio']);
         }
 
         include(HTML_DIR . 'reportes/gestionCashea.php');
