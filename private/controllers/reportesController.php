@@ -241,7 +241,8 @@ if (empty($_SESSION)) {
       case 'gestionCashea':
         include(PUBLIC_DIR . 'general/header.php');
         include(PUBLIC_DIR . 'general/navbar.php');
-        $servicio = $conn->servicio();
+        
+        //$servicio = $conn->servicio($id);
 
         if (isset($_POST['fecha_d']) || isset($_POST['fecha_h'])) {
           $desde = date('Ymd', strtotime($_POST['fecha_d']));
