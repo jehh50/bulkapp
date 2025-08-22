@@ -203,6 +203,7 @@ if (empty($_SESSION)) {
           echo '<thead>
                   <tr>
                     <th>Nombre del cliente</th>
+                    <th>Cédula</th>
                     <th>ID Cuota</th>
                     <th>Monto</th>
                     <th>Fecha de pago</th>
@@ -220,6 +221,7 @@ if (empty($_SESSION)) {
             foreach ($ventas as $venta) {
               echo '<tr>
                       <td>' . $venta['nombreCliente'] . '</td>
+                      <td>' . $venta['cedula'] . '</td>
                       <td>' . $venta['idCuota'] . '</td>
                       <td>' . $venta['monto'] . '</td>
                       <td>' . $venta['fechaPago'] . '</td>
