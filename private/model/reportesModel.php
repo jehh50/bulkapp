@@ -82,7 +82,8 @@ class database
             CONCAT(u.nombre, ' ', u.apellido) AS 'operador',
             cc.nombre_usuario AS 'nombreCliente',
             rc.created_at AS 'fechaCreacion',
-            s.name AS 'estadoGestion'
+            s.name AS 'estadoGestion',
+            cc.cedula AS 'cedula'
         FROM
             results_cashea AS rc
         LEFT JOIN

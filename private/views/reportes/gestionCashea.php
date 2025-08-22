@@ -38,6 +38,7 @@
                   <tr class="bg-success">
                     <th style="text-align: center;">#</th>
                     <th style="text-align: center;">Nombre del cliente</th>
+                    <th style="text-align: center;">Cédula</th>
                     <th style="text-align: center;">ID Cuota</th>
                     <th style="text-align: center;">Monto</th>
                     <th style="text-align: center;">Fecha de pago</th>
@@ -55,6 +56,7 @@
                       <tr align="center">
                         <td><?= $i?></td>
                         <td><?= $venta['nombreCliente']; ?></td>
+                        <td><?= $venta['cedula']; ?></td>
                         <td><?= $venta['idCuota']; ?></td>
                         <td><?= $venta['monto']; ?></td>
                         <td><?= $venta['fechaPago']; ?></td>
