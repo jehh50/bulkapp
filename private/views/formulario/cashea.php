@@ -216,7 +216,8 @@
 
                       <div class="form-group mb-3" id="dQuote">
                         <label class="form-label">ID de la cuota</label>
-                        <input type="text" class="form-control" placeholder="5511223" aria-describedby="idQuote" name="idQuote" id="idQuote" />
+                        <input type="text" class="form-control" placeholder="5511223,5511224" aria-describedby="idQuote" name="idQuote" id="idQuote" />
+                        <p id="error-message" style="color: red;"></p>
                       </div>
 
                       <div class="form-group mb-3" id="dAmount">
@@ -262,7 +263,7 @@
                         <textarea class="form-control" rows=3 maxlength="250" name="observaciones" id="observaciones" oninput="upperCase(this);"></textarea>
                       </div>
                     </div>
-                    <button type="submit" class="btn btn-success btn-md btn-block">Guardar</button>
+                    <button type="submit" id="submitBtn" class="btn btn-success btn-md btn-block">Guardar</button>
                   </form>
                 </div>
               </div>
@@ -277,3 +278,31 @@
 </div>
 
 <script src="public/js/formularioC.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+  const input = document.getElementById('idQuote');
+  const errorMessage = document.getElementById('error-message');
+  const submitBtn = document.getElementById('submitBtn'); // Obtiene el botón
+
+  // La expresión regular que permite solo números y comas
+  const regex = /^[\d,]+$/;
+
+  // Función de validación para reutilizar
+  function validateInput() {
+    if (regex.test(input.value)) {
+      errorMessage.textContent = "";
+      input.style.border = "1px solid green";
+      submitBtn.disabled = false; // Habilita el botón si la validación es correcta
+    } else {
+      errorMessage.textContent = "Error: solo se permiten números y comas.";
+      input.style.border = "1px solid red";
+      submitBtn.disabled = true; // Deshabilita el botón si la validación falla
+    }
+  }
+
+ 
+  // Escucha el evento 'input' para validar en tiempo real
+  input.addEventListener('input', validateInput);
+});
+</script>
