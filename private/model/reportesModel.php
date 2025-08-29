@@ -34,7 +34,7 @@ class database
 
   public function efectivo($serv)
   {
-    $sql = $this->db->query("SELECT id FROM efectivo WHERE servicio_id = '$serv' and descripcion = 'gestión efectiva'");
+    $sql = $this->db->query("SELECT id FROM efectivo WHERE servicio_id  IN $serv and descripcion = 'gestión efectiva'");
     if ($this->db->rows($sql) > 0) {
       $data = $this->db->recorrer($sql);
       $respuesta[] = $data;
@@ -277,4 +277,70 @@ class database
     }
     return $respuesta;
   }
+
+  public function gestionDetalladaCashea($desde, $hasta)
+{
+    // Usar declaraciones preparadas para prevenir inyecciones SQL
+    $sql = "SELECT 
+        IF(g.contacto_id = 0, 'No Efectivo', 'Efectivo') AS tipo_contacto,
+        e.descripcion AS efectivo,
+        ne.descripcion AS no_efectivo,
+        sc.descripcion AS sub_contacto,
+        CASE rc.paymentPlan
+            WHEN '1' THEN 'Monto total'
+            WHEN '2' THEN 'Cuota'
+            WHEN '3' THEN 'Pago personalizado'
+            ELSE rc.paymentPlan
+        END AS planDePago,
+        rc.paymentDate AS fechaPago,
+        rc.idQuote AS idCuota,
+        rc.amount AS monto,
+        rc.fullName AS nombreEncargado,
+        CASE rc.relationship
+            WHEN 'PADRE' THEN 'Padre'
+            WHEN 'MADRE' THEN 'Madre'
+            WHEN 'HIJO' THEN 'Hijo/Hija'
+            WHEN 'HERMANO' THEN 'Hermano/Hermana'
+            WHEN 'ESPOSA' THEN 'Esposo/Esposa'
+            WHEN 'OTRO' THEN 'Otro'
+            ELSE 'No especificado'
+        END AS parentesco,
+        rc.observaciones AS observaciones,
+        cc.nombre_usuario,
+        cc.cedula,
+        st.name AS status,
+        CONCAT(u.nombre, ' ', u.apellido) AS operador,
+        g.fecha AS fecha_gestion,
+        g.hora AS hora_gestion
+    FROM 
+        gestion g
+    LEFT JOIN 
+        results_cashea rc ON g.id = rc.gestion_id
+    LEFT JOIN 
+        efectivo e ON g.efectivo_id = e.id
+    LEFT JOIN 
+        noefectivo ne ON g.noefectivo_id = ne.id
+    LEFT JOIN 
+        subcontacto sc ON g.subcontacto_id = sc.id
+    INNER JOIN 
+        cashea_customers cc ON cc.id = rc.cliente_id
+    INNER JOIN 
+        status st ON st.id = cc.status_id
+    INNER JOIN 
+        users u ON u.id = g.user_id
+    WHERE 
+        g.servicio_id = 2 
+        AND g.fecha BETWEEN ? AND ?;
+    ";
+
+    // Asumiendo que tu clase `db` tiene un método para declaraciones preparadas
+    $stmt = $this->db->prepare($sql);
+    $stmt->bind_param("ss", $desde, $hasta); // "ss" indica que ambos parámetros son strings
+    $stmt->execute();
+
+    $respuesta = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+    return $respuesta;
 }
+}
+?>

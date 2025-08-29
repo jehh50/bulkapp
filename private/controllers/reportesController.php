@@ -10,7 +10,8 @@ if (empty($_SESSION)) {
       case 'index':
         include(PUBLIC_DIR . 'general/header.php');
         include(PUBLIC_DIR . 'general/navbar.php');
-        $servicio = $conn->servicio();
+        $id = '(1,2)';
+        $servicio = $conn->servicio($id);
         include(HTML_DIR . 'reportes/index.php');
         include(PUBLIC_DIR . 'general/footer.php');
         break;
@@ -26,13 +27,13 @@ if (empty($_SESSION)) {
           $hasta = $desde;
         }
         if (!empty($_POST['servicio'])) {
-          $serv = $_POST['servicio'];
+          $serv = '(1,2)';
         }
 
-        $servicio = $conn->servicio();
+        $servicio = $conn->servicio($serv);
         $idEfectivo = $conn->efectivo($serv);
 
-        $gestion = $conn->clientesGestionados($desde, $hasta, $serv, $idEfectivo[0]['id']);
+        $gestion = $conn->clientesGestionados($desde, $hasta, $_POST['servicio'], $idEfectivo[0]['id']);
         include(HTML_DIR . 'reportes/index.php');
         include(PUBLIC_DIR . 'general/footer.php');
         break;
@@ -255,6 +256,72 @@ if (empty($_SESSION)) {
         include(HTML_DIR . 'reportes/gestionCashea.php');
         include(PUBLIC_DIR . 'general/footer.php');
         break;
+      
+      case 'gestionDetalladaCashea':
+        include(PUBLIC_DIR . 'general/header.php');
+        include(PUBLIC_DIR . 'general/navbar.php');
+
+        
+        if (isset($_POST['fecha_d']) || isset($_POST['fecha_h'])) {
+          $desde = date('Ymd', strtotime($_POST['fecha_d']));
+          $hasta = date('Ymd', strtotime($_POST['fecha_h']));
+          $detallados = $conn->gestionDetalladaCashea($_POST['fecha_d'], $_POST['fecha_h']);
+        }
+        include(HTML_DIR . 'reportes/gestionDetalladaCashea.php');
+        include(PUBLIC_DIR . 'general/footer.php');
+        break;
+      
+      case 'downloadCashea':
+        header("Content-type: application/vnd.ms-excel");
+        header("Content-Disposition: attachment; filename=gestionDetalladasCashea.xls");
+        $detallados = $conn->gestionDetalladaCashea($_GET['from'], $_GET['to']);
+          echo '<table class="table table-responsive table-hover table-condensed">';
+          echo '<thead>
+                  <tr> 
+                    <th>Tipo de contacto</th>
+                    <th>No efectivo</th>
+                    <th>Efectivo</th>
+                    <th>Sub Contacto </th>
+                    <th>Plan de pago</th>
+                    <th>Fecha de pago</th>
+                    <th>ID Cuota</th>
+                    <th>Monto</th>
+                    <th>Nombre del contacto</th>
+                    <th>Parentesco</th>
+                    <th>Observaciones</th>
+                    <th>Cliente</th>
+                    <th>Cédula</th>
+                    <th>Estatus</th>
+                    <th>Operador</th>
+                    <th>Fecha gestión</th>
+                    <th>Hora gestión</th>
+                  </tr>
+                </thead>
+                <tbody>';
+          if (!empty($detallados)) { $i=1;
+            foreach ($detallados as $detallado) {
+              echo '<tr>
+                      <td>' . $detallado['tipo_contacto'] . '</td>
+                      <td>' . $detallado['efectivo'] . '</td>
+                      <td>' . $detallado['no_efectivo'] . '</td>
+                      <td>' . $detallado['sub_contacto'] . '</td>
+                      <td>' . $detallado['planDePago'] . '</td>
+                      <td>' . $detallado['fechaPago'] . '</td>
+                      <td>' . $detallado['idCuota'] . '</td>
+                      <td>' . $detallado['monto'] . '</td>
+                      <td>' . $detallado['nombreEncargado'] . '</td>
+                      <td>' . $detallado['parentesco'] . '</td>
+                      <td>' . $detallado['observaciones'] . '</td>
+                      <td>' . $detallado['nombre_usuario'] . '</td>
+                      <td>' . $detallado['cedula'] . '</td>
+                      <td>' . $detallado['status'] . '</td>
+                      <td>' . $detallado['operador'] . '</td>
+                      <td>' . $detallado['fecha_gestion'] . '</td>
+                      <td>' . $detallado['hora_gestion'] . '</td>
+                    </tr>';
+            }
+          }
+          break;
 
       default:
         header('location:' . HTML_DIR . 'error.html');

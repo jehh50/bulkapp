@@ -77,7 +77,7 @@ class database
       return $respuesta;
     }
     if ($servicio == 2) {
-      $sql = $this->db->query("SELECT * FROM cashea_customers WHERE cedula = '$telefono' and status_id != 7 ORDER BY id_cuota ASC");
+      $sql = $this->db->query("SELECT  s.name as status, cc.status_id, cc.id, cc.id_cuota, cc.local_origen, cc.plata_por_cobrar, cc.fecha_pagar, cc.numero_cuota, cc.tramo_inicial, cc.segmento, cc.nombre_usuario, cc.email, cc.telefono, cc.cedula FROM cashea_customers cc INNER JOIN status s ON cc.status_id = s.id WHERE cc.cedula = '$telefono'  ORDER BY cc.id_cuota ASC");
       if ($this->db->rows($sql) > 0) {
         while ($data = $this->db->recorrer($sql)) {
           $respuesta[] = $data;

@@ -49,7 +49,7 @@
           } ?>
           <div class="row text-center" id="formularioCliente">
             <!-- Columna Izquierda: Tabla de compras -->
-            <div class="col-lg-6 col-md-6 col-sm-11" style="float:none; display:inline-block; vertical-align:top;">
+            <div class="col-lg-7 col-md-7 col-sm-11" style="float:none; display:inline-block; vertical-align:top;">
               <div class="panel panel-default">
                 <div class="panel-body">
                   <div class="alert" style="background:#e9e9e9;" role="alert" id="customerData">
@@ -112,6 +112,7 @@
                             <th class="text-center"><h5><strong>Cuota</strong></h5></th>
                             <th class="text-center"><h5><strong>Tramo</strong></h5></th>
                             <th class="text-center"><h5><strong>Segmento</strong></h5></th>
+                            <th class="text-center"><h5><strong>Estado</strong></h5></th>
                           </tr>
                           </thead>
                           <tbody>';
@@ -128,6 +129,7 @@
                                       <td class="text-center">' . $row['numero_cuota'] . '</td>
                                       <td class="text-center">' . $row['tramo_inicial'] . '</td>
                                       <td class="text-center">' . $row['segmento'] . '</td>
+                                      <td class="text-center">' . ($row['status'] == 'Efectiva' ? $row['status'].' ✅' : ($row['status'] == 'No pago' ? $row['status'] .' ❌' : $row['status']) ) .  '</td>
                                     </tr>';
                             $suma_monto += $quote;
                             $i++;
@@ -136,7 +138,7 @@
                         echo '<tr>
                                     <td colspan="2" class="text-right"><strong>Total</strong></td>
                                     <td class="text-center"><strong>' .$suma_monto . '</strong></td>
-                                    <td colspan="2"></td>
+                                    <td colspan="4"></td>
                                   </tr>';
                         echo '</tbody></table></div>';
                         $firstPane = false;
@@ -148,7 +150,7 @@
               </div>
             </div>
             <!-- Columna Derecha: Formulario -->
-            <div class="col-lg-5 col-md-5 col-sm-11 col-xs-11" style="float:none; display:inline-block; vertical-align:top;">
+            <div class="col-lg-4 col-md-4 col-sm-11 col-xs-11" style="float:none; display:inline-block; vertical-align:top;">
               <div class="panel panel-default">
                 <div class="panel-body">
                   <form name="form2" enctype="multipart/form-data" method="POST" onsubmit="return validateForm2();" action="?view=formulario&mode=registro" autocomplete="off">
