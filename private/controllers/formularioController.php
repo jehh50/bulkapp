@@ -35,11 +35,17 @@ if (empty($_SESSION)) {
         if (!$cliente) {
           $msg = 'Cliente sin deuda';
         } else {
-          if ($cliente[0]['status_id'] == 9) {
-            $msg = 'Cliente ya atendido';
-          } else {
-            $msg = '';
+          $st = '';
+          for($i=0; $i < count($cliente); $i++) {
+            $st .= $cliente[$i]['status_id'];
           }
+          $pay = str_repeat(7, count($cliente));
+          if ($st == $pay) {
+            $msg = 'Cliente sin deuda ✅' ;
+          } else { 
+            $msg = ''; 
+          }
+
         }
         include(PUBLIC_DIR . 'general/header.php');
         include(PUBLIC_DIR . 'general/navbar.php');
@@ -185,7 +191,7 @@ if (empty($_SESSION)) {
 
           case 2: // cashea
             if ($subContacto == 1 || $subContacto == 10 || $subContacto == 20 || $subContacto == 21) {
-              $status = 7;
+              $status = 9;
 
               $gestionId = $conn->registroGestion($_POST['contacto'], $efectivo, $producto, $noefectivo, $subContacto, $_POST['usuario'], $date, $_POST['id_cliente'], $status, $hora, $_POST['servicio'], $dni, $idQuote);
 

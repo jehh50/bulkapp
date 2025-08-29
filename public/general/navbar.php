@@ -25,6 +25,7 @@
                   <li><a href="?view=carga_archivo&mode=index">Carga BBDD</a></li>
                   <!-- <li><a href="?view=configuracion&mode=cargaArchivo">Carga BBDD</a></li> -->
                   <li><a href="?view=configuracion&mode=editarResultado">Editar resultados</a></li>
+                  <li><a href="?view=carga_archivo&mode=liberarCuotas">Liberar cuotas</a></li>
                   <li><a href="?view=usuarios&mode=index">Bandeja de usuarios</a></li>
                   <li><a href="?view=usuarios&mode=new">Nuevo usuario</a></li>
                 </ul>
@@ -38,9 +39,10 @@
                   <li><a href="?view=reportes&mode=contactabilidad">Motivos de contacto</a></li>
                   <li><a href="?view=reportes&mode=ventas">Ventas por estado</a></li>
                   <li><a href="?view=reportes&mode=detalleventas">Detalle de ventas</a></li>
-                  <li><a href="?view=reportes&mode=gestionCashea">Gestión Cashea</a></li>
                   <li><a href="?view=reportes&mode=liberar">Liberar cliente</a></li>
                   <li><a href="?view=xml&mode=index">XML</a></li>
+                  <li><a href="?view=reportes&mode=gestionCashea">Gestión Cashea</a></li>
+                  <li><a href="?view=reportes&mode=gestionDetalladaCashea">Gestión Detallada Cashea</a></li>
                 </ul>
               </li>
             <?php } ?>
@@ -52,7 +54,7 @@
                   <li><a href="?view=reportes&mode=contactabilidad">Motivos de contacto</a></li>
                   <li><a href="?view=reportes&mode=ventas">Ventas por estado</a></li>
                   <li><a href="?view=reportes&mode=detallada">Gestión detallada</a></li>
-                  <!-- <li><a href="?view=reportes&mode=gestionCashea">Gestión Cashea</a></li> -->
+                  <li><a href="?view=reportes&mode=gestionDetalladaCashea">Gestión Detallada Cashea</a></li>
                 </ul>
               </li>
             <?php } ?>

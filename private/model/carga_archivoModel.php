@@ -137,4 +137,38 @@ class database
 		}
 		return $respuesta;
 	}
+
+	public function updateQuotes($paramsBatch, $paramTypes)
+	{
+		try {
+			foreach ($paramsBatch as $param) {
+				$param = explode(';', $param[0]);
+				$id = $param[0];
+				$status = ($param[1] == 'Pago' ? 7 : 10);
+
+				echo "ID: $id, Status: $status\n";
+
+				// Reactivar cuota
+				$query = "UPDATE cashea_customers SET status_id = $status WHERE id_cuota = ?";
+				$stmt = $this->db->preparedQuery($query, [$id], $paramTypes);
+				if ($stmt) $stmt->close();
+
+				/*
+				// Si el estado es 'Pago', marcar como pagado, si no, como rechazado
+					$status = ($param[1] == 'Pago' ? 7 : 5);
+
+					// Marcar resultado como rechazado
+					$query = "UPDATE results_cashea SET status_id = $status WHERE idQuote LIKE  '?'";
+					$stmt = $this->db->preparedQuery($query, [$id . '%'], $paramTypes);
+					if ($stmt) $stmt->close();
+				
+				*/
+			}
+
+			return true;
+		} catch (Exception $e) {
+			echo "Error en updateQuotes: " . $e->getMessage();
+			return false;
+		}
+	}
 }

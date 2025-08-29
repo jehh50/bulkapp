@@ -57,7 +57,7 @@ if (empty($_SESSION)) {
 						// Preparar la fila actual según el servicio
 						if ($servicio == 1) {
 							$fila = array_slice($datos, 0, 9);
-							$paramTypes = str_repeat('s', 9) ; // Tipos para el servicio 1
+							$paramTypes = str_repeat('s', 9); // Tipos para el servicio 1
 						} else {
 							$fila = array_slice($datos, 0, 20);
 							$paramTypes = str_repeat('s', 20); // Tipos para el servicio 2
@@ -82,6 +82,64 @@ if (empty($_SESSION)) {
 					echo json_encode(['error' => 'No se pudo abrir el archivo.']);
 				}
 
+				break;
+
+			case 'liberarCuotas';
+				include(PUBLIC_DIR . 'general/header.php');
+				include(PUBLIC_DIR . 'general/navbar.php');
+				include(HTML_DIR . 'carga_archivo/liberarCuotas.php');
+				include(PUBLIC_DIR . 'general/footer.php');
+				break;
+
+			case 'freeQuotes';
+				ob_clean(); // Limpia el buffer de salida
+				// Validaciones básicas de seguridad y existencia del archivo
+				if (empty($_FILES["archivo"]) || $_FILES["archivo"]['error'] !== UPLOAD_ERR_OK) {
+					echo json_encode(['error' => 'No se recibió el archivo o hubo un error al subirlo.']);
+					break;
+				}
+				$archivo = $_FILES["archivo"]['tmp_name'];
+				$batchSize = 500; // Tamaño del lote para inserciones
+				$response = json_encode(['mensaje' => 'No se procesaron filas.']); // Respuesta por defecto
+
+				if (($fp = fopen($archivo, "r")) !== false) {
+					// 1. LEER Y DESCARTAR LA CABECERA (HEADER) ANTES DEL BUCLE
+					// Esto posiciona el puntero del archivo en la primera fila de datos.
+					fgetcsv($fp, 0, ",");
+
+					$paramsBatch = [];
+					$paramTypes = '';
+
+					// 2. CORRECCIÓN DEL BUCLE: Leer una nueva línea del archivo en cada iteración
+					while (($datos = fgetcsv($fp, 0, ",")) !== false) {
+
+						// Omitir filas vacías que fgetcsv a veces puede retornar
+						if (empty($datos) || $datos[0] === null) {
+							continue;
+						}
+
+						// Preparar la fila actual según el servicio
+							$fila = array_slice($datos, 0, 2);
+							$paramTypes = str_repeat('s', 1); 
+
+						$paramsBatch[] = $fila;
+
+						if (count($paramsBatch) >= $batchSize) {
+							$response = $con->updateQuotes($paramsBatch, $paramTypes);
+							$paramsBatch = [];
+						}
+					}
+
+					fclose($fp);
+
+					if (!empty($paramsBatch)) {
+						$response = $con->updateQuotes($paramsBatch, $paramTypes);
+					}
+
+					header('Location: ?view=carga_archivo&mode=liberarCuotas&mensaje=exito');
+				} else {
+					echo json_encode(['error' => 'No se pudo abrir el archivo.']);
+				}
 				break;
 
 
