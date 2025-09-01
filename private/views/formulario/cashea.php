@@ -121,7 +121,12 @@
                         foreach ($cliente as $row) {
                           if ($row['local_origen'] == $c['local_origen']) {
                           $quote = round((float)(str_replace(",",".",$row['plata_por_cobrar'])),2);
-                          $fechaFormateada = DateTime::createFromFormat('d/m/Y H:i', $row['fecha_pagar'])->format('d/m/Y');
+                          if (date('Y-m-d', strtotime($row['fecha_pagar'])) < date('Y-m-d')) {
+                              $fechaFormateada = $row['fecha_pagar'];
+                          } else {
+                            $fechaFormateada = DateTime::createFromFormat('d/m/Y H:i', $row['fecha_pagar'])->format('d/m/Y');
+                          }
+                          // $fechaFormateada = DateTime::createFromFormat('d/m/Y H:i', $row['fecha_pagar'])->format('d/m/Y');
                             echo '<tr>
                                       <th class="text-center" scope="row">' . $row['id_cuota'] . '</th>
                                       <td class="text-center">' . $fechaFormateada. '</td>
