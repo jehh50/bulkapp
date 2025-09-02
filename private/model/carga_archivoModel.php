@@ -12,54 +12,36 @@ class database
 	}
 
 
-public function guardarRegistrosBatch($batch, $cols, $servicio)
-{
-	
-    if (empty($batch)) return false;
-
-    if ($servicio == 1) {
-        $query = "INSERT INTO clientes
-            (identificacion, nombre_legal, telf_hab, telf_ofi, telf_cel, correo, direccion, cuenta, oferta)
-            VALUES ";
-
-			$this->db->query("UPDATE clientes SET status_id = 11)");
-    } else {
-
-		$this->db->query("UPDATE cashea_customers SET status_id = 11 WHERE status_id = 3");
-		
-        $query = "INSERT INTO cashea_customers
-            (cedula, id_cuota, nombre_grupo, fecha_pagar, monto_cuota, numero_cuota, fee, plata_por_cobrar,
-             capital_asignado, id_orden, identificacion_orden, fecha_creacion_orden, email, telefono,
-             nombre_usuario, local_origen, estado_deuda, tramo_inicial, tramo_actual, segmento)
-            VALUES ";
-    }
-
-    // Placeholders fijos por fila
-    $rowPlaceholders = '(' . rtrim(str_repeat('?,', $cols), ',') . ')';
-    $placeHolders = array_fill(0, count($batch), $rowPlaceholders);
-
-    // Aplana parámetros garantizando $cols por fila
-    $flatParams = [];
-    foreach ($batch as $row) {
-        // Por seguridad, trunca/pad aquí también
-        $row = array_slice($row, 0, $cols);
-        if (count($row) < $cols) $row = array_pad($row, $cols, null);
-        array_push($flatParams, ...$row);
-    }
-
-    $query .= implode(',', $placeHolders);
-    $types = str_repeat('s', $cols * count($batch));
-
-    try {
-        $stmt = $this->db->preparedQuery($query, $flatParams, $types);
-        if ($stmt) $stmt->close();
-        return true;
-    } catch (Exception $e) {
-        error_log("Error en guardarRegistrosBatch: " . $e->getMessage());
-        return false;
-    }
-}
-
+	public function guardarRegistrosBatch($batch, $types, $servicio)
+	{
+		// CORRECCIÓN 1: Verificar la variable correcta ($batch) 
+		if (empty($batch)) {
+			return false;
+		}
+		if ($servicio == 1) {
+			$query = "INSERT INTO clientes (identificacion, nombre_legal, telf_hab, telf_ofi, telf_cel, correo, direccion, cuenta, oferta) VALUES ";
+		} else {
+			$query = "INSERT INTO cashea_customers (cedula, id_cuota, nombre_grupo, fecha_pagar, monto_cuota, numero_cuota, fee, plata_por_cobrar, capital_asignado, id_orden, identificacion_orden, fecha_creacion_orden, email, telefono, nombre_usuario, local_origen, estado_deuda, tramo_inicial, tramo_actual, segmento) VALUES ";
+		}
+		$placeHolders = [];
+		$flatennedParams = [];
+		foreach ($batch as $row) {
+			// CORRECCIÓN 2: Usar count($row) para obtener el número de columnas
+			$placeHolders[] = '(' . implode(',', array_fill(0, count($row), '?')) . ')';
+			$flatennedParams = array_merge($flatennedParams, $row);
+		}
+		try {
+			$query .= implode(',', $placeHolders);
+			$stmt = $this->db->preparedQuery($query, $flatennedParams, str_repeat($types, count($batch)));
+			if ($stmt) {
+				$stmt->close();
+			}
+			return true;
+		} catch (Exception $e) {
+			error_log("Error en guardarRegistrosTemporalBatch: " . $e->getMessage());
+			return false;
+		}
+	}
 
 
 	public function registroCashea(

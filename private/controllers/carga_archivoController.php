@@ -27,42 +27,53 @@ if (empty($_SESSION)) {
 				}
 				$archivo = $_FILES["archivo"]['tmp_name'];
 				$servicio = $_POST['servicio'];
+				$batchSize = 500; // Tamaño del lote para inserciones
 				$response = json_encode(['mensaje' => 'No se procesaron filas.']); // Respuesta por defecto
-				// ...
-				$batchSize = 500;
 
 				if (($fp = fopen($archivo, "r")) !== false) {
+					// Detectar la codificación del archivo una sola vez
 					$encoding = mb_detect_encoding(file_get_contents($archivo), 'UTF-8, ISO-8859-1', true);
-					fgetcsv($fp, 0, ";"); // descarta header
+
+					// 1. LEER Y DESCARTAR LA CABECERA (HEADER) ANTES DEL BUCLE
+					// Esto posiciona el puntero del archivo en la primera fila de datos.
+					fgetcsv($fp, 0, ",");
 
 					$paramsBatch = [];
-					$cols = ($servicio == 1) ? 9 : 20; // columnas esperadas fijas
+					$paramTypes = '';
 
-					while (($datos = fgetcsv($fp, 0, ";")) !== false) {
-						if (empty($datos) || $datos[0] === null) continue;
+					// 2. CORRECCIÓN DEL BUCLE: Leer una nueva línea del archivo en cada iteración
+					while (($datos = fgetcsv($fp, 0, ",")) !== false) {
 
-						// Normaliza encoding
-						$datos = array_map(function ($v) use ($encoding) {
-							return mb_convert_encoding($v, 'UTF-8', $encoding ?: 'UTF-8');
+						// Omitir filas vacías que fgetcsv a veces puede retornar
+						if (empty($datos) || $datos[0] === null) {
+							continue;
+						}
+
+						// Convertir la codificación de cada celda a UTF-8
+						$datos = array_map(function ($value) use ($encoding) {
+							return mb_convert_encoding($value, 'UTF-8', $encoding);
 						}, $datos);
 
-						// Toma primeras N columnas y pad con NULL hasta completar
-						$fila = array_slice($datos, 0, $cols);
-						if (count($fila) < $cols) {
-							$fila = array_pad($fila, $cols, null);
+						// Preparar la fila actual según el servicio
+						if ($servicio == 1) {
+							$fila = array_slice($datos, 0, 9);
+							$paramTypes = str_repeat('s', 9); // Tipos para el servicio 1
+						} else {
+							$fila = array_slice($datos, 0, 20);
+							$paramTypes = str_repeat('s', 20); // Tipos para el servicio 2
 						}
 
 						$paramsBatch[] = $fila;
-
 						if (count($paramsBatch) >= $batchSize) {
-							$response = $con->guardarRegistrosBatch($paramsBatch, $cols, $servicio);
+							$response = $con->guardarRegistrosBatch($paramsBatch, $paramTypes, $servicio);
 							$paramsBatch = [];
 						}
 					}
+
 					fclose($fp);
 
 					if (!empty($paramsBatch)) {
-						$response = $con->guardarRegistrosBatch($paramsBatch, $cols, $servicio);
+						$response = $con->guardarRegistrosBatch($paramsBatch, $paramTypes, $servicio);
 					}
 
 					header('Location: ?view=carga_archivo&mode=index&mensaje=exito');
@@ -107,8 +118,8 @@ if (empty($_SESSION)) {
 						}
 
 						// Preparar la fila actual según el servicio
-						$fila = array_slice($datos, 0, 2);
-						$paramTypes = str_repeat('s', 1);
+							$fila = array_slice($datos, 0, 2);
+							$paramTypes = str_repeat('s', 1); 
 
 						$paramsBatch[] = $fila;
 
