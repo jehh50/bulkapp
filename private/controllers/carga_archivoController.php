@@ -34,13 +34,13 @@ if (empty($_SESSION)) {
 					// Detectar la codificación del archivo una sola vez
 					$encoding = mb_detect_encoding(file_get_contents($archivo), 'UTF-8, ISO-8859-1', true);
 
-					fgetcsv($fp, 0, ",");
+					fgetcsv($fp, 0, ";");
 
 					$paramsBatch = [];
 					$paramTypes = '';
 
 					// 2. CORRECCIÓN DEL BUCLE: Leer una nueva línea del archivo en cada iteración
-					while (($datos = fgetcsv($fp, 0, ",")) !== false) {
+					while (($datos = fgetcsv($fp, 0, ";")) !== false) {
 
 						// Omitir filas vacías que fgetcsv a veces puede retornar
 						if (empty($datos) || $datos[0] === null) {
