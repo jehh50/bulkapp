@@ -34,8 +34,6 @@ if (empty($_SESSION)) {
 					// Detectar la codificación del archivo una sola vez
 					$encoding = mb_detect_encoding(file_get_contents($archivo), 'UTF-8, ISO-8859-1', true);
 
-					// 1. LEER Y DESCARTAR LA CABECERA (HEADER) ANTES DEL BUCLE
-					// Esto posiciona el puntero del archivo en la primera fila de datos.
 					fgetcsv($fp, 0, ",");
 
 					$paramsBatch = [];
