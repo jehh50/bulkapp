@@ -18,27 +18,38 @@ class database
 		if (empty($batch)) {
 			return false;
 		}
+
 		if ($servicio == 1) {
 			$query = "INSERT INTO clientes (identificacion, nombre_legal, telf_hab, telf_ofi, telf_cel, correo, direccion, cuenta, oferta) VALUES ";
 		} else {
 			$query = "INSERT INTO cashea_customers (cedula, id_cuota, nombre_grupo, fecha_pagar, monto_cuota, numero_cuota, fee, plata_por_cobrar, capital_asignado, id_orden, identificacion_orden, fecha_creacion_orden, email, telefono, nombre_usuario, local_origen, estado_deuda, tramo_inicial, tramo_actual, segmento) VALUES ";
 		}
+
 		$placeHolders = [];
 		$flatennedParams = [];
+
 		foreach ($batch as $row) {
-			// CORRECCIÓN 2: Usar count($row) para obtener el número de columnas
+			// Crea los placeholders para cada fila, por ejemplo: (?, ?, ?, ...)
 			$placeHolders[] = '(' . implode(',', array_fill(0, count($row), '?')) . ')';
+			// Aplanar el array, añadiendo los valores de la fila al array de parámetros
 			$flatennedParams = array_merge($flatennedParams, $row);
 		}
+
 		try {
+	        // Unir los placeholders para formar la consulta completa.
 			$query .= implode(',', $placeHolders);
-			$stmt = $this->db->preparedQuery($query, $flatennedParams, str_repeat($types, count($batch)));
+
+			$totalParamsCount = count($batch) * count($batch[0]);
+			$paramTypesString = str_repeat('s', $totalParamsCount);
+
+			$stmt = $this->db->preparedQuery($query, $flatennedParams, $paramTypesString);
+
 			if ($stmt) {
 				$stmt->close();
 			}
 			return true;
 		} catch (Exception $e) {
-			error_log("Error en guardarRegistrosTemporalBatch: " . $e->getMessage());
+			error_log("Error en guardarRegistrosBatch: " . $e->getMessage());
 			return false;
 		}
 	}

@@ -190,14 +190,17 @@ if (empty($_SESSION)) {
             break;
 
           case 2: // cashea
-            if ($subContacto == 1 || $subContacto == 10 || $subContacto == 20 || $subContacto == 21) {
-              $status = 9;
 
+            if ($subContacto == 1 || $subContacto == 10 || $subContacto == 20 || $subContacto == 21) {
+              $status = 9; // Compromiso de pago
               $gestionId = $conn->registroGestion($_POST['contacto'], $efectivo, $producto, $noefectivo, $subContacto, $_POST['usuario'], $date, $_POST['id_cliente'], $status, $hora, $_POST['servicio'], $dni, $idQuote);
 
               $results = $conn->registroResultadosCashea($_POST['paymentPlan'], $_POST['paymentDate'], $idQuote, $_POST['amount'], $_POST['fullName'], $_POST['relationship'], $_POST['observaciones'], $_POST['id_cliente'], $status, $gestionId);
+           
             } else {
+
               $registro = $conn->registroGestion($_POST['contacto'], $efectivo, $producto, $noefectivo, $subContacto, $_POST['usuario'], $date, $_POST['id_cliente'], $status, $hora, $_POST['servicio'], $dni, $idQuote);
+           
             }
             header('location:?view=formulario&mode=index');
             break;

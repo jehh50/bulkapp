@@ -23,17 +23,18 @@
         <!-- INICIO DEL FORMULARIO -->
 
         <?php
-        if (empty($cliente) && empty($msg)){ } elseif($msg) {?>
+        if (empty($cliente) && empty($msg)) {
+        } elseif ($msg) { ?>
           <div class="panel-body">
-              <div class="form-group">
-                <div class="row">
-                  <div class="col-xs-10 col-sm-11 col-md-12 col-lg-12">
-                    <div class='alert alert-success' role='alert'><?= $msg; ?></div>
-                  </div>
+            <div class="form-group">
+              <div class="row">
+                <div class="col-xs-10 col-sm-11 col-md-12 col-lg-12">
+                  <div class='alert alert-success' role='alert'><?= $msg; ?></div>
                 </div>
               </div>
             </div>
-        <?php } else {
+          </div>
+          <?php } else {
           if ($msg) { ?>
             <div class="panel-body">
               <div class="form-group">
@@ -47,32 +48,36 @@
 
           <?php exit;
           } ?>
-          <div class="row text-center" id="formularioCliente">
+          <div class="row" id="formularioCliente" style="padding-left: 20px;">
             <!-- Columna Izquierda: Tabla de compras -->
-            <div class="col-lg-7 col-md-7 col-sm-11" style="float:none; display:inline-block; vertical-align:top;">
+            <div class="col-lg-7 col-md-7 col-sm-11">
               <div class="panel panel-default">
                 <div class="panel-body">
                   <div class="alert" style="background:#e9e9e9;" role="alert" id="customerData">
-                    <strong>Datos del cliente:</strong>
                     <span id="customer">
                       <?php
-                      $ultimoNombre = $ultimoEmail = $ultimoTelefono = $ultimoSegmento = $ultimoCedula = '';
+                      $ultimoNombre = $ultimoEmail = $ultimoTelefono = $ultimoSegmento = $ultimoCedula = $ultimoDeuda = '';
                       foreach ($cliente as $c) {
                         if ($c['nombre_usuario'] !== $ultimoNombre) {
-                          echo strtoupper($c['nombre_usuario']) . ' - ';
+                          echo '<strong>Nombre del cliente: </strong>' . strtoupper($c['nombre_usuario']);
                           $ultimoNombre = $c['nombre_usuario'];
                         }
                         if ($c['email'] !== $ultimoEmail) {
-                          echo strtolower($c['email']) . ' - ';
+                          echo '<br><strong>Email: </strong>' . strtolower($c['email']);
                           $ultimoEmail = $c['email'];
                         }
                         if ($c['telefono'] !== $ultimoTelefono) {
-                          echo $c['telefono'] . ' - ';
+                          echo '<br><strong>Teléfono: </strong>' . $c['telefono'];
                           $ultimoTelefono = $c['telefono'];
                         }
                         if ($c['cedula'] !== $ultimoCedula) {
-                          echo $c['cedula'];
+                          echo '<br><strong>Cédula: </strong>' . $c['cedula'];
                           $ultimoCedula = $c['cedula'];
+                        }
+                        $deudaTotal = round((float)(str_replace(",", ".", $c['deuda_total'])), 2);
+                        if ($deudaTotal !== $ultimoDeuda) {
+                          echo '<br><strong style="font-size:16px;">Deuda total</strong><strong style="font-size:16px;color: red;"> $' . $deudaTotal . '</strong>';
+                          $ultimoDeuda = $deudaTotal;
                         }
                       }
                       ?>
@@ -108,6 +113,7 @@
                           <tr>
                             <th class="text-center"><h5><strong>ID Cuota</strong></h5></th>
                             <th class="text-center"><h5><strong>Fecha de pago</strong></h5></th>
+                            <th class="text-center"><h5><strong>Mora</strong></h5></th>
                             <th class="text-center"><h5><strong>Monto</strong></h5></th>
                             <th class="text-center"><h5><strong>Cuota</strong></h5></th>
                             <th class="text-center"><h5><strong>Tramo</strong></h5></th>
@@ -120,29 +126,24 @@
                         $suma_monto = 0;
                         foreach ($cliente as $row) {
                           if ($row['local_origen'] == $c['local_origen']) {
-                          $quote = round((float)(str_replace(",",".",$row['plata_por_cobrar'])),2);
-                          // if (date('Y-m-d', strtotime($row['fecha_pagar'])) < date('Y-m-d')) {
-                          //     $fechaFormateada = $row['fecha_pagar'];
-                          // } else {
-                          //   $fechaFormateada = DateTime::createFromFormat('d/m/Y H:i', $row['fecha_pagar'])->format('d/m/Y');
-                          // }
-                          // $fechaFormateada = DateTime::createFromFormat('d/m/Y H:i', $row['fecha_pagar'])->format('d/m/Y');
+                            $quote = round((float)(str_replace(",", ".", $row['plata_por_cobrar'])), 2);
                             echo '<tr>
                                       <th class="text-center" scope="row">' . $row['id_cuota'] . '</th>
-                                      <td class="text-center">' . $row['fecha_pagar']. '</td>
-                                      <td class="text-center">' . $quote . '</td>
+                                      <td class="text-center">' . $row['fecha_pagar'] . '</td>
+                                      <td class="text-center" style="font-weight: bold;color: red;">' . $row['mora'] . '</td>
+                                      <td class="text-center" style="font-weight:bold;">' . $quote . '</td>
                                       <td class="text-center">' . $row['numero_cuota'] . '</td>
                                       <td class="text-center">' . $row['tramo_inicial'] . '</td>
                                       <td class="text-center">' . $row['segmento'] . '</td>
-                                      <td class="text-center">' . ($row['status'] == 'Efectiva' ? $row['status'].' ✅' : ($row['status'] == 'No pago' ? $row['status'] .' ❌' : $row['status']) ) .  '</td>
+                                      <td class="text-center">' . ($row['status'] == 'Efectiva' ? $row['status'] . ' ✅' : ($row['status'] == 'No pago' ? $row['status'] . ' ❌' : $row['status'])) .  '</td>
                                     </tr>';
                             $suma_monto += $quote;
                             $i++;
                           }
                         }
                         echo '<tr>
-                                    <td colspan="2" class="text-right"><strong>Total</strong></td>
-                                    <td class="text-center"><strong>' .$suma_monto . '</strong></td>
+                                    <td colspan="3" class="text-right"><strong>Total</strong></td>
+                                    <td class="text-center"><strong>' . $suma_monto . '</strong></td>
                                     <td colspan="4"></td>
                                   </tr>';
                         echo '</tbody></table></div>';
@@ -157,7 +158,7 @@
             <!-- Columna Derecha: Formulario -->
             <div class="col-lg-4 col-md-4 col-sm-11 col-xs-11" style="float:none; display:inline-block; vertical-align:top;">
               <div class="panel panel-default">
-                <div class="panel-body">
+                <div class="panel-body" style="background-color: #b9c1db63;">
                   <form name="form2" enctype="multipart/form-data" method="POST" onsubmit="return validateForm2();" action="?view=formulario&mode=registro" autocomplete="off">
                     <input type="hidden" id="dni_cliente" name="dni_cliente" value="<?php echo $cliente[0]['cedula']; ?>">
                     <input type="hidden" id="id_cliente" name="id_cliente" value="<?php echo $cliente[0]['id']; ?>">
@@ -221,93 +222,71 @@
 
                       <div class="form-group mb-3" id="dQuote">
                         <label class="form-label">ID de la cuota</label>
-                        <input type="text" class="form-control" placeholder="5511223,5511224" aria-describedby="idQuote" name="idQuote" id="idQuote" />
-                        <p id="error-message" style="color: red;"></p>
-                      </div>
-
-                      <div class="form-group mb-3" id="dAmount">
-                        <label class="form-label">Monto a abonar</label>
-                        <input type="text" class="form-control" placeholder="545" aria-describedby="amount" name="amount" id="amount" oninput="onlyNumbers(this)" />
-                      </div>
-
-                      <div class="form-group mb-3" id="dPaymentDate">
-                        <label class="form-label">Fecha de compromiso</label>
-                        <ul class="list-unstyled">
+                        <select class="form-control" name="idQuote[]" id="idQuote" multiple>
                           <?php
-                          for ($i = 0; $i < 3; $i++) {
-                            $fecha = date('Y-m-d', strtotime("+$i day"));
-                            $label = date('d/m/Y', strtotime("+$i day"));
-                            echo "<li class='mb-2'>
-                                      <input type='radio' id='paymentDate' name='paymentDate' value='$fecha' onclick=\"document.getElementById('paymentDate').value=this.value; required\"> $label
-                                    </li>";
+                          foreach ($cliente as $c) {
+                            echo "<option value='" . $c['id_cuota'] . '|' . $c['plata_por_cobrar'] . "'>" . $c['id_cuota'] . " - " . $c['plata_por_cobrar'] . "</option>";
                           }
                           ?>
-                        </ul>
-                      </div>
-
-                      <div class="form-group mb-3" id="dFullName">
-                        <label class="form-label">Nombre y apellido</label>
-                        <input type="text" class="form-control" placeholder="Simón Díaz" aria-describedby="fullName" name="fullName" id="fullName" oninput="onlyLetters(this)" />
-                      </div>
-
-                      <div class="form-group mb-3" id="dRelationship">
-                        <label class="form-label">Parentesco</label>
-                        <select class="form-control" name="relationship" id="relationship">
-                          <option value=''>Seleccione...</option>
-                          <option value='PADRE'>Padre</option>
-                          <option value='MADRE'>Madre</option>
-                          <option value='HIJO'>Hijo/Hija</option>
-                          <option value='HERMANO'>Hermano/Hermana</option>
-                          <option value='ESPOSA'>Esposo/Esposa</option>
-                          <option value='OTRO'>Otro</option>
                         </select>
                       </div>
-
-                      <div class="form-group mb-3" id="dObservaciones">
-                        <label class="form-label">Observaciones</label>
-                        <textarea class="form-control" rows=3 maxlength="250" name="observaciones" id="observaciones" oninput="upperCase(this);"></textarea>
-                      </div>
                     </div>
-                    <button type="submit" id="submitBtn" class="btn btn-success btn-md btn-block">Guardar</button>
-                  </form>
+
+                    <div class="form-group mb-3" id="dAmount">
+                      <label class="form-label">Monto a abonar</label>
+                      <input type="text" class="form-control" placeholder="545" aria-describedby="amount" name="amount" id="amount" oninput="onlyNumbers(this)" />
+                    </div>
+
+                    <div class="form-group mb-3" id="dPaymentDate">
+                      <label class="form-label">Fecha de compromiso</label>
+                      <ul class="list-unstyled">
+                        <?php
+                        for ($i = 0; $i < 3; $i++) {
+                          $fecha = date('Y-m-d', strtotime("+$i day"));
+                          $label = date('d/m/Y', strtotime("+$i day"));
+                          echo "<li class='mb-2'>
+                                      <input type='radio' id='paymentDate' name='paymentDate' value='$fecha' onclick=\"document.getElementById('paymentDate').value=this.value; required\"> $label
+                                    </li>";
+                        }
+                        ?>
+                      </ul>
+                    </div>
+
+                    <div class="form-group mb-3" id="dFullName">
+                      <label class="form-label">Nombre y apellido</label>
+                      <input type="text" class="form-control" placeholder="Simón Díaz" aria-describedby="fullName" name="fullName" id="fullName" oninput="onlyLetters(this)" />
+                    </div>
+
+                    <div class="form-group mb-3" id="dRelationship">
+                      <label class="form-label">Parentesco</label>
+                      <select class="form-control" name="relationship" id="relationship">
+                        <option value=''>Seleccione...</option>
+                        <option value='PADRE'>Padre</option>
+                        <option value='MADRE'>Madre</option>
+                        <option value='HIJO'>Hijo/Hija</option>
+                        <option value='HERMANO'>Hermano/Hermana</option>
+                        <option value='ESPOSA'>Esposo/Esposa</option>
+                        <option value='OTRO'>Otro</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group mb-3" id="dObservaciones">
+                      <label class="form-label">Observaciones</label>
+                      <textarea class="form-control" rows=3 maxlength="250" name="observaciones" id="observaciones" oninput="upperCase(this);"></textarea>
+                    </div>
                 </div>
               </div>
+              <button type="submit" id="submitBtn" class="btn btn-success btn-md btn-block">Guardar</button>
+              </form>
             </div>
           </div>
-        <?php } ?>
-        <!-- FIN DEL FORMULARIO -->
       </div>
     </div>
+  <?php } ?>
+  <!-- FIN DEL FORMULARIO -->
   </div>
+</div>
 </div>
 </div>
 
 <script src="public/js/formularioC.js"></script>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-  const input = document.getElementById('idQuote');
-  const errorMessage = document.getElementById('error-message');
-  const submitBtn = document.getElementById('submitBtn'); // Obtiene el botón
-
-  // La expresión regular que permite solo números y comas
-  const regex = /^[\d,]+$/;
-
-  // Función de validación para reutilizar
-  function validateInput() {
-    if (regex.test(input.value)) {
-      errorMessage.textContent = "";
-      input.style.border = "1px solid green";
-      submitBtn.disabled = false; // Habilita el botón si la validación es correcta
-    } else {
-      errorMessage.textContent = "Error: solo se permiten números y comas.";
-      input.style.border = "1px solid red";
-      submitBtn.disabled = true; // Deshabilita el botón si la validación falla
-    }
-  }
-
- 
-  // Escucha el evento 'input' para validar en tiempo real
-  input.addEventListener('input', validateInput);
-});
-</script>

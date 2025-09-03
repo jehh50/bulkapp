@@ -25,8 +25,15 @@ $(document).ready(function () {
           $('#formTitle').show();
           $('#dPaymentPlan').show();
             $('#paymentPlan').attr('required','required');
-          $('#dAmount').show();
-            $('#amount').attr('required','required');
+          $('#paymentPlan').change(function(){
+            if($('#paymentPlan').val() == 3){
+              $('#dAmount').show();
+              $('#amount').attr('required','required');
+            }else{
+              $('#dAmount').hide();
+              $('#amount').removeAttr('required').val("");
+            }
+          });
           $('#dQuote').show();
             $('#idQuote').attr('required','required');
           $('#dPaymentDate').show();
@@ -43,8 +50,10 @@ $(document).ready(function () {
           $('#formTitle').show();
           $('#dPaymentPlan').show();
           $('#paymentPlan').attr('required','required');
-          $('#dAmount').show();
-          $('#amount').attr('required','required');
+          if($('#paymentPlan').val() == 3){
+            $('#dAmount').show();
+            $('#amount').attr('required','required');
+          }
           $('#dQuote').show();
           $('#idQuote').attr('required','required');
           $('#dPaymentDate').show();
@@ -58,7 +67,7 @@ $(document).ready(function () {
         else {
           $('#d_noefectivo').hide();
           $('#noefectivo').val("");
-          $('#formTitle').show();
+          $('#formTitle').hide();
           $('#dPaymentPlan').hide();
           $('#paymentPlan').removeAttr('required').val("");
           $('#dQuote').hide();
@@ -67,6 +76,7 @@ $(document).ready(function () {
           $('#paymentDate').removeAttr('required').val("");
           $('#fullName').removeAttr('required').val("");
           $('#relationship').removeAttr('required').val("");
+          $('#subContact').removeAttr('required').val("");
           $('#dAmount').hide();
           $('#dPaymentDate').hide();
           $('#dFullName').hide();
@@ -88,12 +98,13 @@ $(document).ready(function () {
       $('#dFullName').hide();
       $('#dRelationship').hide();
       $('#dObservaciones').hide();
-      $('#efectivo').val("");
-      $('#paymentPlan').val("");
-      $('#amount').val("");
-      $('#paymentDate').val("");
-      $('#fullName').val("");
-      $('#relationship').val("");
+      $('#efectivo').removeAttr('required').val("");
+      $('#subContacto').removeAttr('required').val("");
+      $('#paymentPlan').removeAttr('required').val("");
+      $('#amount').removeAttr('required').val("");
+      $('#paymentDate').removeAttr('required').val("");
+      $('#fullName').removeAttr('required').val("");
+      $('#relationship').removeAttr('required').val("");
       $('#observaciones').val("");
     }
   });

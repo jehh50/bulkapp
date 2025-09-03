@@ -202,7 +202,7 @@ function validateForm2() {
     let paymentDate = document.getElementById('paymentDate').value;
     let fullName = document.getElementById('fullName').value;
     let relationship = document.getElementById('relationship').value;
-    let amount = document.getElementById('amount').value;
+     let amount = document.getElementById('amount').value;
 
     // let patron_name = /^[a-zA-Z ñáéíóú]{2,60}$/i;
 
