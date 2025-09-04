@@ -77,7 +77,8 @@ class database
       return $respuesta;
     }
     if ($servicio == 2) {
-      $sql = $this->db->query("SELECT  cc.fecha_creacion_orden as mora, s.name as status, cc.status_id, cc.id, cc.id_cuota, cc.local_origen, cc.plata_por_cobrar, cc.fecha_pagar, cc.numero_cuota, cc.tramo_inicial, cc.segmento, cc.nombre_usuario, cc.email, cc.telefono, cc.cedula, (SELECT SUM(plata_por_cobrar) FROM cashea_customers WHERE cedula = '$telefono') AS deuda_total FROM cashea_customers cc INNER JOIN status s ON cc.status_id = s.id WHERE cc.cedula = '$telefono' ORDER BY cc.id_cuota ASC");
+      $sql = $this->db->query("SELECT cc.fecha_creacion_orden as mora, s.name as status, cc.status_id, cc.id, cc.id_cuota, cc.local_origen, cc.plata_por_cobrar, cc.fecha_pagar, cc.numero_cuota, cc.tramo_inicial, cc.segmento, cc.nombre_usuario, cc.email, cc.telefono, cc.cedula, (SELECT SUM(CAST(REPLACE(REPLACE(plata_por_cobrar, '.', ''), ',', '.') AS DECIMAL(20, 10))) AS total_plata_por_cobrar FROM cashea_customers WHERE cedula = '$telefono' and status_id = 3) AS deuda_total FROM cashea_customers cc  INNER JOIN status s ON cc.status_id = s.id WHERE cc.cedula = '$telefono' ORDER BY cc.id_cuota ASC");
+
       if ($this->db->rows($sql) > 0) {
         while ($data = $this->db->recorrer($sql)) {
           $respuesta[] = $data;
@@ -191,8 +192,6 @@ class database
     $producto = ($producto === null) ? "null" : $producto;
     $subcontacto = ($subcontacto === null) ? 0 : $subcontacto;
 
-echo ("insert into gestion (contacto_id, efectivo_id, producto_id, noefectivo_id, subContacto_id, user_id, fecha, cliente_id, status_id, hora, servicio_id) VALUES ($contacto, $efectivo, $producto, $noefectivo, 'null', $id_usuario, '$date', $id_cliente, '$status','$hora', '$servicio')");
-
     $this->db->query("INSERT INTO gestion (contacto_id, efectivo_id, producto_id, noefectivo_id, subContacto_id, user_id, fecha, cliente_id, status_id, hora, servicio_id) VALUES ($contacto, $efectivo, $producto, $noefectivo, $subcontacto, $id_usuario, '$date', $id_cliente, '$status','$hora', '$servicio')");
 
     $id_gestion = $this->db->insert_id;
@@ -209,7 +208,7 @@ echo ("insert into gestion (contacto_id, efectivo_id, producto_id, noefectivo_id
         $this->db->query("INSERT INTO results_cashea (gestion_id,paymentPlan, paymentDate, idQuote, amount, fullName, relationship, observaciones, cliente_id, status_id) VALUES ($gestionId,'$paymentPlan', '$paymentDate', '$value[0]', $amount, '$fullName', '$relationship', '$observaciones', $id_cliente, $status)");
       }else{
         $value = explode('|', $idQuote[$i]);
-        $this->db->query("INSERT INTO results_cashea (gestion_id,paymentPlan, paymentDate, idQuote, amount, fullName, relationship, observaciones, cliente_id, status_id) VALUES ($gestionId,'$paymentPlan', '$paymentDate', '$value[0]', $value[1], '$fullName', '$relationship', '$observaciones', $id_cliente, $status)");
+        $this->db->query("INSERT INTO results_cashea (gestion_id,paymentPlan, paymentDate, idQuote, amount, fullName, relationship, observaciones, cliente_id, status_id) VALUES ($gestionId,$paymentPlan, '$paymentDate', '$value[0]', '$value[1]', '$fullName', '$relationship', '$observaciones', $id_cliente, $status)");
       }
     }
   }
