@@ -190,7 +190,6 @@ if (empty($_SESSION)) {
             break;
 
           case 2: // cashea
-
             if ($subContacto == 1 || $subContacto == 10 || $subContacto == 20 || $subContacto == 21) {
               $status = 9; // Compromiso de pago
               $gestionId = $conn->registroGestion($_POST['contacto'], $efectivo, $producto, $noefectivo, $subContacto, $_POST['usuario'], $date, $_POST['id_cliente'], $status, $hora, $_POST['servicio'], $dni, $idQuote);
