@@ -77,7 +77,7 @@ class database
       return $respuesta;
     }
     if ($servicio == 2) {
-      $sql = $this->db->query("SELECT cc.fecha_creacion_orden as mora, s.name as status, cc.status_id, cc.id, cc.id_cuota, cc.local_origen, cc.plata_por_cobrar, cc.fecha_pagar, cc.numero_cuota, cc.tramo_inicial, cc.segmento, cc.nombre_usuario, cc.email, cc.telefono, cc.cedula, (SELECT SUM(CAST(REPLACE(REPLACE(plata_por_cobrar, '.', ''), ',', '.') AS DECIMAL(20, 10))) AS total_plata_por_cobrar FROM cashea_customers WHERE cedula = '$telefono' and status_id = 3) AS deuda_total FROM cashea_customers cc  INNER JOIN status s ON cc.status_id = s.id WHERE cc.cedula = '$telefono' ORDER BY cc.id_cuota ASC");
+      $sql = $this->db->query("SELECT cc.fecha_creacion_orden as mora, (CASE WHEN s.id = '3' THEN 'Pendiente por cobrar' WHEN s.id = 4 THEN 'Pendiente por cobrar' WHEN s.id = 8 THEN 'Pendiente por cobrar' WHEN s.id = 9 THEN 'Compromiso de pago' ELSE s.name END) AS status, cc.status_id, cc.id, cc.id_cuota, cc.local_origen, cc.plata_por_cobrar, cc.fecha_pagar, cc.numero_cuota, cc.tramo_inicial, cc.segmento, cc.nombre_usuario, cc.email, cc.telefono, cc.cedula, (SELECT SUM(CAST(REPLACE(REPLACE(plata_por_cobrar, '.', ''), ',', '.') AS DECIMAL(20, 10))) AS total_plata_por_cobrar FROM cashea_customers WHERE cedula = '$telefono' AND status_id IN (3,4,8,10)) AS deuda_total FROM cashea_customers cc  INNER JOIN status s ON cc.status_id = s.id WHERE cc.cedula = '$telefono' AND cc.status_id IN (3,4,7,8,9,10) ORDER BY cc.id_cuota ASC");
 
       if ($this->db->rows($sql) > 0) {
         while ($data = $this->db->recorrer($sql)) {
@@ -160,12 +160,15 @@ class database
 
   public function registroGestion($contacto, $efectivo, $producto, $noefectivo, $subcontacto, $id_usuario, $date, $id_cliente, $status, $hora, $servicio, $dni, $idQuote)
   {
-    if ($servicio == 2) {
+    if ($servicio == 1) {
+      $table = 'clientes';
+      $where = 'id = ' . $id_cliente;
+    }else{
       $table = 'cashea_customers';
       if (!$idQuote) {
-        $where = 'cedula = ' . $dni;
+        $where = 'cedula = ' . $dni . ' AND status_id = 3';
       } else {
-        $where = 'cedula = ' . $dni . ' AND id_cuota in ';
+        $where = 'cedula = ' . $dni . ' AND status_id NOT IN (7,11) AND id_cuota in ';
         if (count($idQuote) == 1) {
           $idQuote = explode("|", $idQuote[0]);
           $where .= "($idQuote[0])";
@@ -183,14 +186,11 @@ class database
           }
         }
       }
-    } else {
-      $table = 'clientes';
-      $where = 'id = ' . $id_cliente;
     }
     $efectivo = ($efectivo === null) ? "null" : $efectivo;
     $noefectivo = ($noefectivo === null) ? "null" : $noefectivo;
     $producto = ($producto === null) ? "null" : $producto;
-    $subcontacto = ($subcontacto === null) ? 0 : $subcontacto;
+    $subcontacto = ($subcontacto === null) ? "null" : $subcontacto;
 
     $this->db->query("INSERT INTO gestion (contacto_id, efectivo_id, producto_id, noefectivo_id, subContacto_id, user_id, fecha, cliente_id, status_id, hora, servicio_id) VALUES ($contacto, $efectivo, $producto, $noefectivo, $subcontacto, $id_usuario, '$date', $id_cliente, '$status','$hora', '$servicio')");
 
@@ -203,10 +203,13 @@ class database
   public function registroResultadosCashea($paymentPlan, $paymentDate, $idQuote, $amount, $fullName, $relationship, $observaciones, $id_cliente, $status, $gestionId)
   {
     for ($i = 0; $i < count($idQuote); $i++) {
-      if(count($idQuote) == 1){
+      if (count($idQuote) == 1) {
         $value = explode('|', $idQuote[$i]);
-        $this->db->query("INSERT INTO results_cashea (gestion_id,paymentPlan, paymentDate, idQuote, amount, fullName, relationship, observaciones, cliente_id, status_id) VALUES ($gestionId,'$paymentPlan', '$paymentDate', '$value[0]', $amount, '$fullName', '$relationship', '$observaciones', $id_cliente, $status)");
-      }else{
+        if(empty($amount)){
+          $amount = $value[1];
+        }
+        $this->db->query("INSERT INTO results_cashea (gestion_id,paymentPlan, paymentDate, idQuote, amount, fullName, relationship, observaciones, cliente_id, status_id) VALUES ($gestionId,'$paymentPlan', '$paymentDate', '$value[0]', '$amount', '$fullName', '$relationship', '$observaciones', $id_cliente, $status)");
+      } else {
         $value = explode('|', $idQuote[$i]);
         $this->db->query("INSERT INTO results_cashea (gestion_id,paymentPlan, paymentDate, idQuote, amount, fullName, relationship, observaciones, cliente_id, status_id) VALUES ($gestionId,$paymentPlan, '$paymentDate', '$value[0]', '$value[1]', '$fullName', '$relationship', '$observaciones', $id_cliente, $status)");
       }

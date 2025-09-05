@@ -27,7 +27,7 @@ if (empty($_SESSION)) {
 				}
 				$archivo = $_FILES["archivo"]['tmp_name'];
 				$servicio = $_POST['servicio'];
-				$batchSize = 500; // Tamaño del lote para inserciones
+				$batchSize = 1000; // Tamaño del lote para inserciones
 				$response = json_encode(['mensaje' => 'No se procesaron filas.']); // Respuesta por defecto
 
 				if (($fp = fopen($archivo, "r")) !== false) {

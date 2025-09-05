@@ -1,4 +1,19 @@
 $(document).ready(function () {
+   function toggleSubmitButton() {
+    // Cuenta el número de opciones en el select de cuotas
+    const quoteOptionsCount = $('#idQuote option').length;
+    const submitBtn = $('#submitBtn');
+
+    if (quoteOptionsCount === 0) {
+      // Si no hay cuotas, deshabilita el botón y cambia el texto
+      submitBtn.prop('disabled', true).text('No hay cuotas disponibles');
+    } else {
+      // Si hay cuotas, habilita el botón
+      submitBtn.prop('disabled', false).text('Guardar');
+    }
+  }
+  
+  
   $('#d_efectivo').hide();
   $('#d_noefectivo').hide();
   $('#dPaymentPlan').hide();
@@ -63,6 +78,7 @@ $(document).ready(function () {
           $('#dRelationship').show();
           $('#relationship').attr('required','required');
           $('#dObservaciones').show();
+          $('#observaciones').show();
         }
         else {
           $('#d_noefectivo').hide();
@@ -81,7 +97,7 @@ $(document).ready(function () {
           $('#dPaymentDate').hide();
           $('#dFullName').hide();
           $('#dRelationship').hide();
-          $('#dObservaciones').show();
+          $('#dObservaciones').hide();
         }
       })
     }
@@ -105,7 +121,7 @@ $(document).ready(function () {
       $('#paymentDate').removeAttr('required').val("");
       $('#fullName').removeAttr('required').val("");
       $('#relationship').removeAttr('required').val("");
-      $('#observaciones').val("");
+      $('#observaciones').hide().val("");
     }
   });
 
@@ -135,4 +151,5 @@ $(document).ready(function () {
     })
   });
 
+  toggleSubmitButton();
 });

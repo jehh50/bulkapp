@@ -22,8 +22,6 @@ class database
 		if ($servicio == 1) {
 			$query = "INSERT INTO clientes (identificacion, nombre_legal, telf_hab, telf_ofi, telf_cel, correo, direccion, cuenta, oferta) VALUES ";
 		} else {
-			$this->db->query("UPDATE cashea_customers SET status_id = 11 WHERE status_id = 3");
-
 			$query = "INSERT INTO cashea_customers (cedula, id_cuota, nombre_grupo, fecha_pagar, monto_cuota, numero_cuota, fee, plata_por_cobrar, capital_asignado, id_orden, identificacion_orden, fecha_creacion_orden, email, telefono, nombre_usuario, local_origen, estado_deuda, tramo_inicial, tramo_actual, segmento) VALUES ";
 		}
 

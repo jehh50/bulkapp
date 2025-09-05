@@ -50,7 +50,7 @@
           } ?>
           <div class="row" id="formularioCliente" style="padding-left: 20px;">
             <!-- Columna Izquierda: Tabla de compras -->
-            <div class="col-lg-7 col-md-7 col-sm-11">
+            <div class="col-lg-8 col-md-7 col-sm-11">
               <div class="panel panel-default">
                 <div class="panel-body">
                   <div class="alert" style="background:#e9e9e9;" role="alert" id="customerData">
@@ -135,7 +135,7 @@
                                       <td class="text-center">' . $row['numero_cuota'] . '</td>
                                       <td class="text-center">' . $row['tramo_inicial'] . '</td>
                                       <td class="text-center">' . $row['segmento'] . '</td>
-                                      <td class="text-center">' . ($row['status'] == 'Efectiva' ? $row['status'] . ' ✅' : ($row['status'] == 'No pago' ? $row['status'] . ' ❌' : $row['status'])) .  '</td>
+                                      <td class="text-center">' . ($row['status'] == 'Efectiva' ? ' Pagada ✅' : ($row['status'] == 'No pago' ? $row['status'] . ' ❌' : $row['status'])) .  '</td>
                                     </tr>';
                             $suma_monto += $quote;
                             $i++;
@@ -156,7 +156,7 @@
               </div>
             </div>
             <!-- Columna Derecha: Formulario -->
-            <div class="col-lg-4 col-md-4 col-sm-11 col-xs-11" style="float:none; display:inline-block; vertical-align:top;">
+            <div class="col-lg-3 col-md-4 col-sm-11 col-xs-11" style="float:none; display:inline-block; vertical-align:top;">
               <div class="panel panel-default">
                 <div class="panel-body" style="background-color: #b9c1db63;">
                   <form name="form2" enctype="multipart/form-data" method="POST" onsubmit="return validateForm2();" action="?view=formulario&mode=registro" autocomplete="off">
@@ -165,7 +165,7 @@
                     <input type="hidden" id="usuario" name="usuario" value="<?php echo $_SESSION['id']; ?>">
                     <input type="hidden" id="servicio" name="servicio" value="<?php echo isset($_SESSION['servicio_id']) ? $_SESSION['servicio_id'] : ''; ?>">
 
-                    <h2 class="mb-3"><span class="form-group"><strong>Datos de contacto</strong></span></h2>
+                    <h3 class="mb-3"><span class="form-group"><strong>Datos de contacto</strong></span></h3>
                     <div class="form-group mb-3">
                       <label class="form-label">Contacto Efectivo</label>
                       <select class="form-control" name="contacto" id="contacto" required>
@@ -207,7 +207,7 @@
 
                     <div id="formulario">
                       <section>
-                        <h2 class="mb-3"><span class="form-group" id="formTitle"><strong>Gestión de Cobranza</strong></span></h2>
+                        <h4 style="margin-top:5px;"><span class="form-group" id="formTitle"><strong>Gestión de Cobranza</strong></span></h4>
                       </section>
 
                       <div class="form-group mb-3" id="dPaymentPlan">
@@ -225,8 +225,8 @@
                         <select class="form-control" name="idQuote[]" id="idQuote" multiple>
                           <?php
                           foreach ($cliente as $c) {
-                            echo "<option value='" . $c['id_cuota'] . '|' . $c['plata_por_cobrar'] . "'>" . $c['id_cuota'] . " - " . $c['plata_por_cobrar'] . "</option>";
-                          }
+                            if($c['status_id'] == 9 || $c['status_id'] == 7){}else{echo "<option value='" . $c['id_cuota'] . '|' . $c['plata_por_cobrar'] . "'>" . $c['id_cuota'] . " - " . $c['plata_por_cobrar'] . "</option>";
+                          }}
                           ?>
                         </select>
                       </div>
