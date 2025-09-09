@@ -77,7 +77,7 @@ class database
       return $respuesta;
     }
     if ($servicio == 2) {
-      $sql = $this->db->query("SELECT cc.fecha_creacion_orden as mora, (CASE WHEN s.id = '3' THEN 'Pendiente por cobrar' WHEN s.id = 4 THEN 'Pendiente por cobrar' WHEN s.id = 8 THEN 'Pendiente por cobrar' WHEN s.id = 9 THEN 'Compromiso de pago' ELSE s.name END) AS status, cc.status_id, cc.id, cc.id_cuota, cc.local_origen, cc.plata_por_cobrar, cc.fecha_pagar, cc.numero_cuota, cc.tramo_inicial, cc.segmento, cc.nombre_usuario, cc.email, cc.telefono, cc.cedula, (SELECT SUM(CAST(REPLACE(REPLACE(plata_por_cobrar, '.', ''), ',', '.') AS DECIMAL(20, 10))) AS total_plata_por_cobrar FROM cashea_customers WHERE cedula = '$telefono' AND status_id IN (3,4,8,10)) AS deuda_total FROM cashea_customers cc  INNER JOIN status s ON cc.status_id = s.id WHERE cc.cedula = '$telefono' AND cc.status_id IN (3,4,7,8,9,10) ORDER BY cc.id_cuota ASC");
+      $sql = $this->db->query("SELECT cc.fecha_creacion_orden as mora, (CASE WHEN s.id = '3' THEN 'Pendiente por cobrar' WHEN s.id = 4 THEN 'Pendiente por cobrar' WHEN s.id = 8 THEN 'Pendiente por cobrar' WHEN s.id = 9 THEN 'Compromiso de pago' ELSE s.name END) AS status, cc.status_id, cc.id, cc.id_cuota, cc.local_origen, cc.plata_por_cobrar, cc.fecha_pagar, cc.numero_cuota, cc.tramo_inicial, cc.segmento, cc.nombre_usuario, cc.email, cc.telefono, cc.cedula, (SELECT SUM(CAST(REPLACE(REPLACE(plata_por_cobrar, '.', ''), ',', '.') AS DECIMAL(20, 10))) AS total_plata_por_cobrar FROM cashea_customers WHERE (cedula = '$telefono' OR telefono = '$telefono') AND status_id IN (3,4,8,10,12)) AS deuda_total FROM cashea_customers cc  INNER JOIN status s ON cc.status_id = s.id WHERE (cc.cedula = '$telefono' OR cc.telefono = '$telefono') AND cc.status_id IN (3,4,7,8,9,10,12) ORDER BY cc.id_cuota ASC");
 
       if ($this->db->rows($sql) > 0) {
         while ($data = $this->db->recorrer($sql)) {
@@ -158,17 +158,17 @@ class database
     $this->db->query("INSERT INTO resultados (gestion_id,nombre,apellido,genero,fecha_nacimiento,nacionalidad,cedula,telf_hab,telf_celular,correo,estado_id,ciudad_id,municipio_id,cuenta,tipo_cuenta_id,producto_id,observaciones,fecha_venta,servicio_id) VALUES ($id_gestion,'$nombre','$apellido','$genero','$fecha_nac','$nacionalidad',$cedula,'$telf_hab','$telf_cel','$correo',$estado,$ciudad,$municipio,'$cuenta','$tipocuenta',$producto,'$obs','$fecha','$servicio')");
   }
 
-  public function registroGestion($contacto, $efectivo, $producto, $noefectivo, $subcontacto, $id_usuario, $date, $id_cliente, $status, $hora, $servicio, $dni, $idQuote)
+  public function registroGestion($contacto, $efectivo, $producto, $noefectivo, $subcontacto, $id_usuario, $date, $id_cliente, $status, $hora, $servicio, $dni, $idQuote,$amount = null)
   {
     if ($servicio == 1) {
       $table = 'clientes';
       $where = 'id = ' . $id_cliente;
     }else{
-      $table = 'cashea_customers';
+      $table = 'cashea_customers cc';
       if (!$idQuote) {
-        $where = 'cedula = ' . $dni . ' AND status_id = 3';
+        $where = 'cc.cedula = ' . $dni . ' AND cc.status_id = 3';
       } else {
-        $where = 'cedula = ' . $dni . ' AND status_id NOT IN (7,11) AND id_cuota in ';
+        $where = 'cc.cedula = ' . $dni . ' AND cc.status_id NOT IN (7,11) AND cc.id_cuota in ';
         if (count($idQuote) == 1) {
           $idQuote = explode("|", $idQuote[0]);
           $where .= "($idQuote[0])";
@@ -187,6 +187,13 @@ class database
         }
       }
     }
+    if($status == 12){
+      $set = ", cc.plata_por_cobrar = REPLACE(CAST(REPLACE(cc.plata_por_cobrar,',','.') AS DECIMAL (10,2)) - $amount,'.',',')";
+    }
+    else{
+      $set = "";
+    }
+
     $efectivo = ($efectivo === null) ? "null" : $efectivo;
     $noefectivo = ($noefectivo === null) ? "null" : $noefectivo;
     $producto = ($producto === null) ? "null" : $producto;
@@ -195,7 +202,7 @@ class database
     $this->db->query("INSERT INTO gestion (contacto_id, efectivo_id, producto_id, noefectivo_id, subContacto_id, user_id, fecha, cliente_id, status_id, hora, servicio_id) VALUES ($contacto, $efectivo, $producto, $noefectivo, $subcontacto, $id_usuario, '$date', $id_cliente, '$status','$hora', '$servicio')");
 
     $id_gestion = $this->db->insert_id;
-    $this->db->query("UPDATE $table SET status_id = $status WHERE $where");
+    $this->db->query("UPDATE $table SET status_id = $status $set WHERE $where");
 
     return $id_gestion;
   }
@@ -208,9 +215,10 @@ class database
         if(empty($amount)){
           $amount = $value[1];
         }
+
         $this->db->query("INSERT INTO results_cashea (gestion_id,paymentPlan, paymentDate, idQuote, amount, fullName, relationship, observaciones, cliente_id, status_id) VALUES ($gestionId,'$paymentPlan', '$paymentDate', '$value[0]', '$amount', '$fullName', '$relationship', '$observaciones', $id_cliente, $status)");
       } else {
-        $value = explode('|', $idQuote[$i]);
+        $value = explode('|', $idQuote[$i]);   
         $this->db->query("INSERT INTO results_cashea (gestion_id,paymentPlan, paymentDate, idQuote, amount, fullName, relationship, observaciones, cliente_id, status_id) VALUES ($gestionId,$paymentPlan, '$paymentDate', '$value[0]', '$value[1]', '$fullName', '$relationship', '$observaciones', $id_cliente, $status)");
       }
     }
