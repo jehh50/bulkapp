@@ -32,7 +32,7 @@ if (empty($_SESSION)) {
 
       case 'buscarCliente':
         $cliente = $conn->buscaCliente($_POST['dni'], $_POST['servicioId']);
-        if (!$cliente) {
+        if (empty($cliente)) {
           $msg = 'Cliente sin deuda';
         } else {
           $st = '';
@@ -40,6 +40,7 @@ if (empty($_SESSION)) {
           for($i=0; $i < count($cliente); $i++) {
             $st .= $cliente[$i]['status_id'];
             $id_cliente[] = $cliente[$i]['id'];
+            $customerHistory = $conn->customerHistory($id_cliente);
           }
           $pay = str_repeat(7, count($cliente));
           if ($st == $pay) {
@@ -48,12 +49,10 @@ if (empty($_SESSION)) {
             $msg = ''; 
           }
         }
-
         include(PUBLIC_DIR . 'general/header.php');
         include(PUBLIC_DIR . 'general/navbar.php');
         $noefectivo = $conn->contactoNoEfectivo($_SESSION['servicio_id']);
         $efectivo = $conn->contactoEfectivo($_SESSION['servicio_id']);
-        $customerHistory = $conn->customerHistory($id_cliente);
         include(HTML_DIR . 'formulario/cashea.php');
         include(PUBLIC_DIR . 'general/footer.php');
         break;
