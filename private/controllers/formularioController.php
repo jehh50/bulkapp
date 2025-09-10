@@ -32,16 +32,16 @@ if (empty($_SESSION)) {
 
       case 'buscarCliente':
         $cliente = $conn->buscaCliente($_POST['dni'], $_POST['servicioId']);
-        if (empty($cliente)) {
-          $msg = 'Cliente sin deuda';
+        if (!$cliente) {
+        $msg = 'Cliente sin deuda';
         } else {
           $st = '';
           $id_cliente = [];
           for($i=0; $i < count($cliente); $i++) {
             $st .= $cliente[$i]['status_id'];
             $id_cliente[] = $cliente[$i]['id'];
-            $customerHistory = $conn->customerHistory($id_cliente);
           }
+          $customerHistory = $conn->customerHistory($id_cliente);
           $pay = str_repeat(7, count($cliente));
           if ($st == $pay) {
             $msg = 'Cliente sin deuda ✅' ;
