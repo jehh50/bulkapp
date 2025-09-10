@@ -1,4 +1,6 @@
+<link href="public/css/jquery.datatables.min.css" rel="stylesheet">
 <script src="public/js/fieldsValidation.js"></script>
+
 
 <div class="container" style="margin-top:20px;">
   <div class="row">
@@ -53,7 +55,7 @@
             <div class="col-lg-8 col-md-7 col-sm-11">
               <div class="panel panel-default">
                 <div class="panel-body">
-                  <div class="alert" style="background:#e9e9e9;" role="alert" id="customerData">
+                  <div class="alert" style="background:#b9c1db63;" role="alert" id="customerData">
                     <span id="customer">
                       <?php
                       $ultimoNombre = $ultimoEmail = $ultimoTelefono = $ultimoSegmento = $ultimoCedula = $ultimoDeuda = '';
@@ -153,10 +155,51 @@
                     ?>
                   </div>
                 </div>
+                <div class="panel-body">
+                  <div class="alert" style="background:#b9c1db63;">
+                  <h4><span class="form-group"><strong>Historial de gestiones</strong></span></h4>
+                  <!-- Tabla de historial de gestiones -->
+                  <table class="table table-striped" id="historyTable">
+                    <thead>
+                      <tr>
+                        <th class="text-center">
+                          <h5><strong>Fecha</strong></h5>
+                        </th>
+                        <th class="text-center">
+                          <h5><strong>Tipo Contacto</strong></h5>
+                        </th>
+                        <th class="text-center">
+                          <h5><strong>No efectivo</strong></h5>
+                        </th>
+                        <th class="text-center">
+                          <h5><strong>Efectivo</strong></h5>
+                        </th>
+                        <th class="text-center">
+                          <h5><strong>Subcontacto</strong></h5>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <?php
+                      if ($customerHistory) {
+                        foreach ($customerHistory as $ch) { ?>
+                          <tr>
+                            <th class="text-center" scope="row"><?= date('d-m', strtotime($ch['fecha'])); ?></th>
+                            <td class="text-center"><?= $ch['contacto']; ?></td>
+                            <td class="text-center"><?= $ch['efectivo']; ?></td>
+                            <td class="text-center"><?= $ch['noefectivo']; ?></td>
+                            <td class="text-center"><?= $ch['subcontacto']; ?></td>
+                          </tr>
+                      <?php }
+                      } ?>
+                    </tbody>
+                  </table>
+                  </div>
+                </div>
               </div>
             </div>
             <!-- Columna Derecha: Formulario -->
-            <div class="col-lg-3 col-md-4 col-sm-11 col-xs-11" style="float:none; display:inline-block; vertical-align:top;">
+            <div class="col-lg-3 col-md-4 col-sm-11 col-xs-11" style="float:none; display:inline-block; vertical-align:top; margin-bottom:20px;">
               <div class="panel panel-default">
                 <div class="panel-body" style="background-color: #b9c1db63;">
                   <form name="form2" enctype="multipart/form-data" method="POST" onsubmit="return validateForm2();" action="?view=formulario&mode=registro" autocomplete="off">
@@ -225,8 +268,11 @@
                         <select class="form-control" name="idQuote[]" id="idQuote" multiple>
                           <?php
                           foreach ($cliente as $c) {
-                            if($c['status_id'] == 9 || $c['status_id'] == 7){}else{echo "<option value='" . $c['id_cuota'] . '|' . $c['plata_por_cobrar'] . "'>" . $c['id_cuota'] . " - " . $c['plata_por_cobrar'] . "</option>";
-                          }}
+                            if ($c['status_id'] == 9 || $c['status_id'] == 7) {
+                            } else {
+                              echo "<option value='" . $c['id_cuota'] . '|' . $c['plata_por_cobrar'] . "'>" . $c['id_cuota'] . " - " . $c['plata_por_cobrar'] . "</option>";
+                            }
+                          }
                           ?>
                         </select>
                       </div>
@@ -283,10 +329,36 @@
       </div>
     </div>
   <?php } ?>
-  <!-- FIN DEL FORMULARIO -->
   </div>
 </div>
 </div>
 </div>
 
+  <!-- FIN DEL FORMULARIO -->
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('#historyTable').DataTable( {
+      "scrollCollapse": false,
+      "ordering":false,
+      "searching":false,
+      "paging":true,
+      "pageLength": 5,
+      "lengthChange": false,
+      "language": {
+        "lengthMenu": "Mostrando _MENU_ registros por página",
+        "zeroRecords": "Sin gestiones",
+        "info": "Mostrando página _PAGE_ de _PAGES_",
+        "infoEmpty": "No hay información",
+        "infoFiltered": "(filtered from _MAX_ total records)",
+        oPaginate: {
+          sFirst: "Primero",
+          sLast: "Último",
+          sNext: "Siguiente",
+          sPrevious: "Anterior"
+        },
+      }
+      } );
+    } );
+</script>
 <script src="public/js/formularioC.js"></script>
+<script src="public/js/jquery.dataTables.min.js"></script>

@@ -158,12 +158,12 @@ class database
     $this->db->query("INSERT INTO resultados (gestion_id,nombre,apellido,genero,fecha_nacimiento,nacionalidad,cedula,telf_hab,telf_celular,correo,estado_id,ciudad_id,municipio_id,cuenta,tipo_cuenta_id,producto_id,observaciones,fecha_venta,servicio_id) VALUES ($id_gestion,'$nombre','$apellido','$genero','$fecha_nac','$nacionalidad',$cedula,'$telf_hab','$telf_cel','$correo',$estado,$ciudad,$municipio,'$cuenta','$tipocuenta',$producto,'$obs','$fecha','$servicio')");
   }
 
-  public function registroGestion($contacto, $efectivo, $producto, $noefectivo, $subcontacto, $id_usuario, $date, $id_cliente, $status, $hora, $servicio, $dni, $idQuote,$amount = null)
+  public function registroGestion($contacto, $efectivo, $producto, $noefectivo, $subcontacto, $id_usuario, $date, $id_cliente, $status, $hora, $servicio, $dni, $idQuote, $amount = null)
   {
     if ($servicio == 1) {
       $table = 'clientes';
       $where = 'id = ' . $id_cliente;
-    }else{
+    } else {
       $table = 'cashea_customers cc';
       if (!$idQuote) {
         $where = 'cc.cedula = ' . $dni . ' AND cc.status_id = 3';
@@ -187,10 +187,9 @@ class database
         }
       }
     }
-    if($status == 12){
+    if ($status == 12) {
       $set = ", cc.plata_por_cobrar = REPLACE(CAST(REPLACE(cc.plata_por_cobrar,',','.') AS DECIMAL (10,2)) - $amount,'.',',')";
-    }
-    else{
+    } else {
       $set = "";
     }
 
@@ -212,13 +211,13 @@ class database
     for ($i = 0; $i < count($idQuote); $i++) {
       if (count($idQuote) == 1) {
         $value = explode('|', $idQuote[$i]);
-        if(empty($amount)){
+        if (empty($amount)) {
           $amount = $value[1];
         }
 
         $this->db->query("INSERT INTO results_cashea (gestion_id,paymentPlan, paymentDate, idQuote, amount, fullName, relationship, observaciones, cliente_id, status_id) VALUES ($gestionId,'$paymentPlan', '$paymentDate', '$value[0]', '$amount', '$fullName', '$relationship', '$observaciones', $id_cliente, $status)");
       } else {
-        $value = explode('|', $idQuote[$i]);   
+        $value = explode('|', $idQuote[$i]);
         $this->db->query("INSERT INTO results_cashea (gestion_id,paymentPlan, paymentDate, idQuote, amount, fullName, relationship, observaciones, cliente_id, status_id) VALUES ($gestionId,$paymentPlan, '$paymentDate', '$value[0]', '$value[1]', '$fullName', '$relationship', '$observaciones', $id_cliente, $status)");
       }
     }
@@ -257,6 +256,34 @@ class database
   public function cuentasBancarias()
   {
     $sql = $this->db->query("SELECT * FROM tipo_cuentas where status_id = '2'");
+    if ($this->db->rows($sql) > 0) {
+      while ($data = $this->db->recorrer($sql)) {
+        $respuesta[] = $data;
+      }
+    } else {
+      $respuesta = false;
+    }
+    return $respuesta;
+  }
+
+  public function customerHistory($idCliente)
+  {
+    $in = '';
+    if (count($idCliente) == 1) {
+      $in .= "($idCliente[0])";
+    } else {
+      for ($i = 0; $i < count($idCliente); $i++) {
+        if ($i == 0) {
+          $in .= "($idCliente[$i],";
+        } else if ($i == (count($idCliente) - 1)) {
+          $in .= "$idCliente[$i])";
+        } else {
+          $in .= "$idCliente[$i],";
+        }
+      }
+    }
+
+    $sql = $this->db->query("SELECT IF(g.contacto_id = 0, 'No efecitvo','Efectivo') AS contacto, e.descripcion AS efectivo, ne.descripcion AS noefectivo, s.descripcion AS subcontacto, g.fecha, st.name as status FROM gestion g LEFT JOIN efectivo e ON g.efectivo_id = e.id LEFT JOIN noefectivo ne ON g.noefectivo_id = ne.id LEFT JOIN subcontacto s ON g.subContacto_id = s.id LEFT JOIN status st ON g.status_id = st.id WHERE g.cliente_id IN $in ORDER BY g.id DESC");
     if ($this->db->rows($sql) > 0) {
       while ($data = $this->db->recorrer($sql)) {
         $respuesta[] = $data;
