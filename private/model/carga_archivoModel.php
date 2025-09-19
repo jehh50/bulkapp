@@ -12,42 +12,67 @@ class database
 	}
 
 
-	public function guardarRegistrosBatch($batch, $types, $servicio)
+	/**
+	 * Guarda un lote de registros en la base de datos.
+	 *
+	 * @param array $batch Un array de arrays, donde cada array interno representa una fila de datos.
+	 * @param int $servicio El identificador del servicio (1 para clientes, otro valor para cashea).
+	 * @return int|false El número de filas insertadas con éxito, o false si hubo un error.
+	 */
+	public function guardarRegistrosBatch($batch, $paramTypes,$servicio)
 	{
-		// CORRECCIÓN 1: Verificar la variable correcta ($batch) 
 		if (empty($batch)) {
-			return false;
+			return 0;
 		}
+
+		$columnas = [];
+		$tabla = '';
+		$columnasEsperadas = 0;
 
 		if ($servicio == 1) {
-			$query = "INSERT INTO clientes (identificacion, nombre_legal, telf_hab, telf_ofi, telf_cel, correo, direccion, cuenta, oferta) VALUES ";
+			$tabla = 'clientes';
+			$columnas = ['identificacion', 'nombre_legal', 'telf_hab', 'telf_ofi', 'telf_cel', 'correo', 'direccion', 'cuenta', 'oferta'];
+			$columnasEsperadas = 9;
 		} else {
-			$query = "INSERT INTO cashea_customers (cedula, id_cuota, nombre_grupo, fecha_pagar, monto_cuota, numero_cuota, fee, plata_por_cobrar, capital_asignado, id_orden, identificacion_orden, fecha_creacion_orden, email, telefono, nombre_usuario, local_origen, estado_deuda, tramo_inicial, tramo_actual, segmento) VALUES ";
+			$tabla = 'cashea_customers';
+			$columnas = ['cedula', 'id_cuota', 'nombre_grupo', 'fecha_pagar', 'monto_cuota', 'numero_cuota', 'fee', 'plata_por_cobrar', 'capital_asignado', 'id_orden', 'identificacion_orden', 'fecha_creacion_orden', 'email', 'telefono', 'nombre_usuario', 'local_origen', 'estado_deuda', 'tramo_inicial', 'tramo_actual', 'segmento'];
+			$columnasEsperadas = 20;
+		}
+		$query = "INSERT INTO " . $tabla . " (" . implode(', ', $columnas) . ") VALUES ";
+		$placeHolders = [];
+		$paramsAplanados = [];
+		$batchValido = [];
+
+		foreach ($batch as $indice => $fila) {
+			if (count($fila) === $columnasEsperadas) {
+				$batchValido[] = $fila;
+			} else {
+				error_log("Error en la carga batch: La fila " . ($indice + 1) . " fue omitida. Se esperaban " . $columnasEsperadas . " columnas, pero se recibieron " . count($fila) . ".");
+			}
+		}
+		
+		if (empty($batchValido)) {
+			error_log("Carga batch abortada: Ninguna fila pasó la validación de columnas.");
+			return 0;
 		}
 
-		$placeHolders = [];
-		$flatennedParams = [];
-
-		foreach ($batch as $row) {
-			// Crea los placeholders para cada fila, por ejemplo: (?, ?, ?, ...)
-			$placeHolders[] = '(' . implode(',', array_fill(0, count($row), '?')) . ')';
-			// Aplanar el array, añadiendo los valores de la fila al array de parámetros
-			$flatennedParams = array_merge($flatennedParams, $row);
+		foreach ($batchValido as $fila) {
+			$placeHolders[] = '(' . implode(',', array_fill(0, $columnasEsperadas, '?')) . ')';
+			$paramsAplanados = array_merge($paramsAplanados, $fila);
 		}
 
 		try {
-	        // Unir los placeholders para formar la consulta completa.
+			
 			$query .= implode(',', $placeHolders);
-
-			$totalParamsCount = count($batch) * count($batch[0]);
-			$paramTypesString = str_repeat('s', $totalParamsCount);
-
-			$stmt = $this->db->preparedQuery($query, $flatennedParams, $paramTypesString);
-
-			if ($stmt) {
-				$stmt->close();
-			}
-			return true;
+			$tiposParams = str_repeat('s', count($paramsAplanados));		
+            $stmt = $this->db->preparedQuery($query, $paramsAplanados, $tiposParams);
+            if ($stmt) {
+                $filasAfectadas = $stmt->affected_rows;
+                $stmt->close();
+                return $filasAfectadas;
+            }
+            return 0;
+			
 		} catch (Exception $e) {
 			error_log("Error en guardarRegistrosBatch: " . $e->getMessage());
 			return false;
