@@ -3,8 +3,6 @@ class database
 {
 
 	private $db;
-	private $id;
-	private $nombre;
 
 	public function __construct()
 	{
@@ -33,10 +31,13 @@ class database
 			$tabla = 'clientes';
 			$columnas = ['identificacion', 'nombre_legal', 'telf_hab', 'telf_ofi', 'telf_cel', 'correo', 'direccion', 'cuenta', 'oferta'];
 			$columnasEsperadas = 9;
+			$queryUpdate = "UPDATE clientes SET is_active = 0 WHERE is_active = 1";
+
 		} else {
 			$tabla = 'cashea_customers';
 			$columnas = ['cedula', 'id_cuota', 'nombre_grupo', 'fecha_pagar', 'monto_cuota', 'numero_cuota', 'fee', 'plata_por_cobrar', 'capital_asignado', 'id_orden', 'identificacion_orden', 'fecha_creacion_orden', 'email', 'telefono', 'nombre_usuario', 'local_origen', 'estado_deuda', 'tramo_inicial', 'tramo_actual', 'segmento'];
 			$columnasEsperadas = 20;
+			$queryUpdate = "UPDATE cashea_customers SET is_active = 0 WHERE is_active = 1";
 		}
 		$query = "INSERT INTO " . $tabla . " (" . implode(', ', $columnas) . ") VALUES ";
 		$placeHolders = [];
@@ -63,13 +64,15 @@ class database
 
 		try {
 			
+			$this->db->preparedQuery($queryUpdate);
 			$query .= implode(',', $placeHolders);
 			$tiposParams = str_repeat('s', count($paramsAplanados));		
             $stmt = $this->db->preparedQuery($query, $paramsAplanados, $tiposParams);
             if ($stmt) {
-                $filasAfectadas = $stmt->affected_rows;
+				$filasAfectadas = $stmt->affected_rows;
                 $stmt->close();
-                return $filasAfectadas;
+				return $filasAfectadas;
+
             }
             return 0;
 			

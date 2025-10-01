@@ -32,8 +32,8 @@ if (empty($_SESSION)) {
 
       case 'buscarCliente':
         $cliente = $conn->buscaCliente($_POST['dni'], $_POST['servicioId']);
-        if (!$cliente) {
-        $msg = 'Cliente sin deuda';
+        if (!$cliente || $cliente[0]['is_active'] == 0) {
+        $msg = 'No existe o el cliente no está activo ❌' ;
         } else {
           $st = '';
           $id_cliente = [];
