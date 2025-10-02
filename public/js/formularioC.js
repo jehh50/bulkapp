@@ -116,6 +116,7 @@ $(document).ready(function () {
       $('#dObservaciones').hide();
       $('#efectivo').removeAttr('required').val("");
       $('#subContacto').removeAttr('required').val("");
+      $('#idQuote').removeAttr('required').val("");
       $('#paymentPlan').removeAttr('required').val("");
       $('#amount').removeAttr('required').val("");
       $('#paymentDate').removeAttr('required').val("");

@@ -196,7 +196,7 @@ class database
     $efectivo = ($efectivo === null) ? "null" : $efectivo;
     $noefectivo = ($noefectivo === null) ? "null" : $noefectivo;
     $producto = ($producto === null) ? "null" : $producto;
-    $subcontacto = ($subcontacto === null) ? "null" : $subcontacto;
+    $subcontacto = ($subcontacto === '') ? "null" : $subcontacto;
 
     $this->db->query("INSERT INTO gestion (contacto_id, efectivo_id, producto_id, noefectivo_id, subContacto_id, user_id, fecha, cliente_id, status_id, hora, servicio_id) VALUES ($contacto, $efectivo, $producto, $noefectivo, $subcontacto, $id_usuario, '$date', $id_cliente, '$status','$hora', '$servicio')");
 
