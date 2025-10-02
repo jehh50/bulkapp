@@ -32,7 +32,7 @@ if (empty($_SESSION)) {
 				if (($fp = fopen($archivo, "r")) !== false) {
 					$encoding = mb_detect_encoding(file_get_contents($archivo), 'UTF-8, ISO-8859-1', true);
 
-					$r = (fgetcsv($fp, 0, ","));
+					$r = (fgetcsv($fp, 0, ";"));
 
 					if(count($r) === 1){
 						header('Location: ?view=carga_archivo&mode=index&mensaje=errorFormato');
@@ -42,7 +42,7 @@ if (empty($_SESSION)) {
 					$paramsBatch = [];
 					$paramTypes = '';
 
-					while (($datos = fgetcsv($fp, 0, ",")) !== false) {
+					while (($datos = fgetcsv($fp, 0, ";")) !== false) {
 
 						if (empty($datos) || $datos[0] === null) {
 							continue;
