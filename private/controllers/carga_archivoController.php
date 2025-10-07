@@ -88,38 +88,32 @@ if (empty($_SESSION)) {
 				break;
 
 			case 'freeQuotes';
-				ob_clean(); // Limpia el buffer de salida
-				// Validaciones básicas de seguridad y existencia del archivo
+				ob_clean(); 
 				if (empty($_FILES["archivo"]) || $_FILES["archivo"]['error'] !== UPLOAD_ERR_OK) {
 					echo json_encode(['error' => 'No se recibió el archivo o hubo un error al subirlo.']);
 					break;
 				}
 				$archivo = $_FILES["archivo"]['tmp_name'];
-				$batchSize = 500; // Tamaño del lote para inserciones
-				$response = json_encode(['mensaje' => 'No se procesaron filas.']); // Respuesta por defecto
+				$batchSize = 500;
+				$response = json_encode(['mensaje' => 'No se procesaron filas.']);
 
 				if (($fp = fopen($archivo, "r")) !== false) {
-					// 1. LEER Y DESCARTAR LA CABECERA (HEADER) ANTES DEL BUCLE
-					// Esto posiciona el puntero del archivo en la primera fila de datos.
-					fgetcsv($fp, 0, ",");
+					fgetcsv($fp, 0, ";");
 
 					$paramsBatch = [];
 					$paramTypes = '';
 
-					// 2. CORRECCIÓN DEL BUCLE: Leer una nueva línea del archivo en cada iteración
-					while (($datos = fgetcsv($fp, 0, ",")) !== false) {
+					while (($datos = fgetcsv($fp, 0, ";")) !== false) {
 
-						// Omitir filas vacías que fgetcsv a veces puede retornar
 						if (empty($datos) || $datos[0] === null) {
 							continue;
 						}
-
-						// Preparar la fila actual según el servicio
-							$fila = array_slice($datos, 0, 2);
-							$paramTypes = str_repeat('s', 1); 
+							$fila = array_slice($datos, 0, 3);
+							var_dump($fila);
+							$paramTypes = str_repeat('s', 1);
+							var_dump($paramTypes);
 
 						$paramsBatch[] = $fila;
-
 						if (count($paramsBatch) >= $batchSize) {
 							$response = $con->updateQuotes($paramsBatch, $paramTypes);
 							$paramsBatch = [];

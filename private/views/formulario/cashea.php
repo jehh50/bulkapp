@@ -177,6 +177,9 @@
                         <th class="text-center">
                           <h5><strong>Subcontacto</strong></h5>
                         </th>
+                        <th class="text-center">
+                          <h5><strong>Agente</strong></h5>
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
@@ -189,6 +192,7 @@
                             <td class="text-center"><?= $ch['efectivo']; ?></td>
                             <td class="text-center"><?= $ch['noefectivo']; ?></td>
                             <td class="text-center"><?= $ch['subcontacto']; ?></td>
+                            <td class="text-center"><?= $ch['asesor']; ?></td>
                           </tr>
                       <?php }
                       } ?>

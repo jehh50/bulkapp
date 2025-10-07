@@ -105,7 +105,6 @@ class database
 		$tramo_actual,
 		$segmento
 	) {
-		// Conversión de encoding si es necesario
 		$cedula = iconv(mb_detect_encoding($cedula, mb_detect_order(), true), "UTF-8", $cedula);
 		$nombre_grupo = iconv(mb_detect_encoding($nombre_grupo, mb_detect_order(), true), "UTF-8", $nombre_grupo);
 		$email = iconv(mb_detect_encoding($email, mb_detect_order(), true), "UTF-8", $email);
@@ -146,7 +145,6 @@ class database
 			$segmento
 		];
 
-		// Tipos de datos: ajusta según los tipos reales de tus columnas
 		$paramTypes = 'ssssssssssssssssssss';
 
 		try {
@@ -175,29 +173,23 @@ class database
 	{
 		try {
 			foreach ($paramsBatch as $param) {
-				$param = explode(';', $param[0]);
-				$id = $param[0];
-				$status = ($param[1] == 'Pago' ? 7 : 10);
-
-				echo "ID: $id, Status: $status\n";
-
+				if($param[1] === 'Pago'):
+					$status = 7;
+					$set = ", cc.plata_por_cobrar = REPLACE(CAST(REPLACE(cc.plata_por_cobrar,',','.') AS DECIMAL (10,2)) - $param[2],'.',',')";
+				elseif ($param[1] === 'Pago parcial'):
+					$status = 13;
+					$set = ", cc.plata_por_cobrar = REPLACE(CAST(REPLACE(cc.plata_por_cobrar,',','.') AS DECIMAL (10,2)) - $param[2],'.',',')";
+				else:
+					$status = 10;
+					$set = '';
+				endif;
+				
 				// Reactivar cuota
-				$query = "UPDATE cashea_customers SET status_id = $status WHERE id_cuota = ?";
-				$stmt = $this->db->preparedQuery($query, [$id], $paramTypes);
+				$query = "UPDATE cashea_customers cc SET cc.status_id = $status $set WHERE cc.id_cuota = ?";
+				$stmt = $this->db->preparedQuery($query, [$param[0]], $paramTypes);
 				if ($stmt) $stmt->close();
 
-				/*
-				// Si el estado es 'Pago', marcar como pagado, si no, como rechazado
-					$status = ($param[1] == 'Pago' ? 7 : 5);
-
-					// Marcar resultado como rechazado
-					$query = "UPDATE results_cashea SET status_id = $status WHERE idQuote LIKE  '?'";
-					$stmt = $this->db->preparedQuery($query, [$id . '%'], $paramTypes);
-					if ($stmt) $stmt->close();
-				
-				*/
 			}
-
 			return true;
 		} catch (Exception $e) {
 			echo "Error en updateQuotes: " . $e->getMessage();
