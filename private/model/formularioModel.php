@@ -77,7 +77,7 @@ class database
       return $respuesta;
     }
     if ($servicio == 2) {
-      $sql = $this->db->query("SELECT cc.is_active, cc.fecha_creacion_orden as mora, (CASE WHEN s.id = '3' THEN 'Pendiente por cobrar' WHEN s.id = 4 THEN 'Pendiente por cobrar' WHEN s.id = 8 THEN 'Pendiente por cobrar' WHEN s.id = 9 THEN 'Compromiso de pago' ELSE s.name END) AS status, cc.status_id, cc.id, cc.id_cuota, cc.local_origen, cc.plata_por_cobrar, cc.fecha_pagar, cc.numero_cuota, cc.tramo_inicial, cc.segmento, cc.nombre_usuario, cc.email, cc.telefono, cc.cedula, (SELECT SUM(CAST(REPLACE(REPLACE(plata_por_cobrar, '.', ''), ',', '.') AS DECIMAL(20, 10))) AS total_plata_por_cobrar FROM cashea_customers WHERE (cedula = '$telefono' OR telefono = '$telefono') AND status_id IN (3,4,8,9,10,12) and is_active = 1) AS deuda_total FROM cashea_customers cc  INNER JOIN status s ON cc.status_id = s.id WHERE (cc.cedula = '$telefono' OR cc.telefono = '$telefono') AND cc.status_id IN (3,4,7,8,9,10,12) AND cc.is_active = 1 ORDER BY cc.id_cuota ASC");
+      $sql = $this->db->query("SELECT cc.is_active, cc.fecha_creacion_orden as mora, (CASE WHEN s.id = '3' THEN 'Pendiente por cobrar' WHEN s.id = 4 THEN 'Pendiente por cobrar' WHEN s.id = 8 THEN 'Pendiente por cobrar' WHEN s.id = 9 THEN 'Compromiso de pago' ELSE s.name END) AS status, cc.status_id, cc.id, cc.id_cuota, cc.local_origen, cc.plata_por_cobrar, cc.fecha_pagar, cc.numero_cuota, cc.tramo_inicial, cc.segmento, cc.nombre_usuario, cc.email, cc.telefono, cc.cedula, (SELECT SUM(CAST(REPLACE(REPLACE(plata_por_cobrar, '.', ''), ',', '.') AS DECIMAL(20, 10))) AS total_plata_por_cobrar FROM cashea_customers WHERE (cedula = '$telefono' OR telefono = '$telefono') AND status_id IN (3,4,8,9,10,12,13) and is_active = 1) AS deuda_total FROM cashea_customers cc  INNER JOIN status s ON cc.status_id = s.id WHERE (cc.cedula = '$telefono' OR cc.telefono = '$telefono') AND cc.status_id IN (3,4,7,8,9,10,12,13) AND cc.is_active = 1 ORDER BY cc.id_cuota ASC");
 
       if ($this->db->rows($sql) > 0) {
         while ($data = $this->db->recorrer($sql)) {
@@ -188,7 +188,8 @@ class database
       }
     }
     if ($status == 12) {
-      $set = ", cc.plata_por_cobrar = REPLACE(CAST(REPLACE(cc.plata_por_cobrar,',','.') AS DECIMAL (10,2)) - $amount,'.',',')";
+      $set ='';
+      //$set = ", cc.plata_por_cobrar = REPLACE(CAST(REPLACE(cc.plata_por_cobrar,',','.') AS DECIMAL (10,2)) - $amount,'.',',')";
     } else {
       $set = "";
     }
@@ -196,7 +197,7 @@ class database
     $efectivo = ($efectivo === null) ? "null" : $efectivo;
     $noefectivo = ($noefectivo === null) ? "null" : $noefectivo;
     $producto = ($producto === null) ? "null" : $producto;
-    $subcontacto = ($subcontacto === '') ? "null" : $subcontacto;
+    $subcontacto = ($subcontacto === '' || $subcontacto === null) ? "null" : $subcontacto;
 
     $this->db->query("INSERT INTO gestion (contacto_id, efectivo_id, producto_id, noefectivo_id, subContacto_id, user_id, fecha, cliente_id, status_id, hora, servicio_id) VALUES ($contacto, $efectivo, $producto, $noefectivo, $subcontacto, $id_usuario, '$date', $id_cliente, '$status','$hora', '$servicio')");
 
@@ -283,7 +284,7 @@ class database
       }
     }
 
-    $sql = $this->db->query("SELECT IF(g.contacto_id = 0, 'No efecitvo','Efectivo') AS contacto, e.descripcion AS efectivo, ne.descripcion AS noefectivo, s.descripcion AS subcontacto, g.fecha, st.name as status FROM gestion g LEFT JOIN efectivo e ON g.efectivo_id = e.id LEFT JOIN noefectivo ne ON g.noefectivo_id = ne.id LEFT JOIN subcontacto s ON g.subContacto_id = s.id LEFT JOIN status st ON g.status_id = st.id WHERE g.cliente_id IN $in ORDER BY g.id DESC");
+    $sql = $this->db->query("SELECT IF(g.contacto_id = 0, 'No efectivo','Efectivo') AS contacto, e.descripcion AS efectivo, ne.descripcion AS noefectivo, s.descripcion AS subcontacto, g.fecha, st.name as status, CONCAT(u.nombre,' ',u.apellido) as asesor FROM gestion g LEFT JOIN efectivo e ON g.efectivo_id = e.id LEFT JOIN noefectivo ne ON g.noefectivo_id = ne.id LEFT JOIN subcontacto s ON g.subContacto_id = s.id LEFT JOIN status st ON g.status_id = st.id LEFT JOIN users u ON g.user_id = u.id WHERE g.cliente_id IN $in ORDER BY g.id DESC");
     if ($this->db->rows($sql) > 0) {
       while ($data = $this->db->recorrer($sql)) {
         $respuesta[] = $data;
