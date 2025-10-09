@@ -94,24 +94,26 @@ if (empty($_SESSION)) {
 					break;
 				}
 				$archivo = $_FILES["archivo"]['tmp_name'];
-				$batchSize = 500;
+				$batchSize = 50;
 				$response = json_encode(['mensaje' => 'No se procesaron filas.']);
 
 				if (($fp = fopen($archivo, "r")) !== false) {
-					fgetcsv($fp, 0, ";");
-
+					$fo = fgetcsv($fp, 0, ";");
+					if(count($fo) !== 3){
+						$separator = ",";
+					}else{
+						$separator = ";";
+					}
 					$paramsBatch = [];
 					$paramTypes = '';
 
-					while (($datos = fgetcsv($fp, 0, ";")) !== false) {
+					while (($datos = fgetcsv($fp, 0, $separator)) !== false) {
 
 						if (empty($datos) || $datos[0] === null) {
 							continue;
 						}
 							$fila = array_slice($datos, 0, 3);
-							var_dump($fila);
 							$paramTypes = str_repeat('s', 1);
-							var_dump($paramTypes);
 
 						$paramsBatch[] = $fila;
 						if (count($paramsBatch) >= $batchSize) {
