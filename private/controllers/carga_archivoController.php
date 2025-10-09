@@ -98,16 +98,12 @@ if (empty($_SESSION)) {
 				$response = json_encode(['mensaje' => 'No se procesaron filas.']);
 
 				if (($fp = fopen($archivo, "r")) !== false) {
-					$fo = fgetcsv($fp, 0, ";");
-					if(count($fo) !== 3){
-						$separator = ",";
-					}else{
-						$separator = ";";
-					}
+					fgetcsv($fp, 0, ",");
+
 					$paramsBatch = [];
 					$paramTypes = '';
 
-					while (($datos = fgetcsv($fp, 0, $separator)) !== false) {
+					while (($datos = fgetcsv($fp, 0, ",")) !== false) {
 
 						if (empty($datos) || $datos[0] === null) {
 							continue;
