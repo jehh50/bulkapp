@@ -142,7 +142,6 @@ class database
 
   public function registroResultados($contacto, $efectivo, $producto, $noefectivo, $id_usuario, $date, $nombre, $apellido, $genero, $fecha_nac, $nacionalidad, $cedula, $telf_hab, $telf_cel, $correo, $estado, $ciudad, $municipio, $cuenta, $tipocuenta, $obs, $fecha, $status, $id_cliente, $var, $hora, $servicio)
   {
-
     $this->db->query("INSERT INTO gestion (contacto_id, efectivo_id, producto_id, user_id, fecha, cliente_id, status_id, hora, servicio_id) VALUES ($contacto,$efectivo,$producto,$id_usuario,'$date',$id_cliente,$status,'$hora','$servicio')");
 
     $id_gestion = $this->db->insert_id;
