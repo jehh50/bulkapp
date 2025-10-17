@@ -169,10 +169,10 @@
                           <h5><strong>Tipo Contacto</strong></h5>
                         </th>
                         <th class="text-center">
-                          <h5><strong>No efectivo</strong></h5>
+                          <h5><strong>Efectivo</strong></h5>
                         </th>
                         <th class="text-center">
-                          <h5><strong>Efectivo</strong></h5>
+                          <h5><strong>No Efectivo</strong></h5>
                         </th>
                         <th class="text-center">
                           <h5><strong>Subcontacto</strong></h5>
@@ -213,6 +213,16 @@
                     <input type="hidden" id="servicio" name="servicio" value="<?php echo isset($_SESSION['servicio_id']) ? $_SESSION['servicio_id'] : ''; ?>">
 
                     <h3 class="mb-3"><span class="form-group"><strong>Datos de contacto</strong></span></h3>
+
+                    <div class="form-group mb-3" id="d_gestion">
+                      <label class="form-label">Tipo de gestión</label>
+                      <select class="form-control" name="gestion" id="gestion" required>
+                          <option value='' disabled selected style='display:none;'>Seleccione...</option>
+                          <option value='telefonica'>Atención telefónica</option>
+                          <option value='whastapp'>WhastApp</option>
+                      </select>
+                    </div>
+
                     <div class="form-group mb-3">
                       <label class="form-label">Contacto Efectivo</label>
                       <select class="form-control" name="contacto" id="contacto" required>
@@ -295,7 +305,7 @@
                           $fecha = date('Y-m-d', strtotime("+$i day"));
                           $label = date('d/m/Y', strtotime("+$i day"));
                           echo "<li class='mb-2'>
-                                      <input type='radio' id='paymentDate' name='paymentDate' value='$fecha' onclick=\"document.getElementById('paymentDate').value=this.value; required\"> $label
+                                      <input type='radio' id='paymentDate_radio_$i' name='paymentDate' value='$fecha'> $label
                                     </li>";
                         }
                         ?>

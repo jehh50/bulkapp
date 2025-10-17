@@ -33,20 +33,20 @@ if (empty($_SESSION)) {
       case 'buscarCliente':
         $cliente = $conn->buscaCliente($_POST['dni'], $_POST['servicioId']);
         if (!$cliente || $cliente[0]['is_active'] == 0) {
-        $msg = 'No existe o el cliente no está activo ❌' ;
+          $msg = 'No existe o el cliente no está activo ❌';
         } else {
           $st = '';
           $id_cliente = [];
-          for($i=0; $i < count($cliente); $i++) {
+          for ($i = 0; $i < count($cliente); $i++) {
             $st .= $cliente[$i]['status_id'];
             $id_cliente[] = $cliente[$i]['id'];
           }
           $customerHistory = $conn->customerHistory($id_cliente);
           $pay = str_repeat(7, count($cliente));
           if ($st == $pay) {
-            $msg = 'Cliente sin deuda ✅' ;
-          } else { 
-            $msg = ''; 
+            $msg = 'Cliente sin deuda ✅';
+          } else {
+            $msg = '';
           }
         }
         include(PUBLIC_DIR . 'general/header.php');
@@ -132,6 +132,7 @@ if (empty($_SESSION)) {
         // datos comunes
         $date = date('Y-m-d');
         $hora = date('H:i:s');
+        $gestion = isset($_POST['gestion']) ? $_POST['gestion'] : null;
         $efectivo = isset($_POST['efectivo']) ? $_POST['efectivo'] : null;
         $status = isset($_POST['efectivo']) ? 4 : null;
         $noefectivo = isset($_POST['noefectivo']) ? $_POST['noefectivo'] : null;
@@ -186,31 +187,27 @@ if (empty($_SESSION)) {
 
               $registro = $conn->registroResultados($_POST['contacto'], $efectivo, $producto, $noefectivo, $_POST['usuario'], $date, $nombre, $apellido, $genero, $fecha_nac, $nacionalidad, $cedula, $telf_hab, $telf_cel, $correo, $estado, $ciudad, $municipio, $cuenta, $tipocuenta, $obs, $fecha, $status, $_POST['id_cliente'], $var, $hora, $_POST['servicio']);
             } else {
-              $registro = $conn->registroGestion($_POST['contacto'], $efectivo, $producto, $noefectivo, $subContacto, $_POST['usuario'], $date, $_POST['id_cliente'], $status, $hora, $_POST['servicio'], $dni, $idQuote);
+              $registro = $conn->registroGestion($_POST['contacto'], $efectivo, $producto, $noefectivo, $subContacto, $_POST['usuario'], $date, $_POST['id_cliente'], $status, $hora, $_POST['servicio'], $dni, $idQuote, $amount, $_POST['gestion']);
             }
-            header('location:?view=formulario&mode=index');
+            //header('location:?view=formulario&mode=index');
             break;
 
           case 2: // cashea
             if ($subContacto == 1 || $subContacto == 10 || $subContacto == 20 || $subContacto == 21) {
-              
-              if($_POST['paymentPlan'] == 3) {
+              if ($_POST['paymentPlan'] == 3) {
                 $status = 12;                   //Pago abonado
                 $amount = $_POST['amount'];
-              }else{
+              } else {
                 $status = 9;                    //Compromiso de pago
                 $amount = null;
               }
 
-              
-              $gestionId = $conn->registroGestion($_POST['contacto'], $efectivo, $producto, $noefectivo, $subContacto, $_POST['usuario'], $date, $_POST['id_cliente'], $status, $hora, $_POST['servicio'], $dni, $idQuote, $amount);
+              $gestionId = $conn->registroGestion($_POST['contacto'], $efectivo, $producto, $noefectivo, $subContacto, $_POST['usuario'], $date, $_POST['id_cliente'], $status, $hora, $_POST['servicio'], $dni, $idQuote, $gestion);
 
               $results = $conn->registroResultadosCashea($_POST['paymentPlan'], $_POST['paymentDate'], $idQuote, $_POST['amount'], $_POST['fullName'], $_POST['relationship'], $_POST['observaciones'], $_POST['id_cliente'], $status, $gestionId);
-           
             } else {
 
-              $registro = $conn->registroGestion($_POST['contacto'], $efectivo, $producto, $noefectivo, $subContacto, $_POST['usuario'], $date, $_POST['id_cliente'], $status, $hora, $_POST['servicio'], $dni, $idQuote);
-           
+              $registro = $conn->registroGestion($_POST['contacto'], $efectivo, $producto, $noefectivo, $subContacto, $_POST['usuario'], $date, $_POST['id_cliente'], $status, $hora, $_POST['servicio'], $dni, $idQuote, $_POST['gestion']);
             }
             header('location:?view=formulario&mode=index');
             break;

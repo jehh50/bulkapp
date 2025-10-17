@@ -190,56 +190,108 @@ function validateForm() {
     return false;
 }
 
-function validateForm2() {
+function validateFormCashea() {
     console.log('Comienza la validación del segundo formulario...');
-    if(!$('#formulario2').is(':visible')) {
-        console.log('El formulario2 no está visible, no se realizará la validación.');
-        return true; // Si el formulario no está visible, no se valida
+    
+    // Obtener valores de los campos
+    const amountField = document.getElementById('amount');
+    const dAmount = document.getElementById('dAmount'); // Contenedor de Monto a abonar
+
+    // Si la sección de pago no está visible (no hay compromiso), la validación de compromiso no aplica.
+    const dPaymentDate = document.getElementById('dPaymentDate');
+    if (dPaymentDate.style.display === 'none') {
+        console.log('La sección de Fecha de compromiso no está visible, no se realizarán validaciones de compromiso.');
+        return true; 
     }
-
-
-    let paymentPlan = document.getElementById('paymentPlan').value;
-    let paymentDate = document.getElementById('paymentDate').value;
-    let fullName = document.getElementById('fullName').value;
-    let relationship = document.getElementById('relationship').value;
-     let amount = document.getElementById('amount').value;
-
-    // let patron_name = /^[a-zA-Z ñáéíóú]{2,60}$/i;
-
-    // // Validación de nombre
-    // // if (!fullName.match(patron_name)) {
-    // //     alert("Nombre inválido: " + fullName + ". El formato debe ser solo letras (ej. Pedro Luis).");
-    // //     document.getElementById('fullName').focus();
-    // //     return false;
-    // // }
-
-    // Validación de payment plan
-    // if (paymentPlan === "") {
-        //  alert("Debe seleccionar un plan de pago.");
-    // //     document.getElementById('paymentPlan').focus();
-        // return false;
-    // }
-    // // Validación de fecha de pago
-    // // if (paymentDate === ""  ) {
-    // //     alert('Debe seleccionar una fecha de compromiso.');
-    // //     document.getElementById('paymentDate').focus();
-    // //     return false;
-    // // }
-    // // Validación de relación
-    // if (relationship === "") {
-    //     alert("Debe seleccionar un parentesco.");
-    //     document.getElementById('relationship').focus();
-    //     return false;
-    // }
-
+   
     console.log('Valor de contacto: ' + $('#contacto').val());
     console.log('Valor de noefectivo: ' + $('#noefectivo').val());
-    // // Validación de monto
-    if (amount === "" || isNaN(amount) || parseFloat(amount) <= 0) {
-        alert("El monto debe ser un número válido y mayor a cero.");
-        document.getElementById('amount').focus();
-        return false;
+    
+    // 1. Validación de monto (solo si el campo está visible, lo que implica paymentPlan=3)
+    // dAmount está visible cuando el plan de pago es "Pago personalizado"
+    if (dAmount.style.display !== 'none') {
+        let amount = amountField.value;
+        if (amount === "" || isNaN(amount) || parseFloat(amount) <= 0) {
+            alert("⚠️ El campo 'Monto a abonar' es obligatorio para el plan de pago seleccionado y debe ser mayor a cero.");
+            amountField.focus();
+            return false;
+        }
     }
 
-    // return true; // Si todas las validaciones pasan, permite el envío del formulario
+    // 2. Validación de Fecha de compromiso (paymentDate)
+    
+    // Usamos querySelectorAll con el atributo NAME, que agrupa todos los radio buttons.
+    const paymentDateRadios = document.querySelectorAll('input[name="paymentDate"]');
+    let isPaymentDateSelected = false;
+
+    // Recorre los radio buttons para ver si alguno está marcado
+    for (const radio of paymentDateRadios) {
+        if (radio.checked) {
+            isPaymentDateSelected = true;
+            break;
+        }
+    }
+
+    // Si no se seleccionó ninguna fecha, mostramos la alerta y evitamos el envío
+    if (!isPaymentDateSelected) {
+        alert("⚠️ El campo 'Fecha de compromiso' es obligatorio. Por favor, selecciona una fecha.");
+        return false; // Evita el envío del formulario
+    }
+
+    // Si todas las validaciones pasan, permite el envío del formulario
+    console.log('Validación del formulario 2 exitosa.');
+    return true; 
+}
+
+function validateForm2() {
+    console.log('Comienza la validación del segundo formulario...');
+    
+    // Obtener valores de los campos
+    const amountField = document.getElementById('amount');
+    const dAmount = document.getElementById('dAmount'); // Contenedor de Monto a abonar
+
+    // Si la sección de pago no está visible (no hay compromiso), la validación de compromiso no aplica.
+    const dPaymentDate = document.getElementById('dPaymentDate');
+    if (dPaymentDate.style.display === 'none') {
+        console.log('La sección de Fecha de compromiso no está visible, no se realizarán validaciones de compromiso.');
+        return true; 
+    }
+   
+    console.log('Valor de contacto: ' + $('#contacto').val());
+    console.log('Valor de noefectivo: ' + $('#noefectivo').val());
+    
+    // 1. Validación de monto (solo si el campo está visible, lo que implica paymentPlan=3)
+    // dAmount está visible cuando el plan de pago es "Pago personalizado"
+    if (dAmount.style.display !== 'none') {
+        let amount = amountField.value;
+        if (amount === "" || isNaN(amount) || parseFloat(amount) <= 0) {
+            alert("⚠️ El campo 'Monto a abonar' es obligatorio para el plan de pago seleccionado y debe ser mayor a cero.");
+            amountField.focus();
+            return false;
+        }
+    }
+
+    // 2. Validación de Fecha de compromiso (paymentDate)
+    
+    // Usamos querySelectorAll con el atributo NAME, que agrupa todos los radio buttons.
+    const paymentDateRadios = document.querySelectorAll('input[name="paymentDate"]');
+    let isPaymentDateSelected = false;
+
+    // Recorre los radio buttons para ver si alguno está marcado
+    for (const radio of paymentDateRadios) {
+        if (radio.checked) {
+            isPaymentDateSelected = true;
+            break;
+        }
+    }
+
+    // Si no se seleccionó ninguna fecha, mostramos la alerta y evitamos el envío
+    if (!isPaymentDateSelected) {
+        alert("⚠️ El campo 'Fecha de compromiso' es obligatorio. Por favor, selecciona una fecha.");
+        return false; // Evita el envío del formulario
+    }
+
+    // Si todas las validaciones pasan, permite el envío del formulario
+    console.log('Validación del formulario 2 exitosa.');
+    return true; 
 }
