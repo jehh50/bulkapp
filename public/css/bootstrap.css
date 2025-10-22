@@ -7,12 +7,14 @@
 @charset "utf-8";
 
 html {
-  font-family: sans-serif;
+  font-family: 'Poppins', sans-serif !important;
   -webkit-text-size-adjust: 100%;
       -ms-text-size-adjust: 100%;
 }
 body {
+  font-family: 'Poppins', sans-serif !important;
   margin: 0;
+
   /*background-image: url("http://dev.paz-inc.com/wp-content/uploads/2016/09/funeral-memorial-program-backgrounds_207941.jpg");*/
 }
 article,

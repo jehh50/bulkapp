@@ -1,104 +1,142 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>BULKSALES</title>
-    <link href="public/css/bootstrap.css" rel="stylesheet" type="text/css" />
-    <link href="public/images/icon.png" rel="icon" type="image/png"/>
-    <script src="public/js/jquery-3.2.1.min.js"></script>
-    <script>
-    //VALIDACION DEL NOMBRE DE USUARIO
-    $(document).ready(function(){
-    //VALIDACION DE LA CONTRASEÑA
-       $('#session').click(function(){
-          if ($('#username').val() === "" || $('#password').val() === "" ) {
-            $('#mensaje').show()
-          }
-          else{
-            console.log($('#username').val() + ' ' + $('#password').val());
-            $('#mensaje3').hide()
-            $.post('?view=session&mode=login',
-              {
-                user:$('#username').val(),
-                pass:$('#password').val()
-              },
-              function(confirm){
-              if(confirm==2){
-                $('#mensaje2').show();
-                $('#mensaje3').hide();
-              }
-              else if(confirm==3){ //inactive user
-                $('#mensaje2').hide();
-                $('#mensaje3').show();
-              }
-              else{
-                window.location='?view=formulario&mode=index';
-              }
-            })
-          }
-        })
-    })     
-    </script>
-    <style type="text/css">
-      @import url('https://fonts.googleapis.com/css?family=Poppins');
-      .loginbox{
-        margin-top: 200px;
-      }
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CRM - Iniciar Sesión</title>
 
-      .loginboxes{
-        margin-top: 50px;
-        margin-bottom: -180px;
-        margin-left: 100px;
-      }
-    </style>
-  </head>
+  <link href="public/css/bootstrap.css" rel="stylesheet" type="text/css" />
+  <link href="public/images/icon.png" rel="icon" type="image/png"/>
+  <link href="https://fonts.googleapis.com/css?family=Poppins:400,600&display=swap" rel="stylesheet">
+  <script src="public/js/jquery-3.2.1.min.js"></script>
+  <style>
+    body {
+      background-color: #e9e9e9 !important;
+      font-family: 'Poppins', sans-serif;
+    }
+    .login-wrapper {
+      /* min-height: 100vh; se mantiene para centrar el contenido */
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
+      padding: 20px 10px; /* Padding para evitar que el contenido toque los bordes en móviles */
+    }
+    .panel {
+      margin-top: 20px;
+      /* Sombra sutil para un aspecto más moderno */
+      box-shadow: 0 4px 8px rgba(0,0,0,.1);
+    }
+    .panel-heading {
+      background-color: #f7f7f7;
+      color: #333;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    /* Estilo para ajustar el ancho del logo en responsive */
+    .logo-img {
+        max-width: 120px; /* Un tamaño un poco más grande para el logo */
+        height: auto;
+        margin-bottom: 20px; /* Espacio debajo del logo */
+    }
+  </style>
 
-  <body style="background-color: #f0f0f0 !important;">
-    <div class="loginboxes">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-offset-5">
-            <div class="mx-auto">
-              <img src="public/images/logo.jpg" height="15%" width="15%">
+  <script>
+    $(function () {
+      $('#session').click(function () {
+        // Oculta todas las alertas antes de validar
+        $('#alert-campos, #alert-invalido, #alert-inactivo').hide();
+
+        if ($('#username').val() === "" || $('#password').val() === "") {
+          // Muestra la alerta de campos incompletos
+          $('#alert-campos').show();
+        } else {
+          // Si los campos están llenos, procede con la petición AJAX
+          $.post('?view=session&mode=login',
+            {
+              user: $('#username').val(),
+              pass: $('#password').val()
+            }, function (confirm) {
+              if (confirm == 2) {
+                // Usuario o contraseña inválido
+                $('#alert-invalido').show();
+              } else if (confirm == 3) {
+                // Usuario inactivo
+                $('#alert-inactivo').show();
+              } else {
+                // Inicio de sesión exitoso
+                window.location = '?view=formulario&mode=index';
+              }
+            });
+        }
+      });
+    });
+  </script>
+</head>
+
+<body>
+  <div class="container login-wrapper">
+    <img src="public/images/logo.jpg" class="img-responsive center-block logo-img" alt="Logo BULKSALES">
+
+    <div class="col-xs-12 col-sm-8 col-md-4">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title"><strong>Iniciar sesión</strong></h3>
+        </div>
+        <div class="panel-body">
+          <fieldset>
+            <div id="alert-campos" class="alert alert-danger alert-dismissible" role="alert" style="display:none;">
+              <button type="button" class="close" data-hide="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <strong>¡Atención!</strong> Debe completar todos los campos.
             </div>
-          </div>
+
+            <div class="form-group">
+              <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                <input type="text" id="username" class="form-control" placeholder="Usuario" maxlength="10" autofocus>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                <input type="password" id="password" class="form-control" placeholder="Contraseña" maxlength="15">
+              </div>
+            </div>
+
+            <div id="alert-invalido" class="alert alert-warning alert-dismissible" role="alert" style="display:none;">
+              <button type="button" class="close" data-hide="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <strong>Error de Acceso:</strong> Usuario o contraseña inválido.
+            </div>
+
+            <div id="alert-inactivo" class="alert alert-info alert-dismissible" role="alert" style="display:none;">
+              <button type="button" class="close" data-hide="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <strong>Cuenta Inactiva:</strong> Contacte al administrador.
+            </div>
+
+            <button id="session" class="btn btn-success btn-block btn-lg">
+              <i class="glyphicon glyphicon-log-in"></i> Iniciar sesión
+            </button>
+          </fieldset>
         </div>
       </div>
     </div>
-    <div class="loginbox">
-     <div class="container">
-      <div class="row">
-       <div class="col-lg-offset-4 col-lg-4">
-        <div class="login-panel panel panel-default">
-         <div class="panel-heading">
-          <h1 class="panel-title "><strong>Inicio de sesión</strong></h1>
-         </div>
-         <div class="panel-body">
-           <fieldset>
-            <div class="form-group">
-             <input type='text' class="form-control" name="username" id='username' placeholder='Usuario' maxlength="10" required autofocus>
-              <div id="mensaje" class="message" style="display:none; color:red;">Debe completar todos los campos.</div>
-            </div>
-            <div class="form-group">
-             <input type='password' class="form-control" name="password" id='password' placeholder='Contraseña' maxlength="15" required>
-             <div id="mensaje2" class="message" style="display:none; color: red;">Usuario o contraseña invalido.</div>
-             <div id="mensaje3" class="message" style="display:none; color: red;">Usuario inactivo. Contacte al administrador.</div>
-            </div>
-            <input id="session" name="session" type="submit" class="btn btn-lg btn-success btn-block" value="Iniciar sesión" />
-           </fieldset>
-          </form>
-         </div>
-        </div>
-       </div>
-      </div>
-     </div>
-    </div>
-    <div class="footer">
-      
-      <p style="text-align: center;">Este sitio fue desarrollado por @jehh_50</p>
-      <p style="text-align: center;"><?=APP_COPY?></p>
-    </div>
-  </body>
+
+    <footer class="col-xs-12" style="margin-top:20px; color: #777;">
+      <p>Este sitio fue desarrollado por @jehh_50</p>
+      <p><?php echo APP_COPY; ?></p>
+    </footer>
+  </div>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script>
+    // Inicializar el evento para ocultar las alertas
+    $('[data-hide="alert"]').on('click', function(){
+      $(this).closest('.alert').hide();
+    });
+  </script>
+</body>
 </html>
