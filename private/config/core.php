@@ -8,7 +8,7 @@ define('DB_HOST','crmapp-db.cihms2oq8bxx.us-east-1.rds.amazonaws.com');
 define('DB_USER','admin');
 define('DB_NAME','ddremwdt_crm');
 define('DB_PORT','3306');
-define('DB_PASS','C0l0mb1401++');
+define('DB_PASS','C0l0mb1401+');
 
 #cPanel Credentials
 #Constantes de conexion a BDD
