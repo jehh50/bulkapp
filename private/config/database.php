@@ -5,7 +5,7 @@ class Conexion extends mysqli
 
   public function __construct()
   {
-    parent::__construct(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT);
+    parent::__construct('p:'. DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT);
 
     if ($this->connect_errno) {
       throw new Exception('Error en la conexión a la base de datos: ' . $this->connect_error);
