@@ -19,7 +19,7 @@ if (empty($_SESSION)) {
 
 			case 'actualizarProducto':
 				$res = $con->updateProd($_POST["id"], $_POST["nombre"], $_POST["codigo"], $_POST['costo']);
-				header("location:?view=configuracion&mode=consultarProducto");
+				header("location:?view=configuracion&mode=index");
 				break;
 
 			case 'agregarProducto':
@@ -30,11 +30,11 @@ if (empty($_SESSION)) {
 				include(PUBLIC_DIR . 'general/footer.php');
 				break;
 
-			case 'consultarProducto':
+			case 'index':
 				include(PUBLIC_DIR . 'general/header.php');
 				include(PUBLIC_DIR . 'general/navbar.php');
 				$listarProducto = $con->listarProductos();
-				include(HTML_DIR . 'configuracion/consultarProducto.php');
+				include(HTML_DIR . 'configuracion/index.php');
 				include(PUBLIC_DIR . 'general/footer.php');
 				break;
 
@@ -45,7 +45,7 @@ if (empty($_SESSION)) {
 					$gestion = $con->guardarProductos($_POST['producto'][$i], $_POST['codigo'][$i], $_POST['costo'][$i], $servicio, $_POST['plan'][$i]);
 					$i++;
 				}
-				header('location:?view=configuracion&mode=consultarProducto&mensaje=exito');
+				header('location:?view=configuracion&mode=index&mensaje=exito');
 				break;
 
 			case 'cargaArchivo':
@@ -223,8 +223,8 @@ if (empty($_SESSION)) {
 			case 'editarResultado':
 				include(PUBLIC_DIR . 'general/header.php');
 				include(PUBLIC_DIR . 'general/navbar.php');
-				$servicio = $con->servicio();
-				$productos = $con->productos($_SESSION['servicio_id']);
+				// $servicio = $con->servicio();
+				// $productos = $con->productos($_SESSION['servicio_id']);
 				include(HTML_DIR . 'configuracion/editarResultado.php');
 				include(PUBLIC_DIR . 'general/footer.php');
 				break;
@@ -267,23 +267,28 @@ if (empty($_SESSION)) {
 
 			case 'actualiza':
 				var_dump($_GET);
-				echo '<br>';
-				// echo $_GET['nombre'].'-'.$_GET['apellido'];
+				$result = $con->updateResultados($_GET['id'], $_GET['nombre'], $_GET['apellido'], $_GET['cedula'], $_GET['sexo'], $_GET['nacimiento'], $_GET['hab'], $_GET['cel'], $_GET['correo'], $_GET['venta'],$_GET['productoId']);
 
-				$result = $con->updateResultados($_GET['id'], $_GET['nombre'], $_GET['apellido'], $_GET['cedula'], $_GET['sexo'], $_GET['nacimiento'], $_GET['hab'], $_GET['cel'], $_GET['correo'], $_GET['venta']);
+				if ($result == true){
+					$json['response'] = 'true';
+					header("Location: ?view=configuracion&mode=editarResultado&mensaje=exito");
+				} else {
+					$json['response'] = 'false';
+					header("Location: ?view=configuracion&mode=editarResultado&mensaje=error");
 
-				// if ($ejecucion) {
-				// 	$json['response'] = 'true';
-				// } else {
-				// 	$json['response'] = 'false';
-				// }
-				// echo json_encode($json);
+				}
 				break;
 
 			case 'eliminar':
-				$eliminar = $con->eliminarVenta($_GET['id']);
-				$json['response'] = ($eliminar == 'true') ? 'true' : $eliminar;
-				echo json_encode($json);
+				$result = $con->eliminarVenta($_GET['id']);
+				if ($result == true){
+					$json['response'] = 'true';
+					header("Location: ?view=configuracion&mode=editarResultado&mensaje=eliminado");
+				} else {
+					$json['response'] = 'false';
+					header("Location: ?view=configuracion&mode=editarResultado&mensaje=error");
+
+				}
 				break;
 
 			case 'ciudad_':

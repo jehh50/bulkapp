@@ -5,7 +5,6 @@ if (isset($_GET['mode'])) {
   switch ($_GET['mode']) {
     case 'login':
       $user = $conexion->sessionNew($_POST['user'], md5($_POST['pass']));
-    // var_dump($user);
       if (!empty($user)) {
         if ($user['status_id'] == 1) {
           echo 3;
@@ -23,7 +22,6 @@ if (isset($_GET['mode'])) {
           if ($_POST['pass'] == '123456') {
             header("location:?view=usuarios&mode=changepass");
           } else {
-            // echo $user['status_id'];
             header("location:?view=formulario&mode=index");
           }
         }

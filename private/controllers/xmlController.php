@@ -30,13 +30,6 @@ if (empty($_SESSION)) {
         //ajustar el codigo del servicio
         $datosXML = $conexion->datosXML($fecha_, 1);
 
-  //       $encabezado = '<bulk_sales xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="bulk_sales.xsd">
-  // <company code="7">
-  //   <company_name>SEGUROS CAPITAL C.A.</company_name> 
-  //     <agencies>
-  //       <agency code="805">
-  //         <agency_name>CARACAS</agency_name>
-  //           <transactions>';
         $encabezado = '<bulk_sales xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="bulk_sales.xsd">
   <company code="17">
     <company_name>CORPF1</company_name> 

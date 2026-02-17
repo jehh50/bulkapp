@@ -1,209 +1,191 @@
 <script type="text/javascript" src="public/js/loader.js"></script>
-<div class="container" style="margin-top: 10px;">
-  <div class="col-lg-12">
-    <div class="panel panel-default">
-      <div class="panel-body">
-        <div class="form-group">
-          <section>
-            <label>
-              <h1>Resumen de gestión por Contactos</h1>
-            </label>
-          </section>
-          <form name="resultados" method="POST" action="?view=reportes&mode=contactabilidad">
-            <div class="form-group">
-              <div class="form-group col-lg-3">
-                <label>Desde</label><input type="date" class="form-control" aria-describedby="fecha_d"
-                  value="<?= $desde ?>" name="fecha_d" id="fecha_d" autofocus />
+<div class="container-fluid" style="margin-top:15px;">
+  <div class="row">
+    <div class="col-xs-12 col-md-10 col-md-offset-1">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <h2 class="text-center">Resumen de gestión por Contactos</h2>
+          <hr>
+          <form method="POST" action="?view=reportes&mode=contactabilidad">
+            <div class="row">
+
+              <div class="form-group col-xs-12 col-sm-6 col-md-3">
+                <label>Desde</label>
+                <input type="date"
+                       class="form-control"
+                       name="fecha_d"
+                       value="<?= $desde ?>">
               </div>
-              <div class="form-group col-lg-3">
-                <label>Hasta</label><input type="date" class="form-control" aria-describedby="fecha_h"
-                  value="<?= $hasta ?>" name="fecha_h" id="fecha_h" autofocus />
+
+              <div class="form-group col-xs-12 col-sm-6 col-md-3">
+                <label>Hasta</label>
+                <input type="date"
+                       class="form-control"
+                       name="fecha_h"
+                       value="<?= $hasta ?>">
               </div>
-              <div class="form-group col-lg-3">
+
+              <div class="form-group col-xs-12 col-sm-6 col-md-3">
                 <label>Servicio</label>
-                <select class="form-control" name="servicio" id="servicio">
+                <select class="form-control" name="servicio" required>
+                  <option value="" disabled selected>Seleccione...</option>
                   <?php foreach ($servicio as $s) { ?>
-                    <option value='' disabled selected style='display:none;'>Seleccione...</option>
-                    <option value='<?php echo $s['id']; ?>'><?php echo $s['descripcion'];
-                  } ?></option>
+                    <option value="<?= $s['id']; ?>">
+                      <?= $s['descripcion']; ?>
+                    </option>
+                  <?php } ?>
                 </select>
               </div>
-            </div>
-            <div class="form-group col-lg-12">
-              <input type="submit" class="btn btn-medium btn-success" value="Buscar" id="btn-buscar">
+
+              <div class="form-group col-xs-12 col-sm-6 col-md-3" style="margin-top:25px;">
+                <button type="submit"
+                        class="btn btn-success btn-block">
+                  Buscar
+                </button>
+              </div>
+
             </div>
           </form>
+
         </div>
       </div>
+
     </div>
   </div>
 </div>
 
-<div class="container">
-  <div class="form-row">
-    <div class="col-lg-6">
-      <div class="panel panel-danger">
-        <div class="panel-heading">Gestión NO CONTACTO</div>
-        <div class="panel-body">
-          <table class="table table-responsive table-hover table-condensed">
-            <thead>
-              <tr>
-                <th style="text-align: center;">
-                  <h5>DESCRIPCIÓN</h5>
-                </th>
-                <th style="text-align: center;">
-                  <h5>TOTAL</h5>
-                </th>
-              </tr>
-            </thead>
-            <?php $total = 0;
-            if (!empty($resultn)) {
-              foreach ($resultn as $noefectivo) { ?>
-                <tbody>
-                  <tr align="center">
-                    <td>
-                      <h5><?= $noefectivo['descripcion']; ?></h5>
-                    </td>
-                    <td>
-                      <h5><?= $noefectivo['total']; ?></h5>
-                    </td>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-xs-12 col-md-10 col-md-offset-1">
+
+      <!-- NO CONTACTO -->
+      <div class="col-xs-12 col-md-6">
+        <div class="panel panel-danger">
+          <div class="panel-heading text-center">
+            <strong>Gestión NO CONTACTO</strong>
+          </div>
+          <div class="panel-body">
+            <div class="table-responsive">
+              <table class="table table-striped table-condensed">
+                <thead>
+                  <tr class="text-center">
+                    <th>Descripción</th>
+                    <th>Total</th>
                   </tr>
-                  <?php
-                  $total = $total + $noefectivo['total'];
-              }
-            } ?>
-              <tr align="center">
-                <td>
-                  <h5>TOTAL</h5>
-                </td>
-                <td>
-                  <h5><?= $total; ?></h5>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div id="chart_ne"></div>
-      </div>
-    </div>
+                </thead>
+                <tbody>
+                  <?php $total = 0;
+                  if (!empty($resultn)) {
+                    foreach ($resultn as $r) {
+                      $total += $r['total']; ?>
+                      <tr class="text-center">
+                        <td><?= $r['descripcion']; ?></td>
+                        <td><?= $r['total']; ?></td>
+                      </tr>
+                  <?php }} ?>
+                  <tr class="info text-center">
+                    <td><strong>TOTAL</strong></td>
+                    <td><strong><?= $total; ?></strong></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
 
-    <div class="col-lg-offset-0 col-lg-6">
-      <div class="panel panel-success">
-        <div class="panel-heading">Gestión CONTACTO</div>
-        <div class="panel-body">
-          <table class="table table-responsive table-hover table-condensed">
-            <thead>
-              <tr>
-                <th style="text-align: center;">
-                  <h5>DESCRIPCIÓN</h5>
-                </th>
-                <th style="text-align: center;">
-                  <h5>TOTAL</h5>
-                </th>
-              </tr>
-            </thead>
+            <div id="chart_ne" style="width:100%; height:400px;"></div>
 
-            <?php $total2 = 0; if(!$resulte){}else{
-            foreach ($resulte as $efectivo) { ?>
-              <tbody>
-                <tr align="center">
-                  <td>
-                    <h5><?= $efectivo['descripcion']; ?></h5>
-                  </td>
-                  <td>
-                    <h5><?= $efectivo['total']; ?></h5>
-                  </td>
-                </tr>
-                <?php
-                $total2 = $total2 + $efectivo['total'];
-            } ?>
-              <tr align="center">
-                <td>
-                  <h5>TOTAL</h5>
-                </td>
-                <td>
-                  <h5><?= $total2; ?></h5>
-                </td>
-              </tr>
-            </tbody>
-            <?php } ?>
-          </table>
+          </div>
         </div>
-        <div id="chart_ef"></div>
       </div>
+
+      <!-- CONTACTO -->
+      <div class="col-xs-12 col-md-6">
+        <div class="panel panel-success">
+          <div class="panel-heading text-center">
+            <strong>Gestión CONTACTO</strong>
+          </div>
+          <div class="panel-body">
+
+            <div class="table-responsive">
+              <table class="table table-striped table-condensed">
+                <thead>
+                  <tr class="text-center">
+                    <th>Descripción</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php $total2 = 0;
+                  if (!empty($resulte)) {
+                    foreach ($resulte as $r) {
+                      $total2 += $r['total']; ?>
+                      <tr class="text-center">
+                        <td><?= $r['descripcion']; ?></td>
+                        <td><?= $r['total']; ?></td>
+                      </tr>
+                  <?php }} ?>
+                  <tr class="success text-center">
+                    <td><strong>TOTAL</strong></td>
+                    <td><strong><?= $total2; ?></strong></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div id="chart_ef" style="width:100%; height:400px;"></div>
+
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
 
-<script type="text/javascript">
-  // Load the Visualization API and the corechart package.
-  google.charts.load('current', { 'packages': ['corechart'] });
 
-  // Set a callback to run when the Google Visualization API is loaded.
-  google.charts.setOnLoadCallback(drawChart);
+<script>
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(drawCharts);
 
-  // Callback that creates and populates a data table,
-  // instantiates the pie chart, passes in the data and
-  // draws it.
-  function drawChart() {
+function drawCharts(){
 
-    // Create the data table.
-    var data = new google.visualization.DataTable();
-    data.addColumn('string', 'Motivo no contacto');
-    data.addColumn('number', 'Total');
-    <?php foreach ($resultn as $noefectivo) { ?>
-      data.addRows([
-        ['<?= $noefectivo['descripcion']; ?>', <?= $noefectivo['total']; ?>]
-      ]);
+  drawPie('chart_ne', 'Contacto NO EFECTIVO', [
+    <?php foreach ($resultn as $r) { ?>
+      ['<?= $r['descripcion']; ?>', <?= $r['total']; ?>],
     <?php } ?>
+  ]);
 
-    // Set chart options
-    var options = {
-      'title': 'Contacto NO EFECTIVO',
-      'width': 530,
-      'height': 400,
-      is3D: true
-    };
-
-    // Instantiate and draw our chart, passing in some options.
-    var chart = new google.visualization.PieChart(document.getElementById('chart_ne'));
-    chart.draw(data, options);
-  }
-
-</script>
-<script type="text/javascript">
-
-  // Load the Visualization API and the corechart package.
-  google.charts.load('current', { 'packages': ['corechart'] });
-
-  // Set a callback to run when the Google Visualization API is loaded.
-  google.charts.setOnLoadCallback(drawChart);
-
-  // Callback that creates and populates a data table,
-  // instantiates the pie chart, passes in the data and
-  // draws it.
-  function drawChart() {
-
-    // Create the data table.
-    var data = new google.visualization.DataTable();
-    data.addColumn('string', 'Topping');
-    data.addColumn('number', 'Slices');
-    <?php foreach ($resulte as $efectivo) { ?>
-      data.addRows([
-        ['<?= $efectivo['descripcion']; ?>', <?= $efectivo['total']; ?>]
-      ]);
+  drawPie('chart_ef', 'Contacto EFECTIVO', [
+    <?php foreach ($resulte as $r) { ?>
+      ['<?= $r['descripcion']; ?>', <?= $r['total']; ?>],
     <?php } ?>
+  ]);
 
-    // Set chart options
-    var options = {
-      'title': 'Contacto EFECTIVO',
-      'width': 530,
-      'height': 400,
-      is3D: true
-    };
+}
 
-    // Instantiate and draw our chart, passing in some options.
-    var chart = new google.visualization.PieChart(document.getElementById('chart_ef'));
+function drawPie(elementId, title, rows){
+
+  var data = new google.visualization.DataTable();
+  data.addColumn('string','Motivo');
+  data.addColumn('number','Total');
+  data.addRows(rows);
+
+  var options = {
+    title: title,
+    width: '100%',
+    height: 400,
+    chartArea: {width:'90%', height:'75%'},
+    is3D: true
+  };
+
+  var chart = new google.visualization.PieChart(
+    document.getElementById(elementId)
+  );
+
+  chart.draw(data, options);
+
+  window.addEventListener('resize', function(){
     chart.draw(data, options);
-  }
+  });
+
+}
 </script>

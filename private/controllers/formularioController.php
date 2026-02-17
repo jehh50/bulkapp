@@ -15,7 +15,7 @@ if (empty($_SESSION)) {
         $efectivo = $conn->contactoEfectivo($_SESSION['servicio_id']);
         switch ($_SESSION['servicio_id']) {
           case 1:
-            // bancamiga bancaribe
+            // bancamiga bancaribe bancoActivo
             $estado = $conn->estado($_SESSION['servicio_id']);
             $producto = $conn->ventaProducto($_SESSION['servicio_id']);
             $cuentas = $conn->cuentasBancarias();

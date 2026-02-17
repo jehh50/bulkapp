@@ -79,9 +79,9 @@ if (empty($_SESSION)) {
           $json['response'] = 'true';
           if (isset($cliente['nombre_legal'])) {
             $json['nombre'] = $cliente['nombre_legal'];
-            $json['hab'] = $cliente['telf_hab'];
-            $json['ofi'] = $cliente['telf_ofi'];
-            $json['cel'] = $cliente['telf_cel'];
+            $json['hab'] = ($cliente['telf_hab'] == null)? 'No posee' : $cliente['telf_hab'];
+            $json['ofi'] = ($cliente['telf_ofi'] == null)? 'No posee' : $cliente['telf_ofi'];
+            $json['cel'] = ($cliente['telf_cel'] == null)? 'No posee' : $cliente['telf_cel'];
             $json['cedula'] = $cliente['identificacion'];
             $json['servicio'] = $cliente['descripcion'];
             $json['status'] = strtoupper($cliente['name']);
