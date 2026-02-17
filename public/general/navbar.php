@@ -1,4 +1,4 @@
-<body style="background-color: #252525 !important">
+<body style="background-color: #e9e9e9 !important">
   <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container-fluid">
       <div class="navbar-header">
@@ -18,8 +18,8 @@
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Configuración <span class="caret"></span></a>
                 <ul class="dropdown-menu">
+                  <li><a href="?view=configuracion&mode=index">Listar Productos</a></li>
                   <li><a href="?view=configuracion&mode=agregarProducto">Agregar Productos</a></li>
-                  <li><a href="?view=configuracion&mode=consultarProducto">Listar Productos</a></li>
                   <li role="separator" class="divider"></li>
                   <li><a href="?view=carga_archivo&mode=index">Carga BBDD</a></li>
                   <li><a href="?view=configuracion&mode=editarResultado">Editar resultados</a></li>

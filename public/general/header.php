@@ -11,9 +11,7 @@
 
     <link rel="stylesheet" href="public/css/bootstrap.css" type="text/css">
     <link rel="stylesheet" href="public/css/estilos.css" type="text/css">
-    <!-- <link rel="stylesheet" href="public/css/estilosindex.css" type="text/css"> -->
     <link href="public/images/icon.png" rel="icon" type="image/png"/>
-    <!-- <link href="public/css/login.css" rel="stylesheet"/> -->
     <link href="public/css/dashboard.css" rel="stylesheet">
     <script src="public/js/jquery-3.2.1.min.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Poppins:400,600&display=swap" rel="stylesheet">

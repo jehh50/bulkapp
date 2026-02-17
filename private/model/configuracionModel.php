@@ -166,10 +166,12 @@ class database
     }
     return $respuesta;
   }
-  public function updateResultados($id, $nombre, $apellido, $cedula, $genero, $fecha_nac, $hab, $cel, $correo, $venta)
+  public function updateResultados($id, $nombre, $apellido, $cedula, $genero, $fecha_nac, $hab, $cel, $correo, $venta, $productId)
   {
-    echo ("UPDATE resultados SET nombre='$nombre', apellido='$apellido', genero='$genero', fecha_nacimiento='$fecha_nac', cedula=$cedula, telf_hab='$hab', telf_celular='$cel', correo='$correo', fecha_venta='$venta' WHERE  id=$id");
-    $this->db->query("UPDATE resultados SET nombre='$nombre', apellido='$apellido', genero='$genero', fecha_nacimiento='$fecha_nac', cedula=$cedula, telf_hab='$hab', telf_celular='$cel', correo='$correo', fecha_venta='$venta'  WHERE  id=$id");
+    //echo ("UPDATE resultados SET nombre='$nombre', apellido='$apellido', genero='$genero', fecha_nacimiento='$fecha_nac', cedula=$cedula, telf_hab='$hab', telf_celular='$cel', correo='$correo', fecha_venta='$venta' WHERE  id=$id");
+
+    $this->db->query("UPDATE resultados SET nombre='$nombre', apellido='$apellido', genero='$genero', fecha_nacimiento='$fecha_nac', cedula=$cedula, telf_hab='$hab', telf_celular='$cel', correo='$correo', fecha_venta='$venta', producto_id=$productId WHERE  id=$id");
+
     return true;
   }
 

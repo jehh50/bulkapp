@@ -1,111 +1,160 @@
-<script type="text/javascript">
+<script>
 $(document).ready(function(){
+
   $('#fecha_h').change(function(){
-    d = ($('#fecha_d').val());
-    h = ($('#fecha_h').val());
-    if(h<d){
+    var d = $('#fecha_d').val();
+    var h = $('#fecha_h').val();
+
+    if(d && h && h < d){
       alert('La fecha "HASTA" es menor a la fecha "DESDE". Por favor verifique');
+      $('#fecha_h').val('');
     }
   });
-})
+
+});
 
 function validateService(){
-  var a = document.getElementById('servicio').value;
-  if(a == ''){
+  var servicio = $('#servicio').val();
+  if(!servicio){
     alert('Por favor seleccione un servicio');
     return false;
   }
-  else{
-    return true;
-  }
+  return true;
 }
 </script>
-<div class="container">
+
+<div class="container-fluid" style="margin-top: 40px;">
   <div class="row">
-    <div class="col-xs-12 col-sm-12 col-md-10 col-lg-12">
-      <section class="container">
-        <header><h1></h1></header>
-      </section>
+    <div class="col-xs-12 col-md-10 col-md-offset-1">
+
       <div class="panel panel-default">
         <div class="panel-body">
-          <div class="form-group">
-            <section>
-              <label><h1>Resumen de gestión por operador</h1></label>
-            </section>
-          <form name="resultados" method="POST" action="?view=reportes&mode=acumulado" onsubmit="return validateService(this)">
-            <div class="form-group">              
-              <div class="form-group col-lg-3">  
-                <label>Desde</label><input type="date" class="form-control" aria-describedby="fecha_d" name="fecha_d" id="fecha_d" autofocus />
+
+          <h2 class="text-center">Resumen de gestión por operador</h2>
+          <hr>
+
+          <!-- FORM FILTROS -->
+          <form name="resultados"
+                method="POST"
+                action="?view=reportes&mode=acumulado"
+                onsubmit="return validateService();">
+
+            <div class="row">
+
+              <div class="form-group col-xs-12 col-sm-6 col-md-3">
+                <label>Desde</label>
+                <input type="date"
+                       class="form-control"
+                       name="fecha_d"
+                       id="fecha_d">
               </div>
-              <div class="form-group col-lg-3">  
-                <label>Hasta</label><input type="date" class="form-control" aria-describedby="fecha_h" name="fecha_h" id="fecha_h" autofocus />
+
+              <div class="form-group col-xs-12 col-sm-6 col-md-3">
+                <label>Hasta</label>
+                <input type="date"
+                       class="form-control"
+                       name="fecha_h"
+                       id="fecha_h">
               </div>
-              <div class="form-group col-lg-3">
+
+              <div class="form-group col-xs-12 col-sm-6 col-md-3">
                 <label>Servicio</label>
-                <select class="form-control" name="servicio" id="servicio" >
-                  <?php foreach ($servicio as $s) {?>
-                  <option value='' disabled selected style='display:none;'>Seleccione...</option>
-                  <option value='<?php echo $s['id'];?>'><?php echo $s['descripcion'];}?></option>
+                <select class="form-control"
+                        name="servicio"
+                        id="servicio"
+                        required>
+                  <option value="" disabled selected>Seleccione...</option>
+                  <?php foreach ($servicio as $s) { ?>
+                    <option value="<?php echo $s['id']; ?>">
+                      <?php echo $s['descripcion']; ?>
+                    </option>
+                  <?php } ?>
                 </select>
               </div>
 
-            </div>
-            <div class="form-group col-lg-12">
-                <input type="submit" class="btn btn-medium btn-success" value="Buscar" id="btn-buscar">
+              <div class="form-group col-xs-12 col-sm-6 col-md-3" style="margin-top:25px;">
+                <button type="submit"
+                        class="btn btn-success btn-block">
+                  Buscar
+                </button>
+              </div>
+
             </div>
           </form>
-            <div class="table-responsive col-lg-12">
-              <div style="overflow-y: scroll; height: 350px; margin-top: 10px;">
-                <table class="table table-responsive table-hover table-condensed">
-                  <thead>
-                    <tr  style="background-color: #1a4190; color: #ffffff">
-                      <th style="text-align: center;"><h5><strong>Nombre y Apellido</strong></h5></th>
-                      <th style="text-align: center;"><h5><strong>Clientes gestionados</strong></h5></th>
-                      <th style="text-align: center;"><h5><strong>Clientes contactados</strong></h5></th>
-                      <th style="text-align: center;"><h5><strong>Clientes no contactados</strong></h5></th>
-                      <th style="text-align: center;"><h5><strong>Ventas realizadas</strong></h5></th>
-                      <th style="text-align: center;"><h5><strong>% Clientes contactados</strong></h5></th>
-                      <th style="text-align: center;"><h5><strong>% Clientes no contactados</strong></h5></th>
-                      <th style="text-align: center;"><h5><strong>%Ventas realizadas</strong></h5></th>
-                    </tr>
-                  </thead>
-                  <?php $totalg = $totalc = $totaln = $totalv = 0;
-                    if (!empty($gestion)) {
-                      foreach($gestion as $gestionados){?>
-                        <tbody>
-                          <tr align="center">
-                            <td><h5><?php echo $gestionados['nombre'];?></h5></td>
-                            <td><h5><?php echo $gestionados['gestion'];?></h5></td>
-                            <td><h5><?php echo $gestionados['efectivos'];?></h5></td>
-                            <td><h5><?php echo ($gestionados['gestion'] - $gestionados['efectivos']);?></h5></td>
-                            <td><h5><?php echo $gestionados['ventas'];?></h5></td>
-                            <td><h5><?php echo (round($gestionados['efectivos']/$gestionados['gestion'],4) * 100).'%';?></h5></td>
-                            <td><h5><?php echo (round(($gestionados['gestion'] - $gestionados['efectivos'])/$gestionados['gestion'],4) * 100).'%';?></h5></td>
-                            <td><h5><?php if($gestionados['ventas'] == 0){ echo 0;}else{echo (round($gestionados['ventas']/$gestionados['efectivos'],4) * 100).'%';}?></h5></td>
-                          </tr>
-                        </tbody>
-                   <?php 
-                      $totalg=$totalg+$gestionados['gestion'];
-                      $totalc=$totalc+$gestionados['efectivos'];
-                      $totaln=($totalg-$totalc);
-                      $totalv=$totalv+$gestionados['ventas'];
-                    }}?>
-                      <tr align="center" style="background-color: #1a4190; color: #ffffff">
-                        <td><h5><strong>TOTALES</strong></h5></td>
-                        <td><h5><strong><?php echo $totalg ;?></strong></h5></td>
-                        <td><h5><strong><?php echo $totalc ;?></strong></h5></td>
-                        <td><h5><strong><?php echo $totaln ;?></strong></h5></td>
-                        <td><h5><strong><?php echo $totalv ;?></strong></h5></td>
-                        <td><h5><strong><?php if ($totalg==0) {echo 0;}else{echo (round(($totalc/$totalg),4)*100).'%';}?></strong></h5></td>
-                        <td><h5><strong><?php if ($totalg==0) {echo 0;}else{echo (round(($totaln/$totalg),4)*100).'%';}?></strong></h5></td>
-                        <td><h5><strong><?php if ($totalc==0) {echo 0;}else{echo (round(($totalv/$totalc),4)*100).'%';}?></strong></h5></td>
-                      </tr>
-                      </div>
-                </table>
-              </div>
-            </div>
+
+          <hr>
+
+          <!-- TABLA -->
+          <div class="table-responsive">
+            <table class="table table-striped table-bordered table-hover">
+
+              <thead style="background-color:#1a4190; color:#fff;">
+                <tr class="text-center">
+                  <th>Nombre y Apellido</th>
+                  <th>Gestionados</th>
+                  <th>Contactados</th>
+                  <th>No contactados</th>
+                  <th>Ventas</th>
+                  <th>% Contactados</th>
+                  <th>% No contactados</th>
+                  <th>% Ventas</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <?php
+                $totalg = $totalc = $totaln = $totalv = 0;
+
+                if (!empty($gestion)) {
+                  foreach($gestion as $g){
+
+                    $noContactados = $g['gestion'] - $g['efectivos'];
+                    $pctContactados = $g['gestion'] ? round(($g['efectivos']/$g['gestion'])*100,2) : 0;
+                    $pctNoContactados = $g['gestion'] ? round(($noContactados/$g['gestion'])*100,2) : 0;
+                    $pctVentas = $g['efectivos'] ? round(($g['ventas']/$g['efectivos'])*100,2) : 0;
+
+                    echo "<tr class='text-center'>
+                            <td>{$g['nombre']}</td>
+                            <td>{$g['gestion']}</td>
+                            <td>{$g['efectivos']}</td>
+                            <td>{$noContactados}</td>
+                            <td>{$g['ventas']}</td>
+                            <td>{$pctContactados}%</td>
+                            <td>{$pctNoContactados}%</td>
+                            <td>{$pctVentas}%</td>
+                          </tr>";
+
+                    $totalg += $g['gestion'];
+                    $totalc += $g['efectivos'];
+                    $totalv += $g['ventas'];
+                  }
+
+                  $totaln = $totalg - $totalc;
+                  $totalPctC = $totalg ? round(($totalc/$totalg)*100,2) : 0;
+                  $totalPctN = $totalg ? round(($totaln/$totalg)*100,2) : 0;
+                  $totalPctV = $totalc ? round(($totalv/$totalc)*100,2) : 0;
+                ?>
+
+                <tr style="background-color:#1a4190; color:#fff;" class="text-center">
+                  <td><strong>TOTALES</strong></td>
+                  <td><strong><?php echo $totalg; ?></strong></td>
+                  <td><strong><?php echo $totalc; ?></strong></td>
+                  <td><strong><?php echo $totaln; ?></strong></td>
+                  <td><strong><?php echo $totalv; ?></strong></td>
+                  <td><strong><?php echo $totalPctC; ?>%</strong></td>
+                  <td><strong><?php echo $totalPctN; ?>%</strong></td>
+                  <td><strong><?php echo $totalPctV; ?>%</strong></td>
+                </tr>
+
+                <?php } ?>
+              </tbody>
+
+            </table>
+          </div>
+
         </div>
       </div>
+
     </div>
   </div>
 </div>

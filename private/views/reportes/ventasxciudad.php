@@ -1,111 +1,172 @@
 <script type="text/javascript" src="public/js/loader.js"></script>
-<div class="container">
+
+<style>
+  .table-scroll {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  .chart-container {
+    width: 100%;
+    min-height: 320px;
+    height: 55vh;
+    margin-top: 20px;
+  }
+
+  @media (max-width: 768px) {
+    h2 {
+      font-size: 20px;
+    }
+  }
+</style>
+
+
+<div class="container-fluid" style="margin-top:40px;">
   <div class="row">
-    <div class="col-lg-12">
-      <section class="container">
-        <header>
-          <h1></h1>
-        </header>
-      </section>
-      <section>
-        <label>
-          <h1 style="color:#ffffff">Detalle de ventas para el estado <strong><a href="?view=reportes&mode=ventas"><?= $estado; ?></a></strong>
-          </h1>
-        </label>
-      </section>
+    <div class="col-xs-12 col-md-10 col-md-offset-1">
+
+      <div class="panel panel-default">
+        <div class="panel-body text-center">
+          <h2>
+            Detalle de ventas para el estado
+            <strong>
+              <a href="?view=reportes&mode=ventas">
+                <?= htmlspecialchars($estado); ?>
+              </a>
+            </strong>
+          </h2>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
-<br>
-<div class="container">
+
+
+<div class="container-fluid">
   <div class="row">
-    <div class="col-lg-6">
+    <div class="col-xs-12 col-md-10 col-md-offset-1">
+
       <div class="panel panel-danger">
-        <div class="panel-heading" style="text-align: center; font-size: 16px;">VENTAS POR CIUDAD</div>
+
+        <div class="panel-heading text-center">
+          <strong>VENTAS POR CIUDAD</strong>
+        </div>
+
         <div class="panel-body">
-          <div class="table-responsive">
-            <div style="overflow-y: scroll; height:auto">
-              <table class="table table-responsive table-hover table-condensed">
-                <thead class="bg-danger">
-                  <tr>
-                    <th style="text-align: center;">
-                      <h5>CIUDAD</h5>
-                    </th>
-                    <th style="text-align: center;">
-                      <h5>VENTAS</h5>
-                    </th>
-                  </tr>
-                </thead>
-                <?php $total = 0;
-                foreach ($result as $ventas) { ?>
-                  <tbody>
-                    <tr align="center">
-                      <td>
-                        <h5><?= $ventas['ciudad']; ?></h5>
-                      </td>
-                      <td>
-                        <h5><?= $ventas['total']; ?></h5>
-                      </td>
+
+          <div class="row">
+            <div class="col-xs-12 col-md-8 col-md-offset-2">
+
+              <div class="table-responsive table-scroll">
+                <table class="table table-striped table-condensed">
+
+                  <thead class="bg-danger text-center">
+                    <tr>
+                      <th class="text-center">CIUDAD</th>
+                      <th class="text-center">VENTAS</th>
                     </tr>
-                    <?php
-                    $total = $total + $ventas['total'];
-                } ?>
-                  <tr align="center">
-                    <td>
-                      <h5><strong>TOTAL</strong></h5>
-                    </td>
-                    <td>
-                      <h5><strong><?= $total; ?></strong></h5>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                  </thead>
+
+                  <tbody>
+                    <?php 
+                    $total = 0;
+                    if (!empty($result)) {
+                      foreach ($result as $ventas) { 
+                        $total += $ventas['total'];
+                    ?>
+                        <tr class="text-center">
+                          <td><?= htmlspecialchars($ventas['ciudad']); ?></td>
+                          <td><?= $ventas['total']; ?></td>
+                        </tr>
+                    <?php 
+                      } 
+                    ?>
+                      <tr class="info text-center">
+                        <td><strong>TOTAL</strong></td>
+                        <td><strong><?= $total; ?></strong></td>
+                      </tr>
+                    <?php } else { ?>
+                      <tr>
+                        <td colspan="2" class="text-center text-muted">
+                          Sin datos para mostrar
+                        </td>
+                      </tr>
+                    <?php } ?>
+                  </tbody>
+
+                </table>
+              </div>
+
             </div>
           </div>
+
+          <!-- GRÁFICO -->
+          <div class="chart-container">
+            <div id="chart_ne" style="width:100%; height:100%;"></div>
+          </div>
+
         </div>
       </div>
-    </div>
-    <div class="col-lg-6">
-      <div class="panel panel-success">
-        <div class="panel-body bg-warning">
-          <div id="chart_ne" style="height:300px"></div>
-        </div>
-      </div>
+
     </div>
   </div>
 </div>
 
-<script type="text/javascript">
-  // Load the Visualization API and the corechart package.
-  google.charts.load('current', { 'packages': ['corechart'] });
 
-  // Set a callback to run when the Google Visualization API is loaded.
-  google.charts.setOnLoadCallback(drawChart);
+<script>
+google.charts.load('current', { packages:['corechart'] });
+google.charts.setOnLoadCallback(initChart);
 
-  // Callback that creates and populates a data table,
-  // instantiates the pie chart, passes in the data and
-  // draws it.
-  function drawChart() {
+let chart, data, options;
 
-    // Create the data table.
-    var data = new google.visualization.DataTable();
-    data.addColumn('string', 'Estado');
-    data.addColumn('number', 'Total');
-    <?php foreach ($result as $ventas) { ?>
-      data.addRows([
-        ['<?= $ventas['ciudad']; ?>', <?= $ventas['total']; ?>]
-      ]);
-    <?php } ?>
+function initChart() {
 
-    // Set chart options
-    var options = {
-      'title': 'Ventas x Ciudad',
-      legend: { position: "none" },
-      is3D: true
-    };
+  const container = document.getElementById('chart_ne');
+  if (!container) return;
 
-    // Instantiate and draw our chart, passing in some options.
-    var chart = new google.visualization.PieChart(document.getElementById('chart_ne'));
-    chart.draw(data, options);
+  const rows = <?= json_encode(
+    !empty($result)
+      ? array_map(function ($r) {
+          return [$r['ciudad'], (int)$r['total']];
+        }, $result)
+      : []
+  ); ?>;
+
+  if (!rows || rows.length === 0) {
+    container.innerHTML = "<div class='text-center text-muted'>Sin datos para mostrar</div>";
+    return;
   }
+
+  data = new google.visualization.DataTable();
+  data.addColumn('string', 'Ciudad');
+  data.addColumn('number', 'Total');
+  data.addRows(rows);
+
+  options = {
+    title: 'Ventas x Ciudad',
+    chartArea: { width: '85%', height: '75%' },
+    legend: { position: window.innerWidth < 768 ? 'bottom' : 'right' },
+    is3D: true
+  };
+
+  chart = new google.visualization.PieChart(container);
+  drawChartResponsive();
+}
+
+function drawChartResponsive() {
+  if (!chart) return;
+
+  const container = document.getElementById('chart_ne');
+  options.width = container.offsetWidth;
+  options.height = container.offsetHeight;
+
+  chart.draw(data, options);
+}
+
+let resizeTimeout;
+window.addEventListener('resize', function() {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(drawChartResponsive, 200);
+});
 </script>

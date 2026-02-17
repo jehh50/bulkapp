@@ -83,7 +83,8 @@ class database
             cc.nombre_usuario AS 'nombreCliente',
             rc.created_at AS 'fechaCreacion',
             s.name AS 'estadoGestion',
-            cc.cedula AS 'cedula'
+            cc.cedula AS 'cedula',
+            g.tipo_gestion
         FROM
             results_cashea AS rc
         LEFT JOIN
@@ -135,6 +136,7 @@ class database
 
   public function buscarCliente($cedula)
   {
+    
     $sql = $this->db->query("SELECT a.nombre_legal,a.telf_hab,a.telf_ofi, a.telf_cel,c.name,a.identificacion,b.descripcion FROM clientes a INNER JOIN servicios b ON a.servicio_id = b.id INNER JOIN status c ON a.status_id = c.id WHERE a.identificacion = '$cedula' OR a.telf_ofi = '$cedula'");
     if ($this->db->rows($sql) > 0) {
       $respuesta = $this->db->recorrer($sql);
