@@ -266,8 +266,7 @@ if (empty($_SESSION)) {
 
 
 			case 'actualiza':
-				var_dump($_GET);
-				$result = $con->updateResultados($_GET['id'], $_GET['nombre'], $_GET['apellido'], $_GET['cedula'], $_GET['sexo'], $_GET['nacimiento'], $_GET['hab'], $_GET['cel'], $_GET['correo'], $_GET['venta'],$_GET['productoId']);
+				$result = $con->updateResultados($_GET['id'], $_GET['nombre'], $_GET['apellido'], $_GET['cedula'], $_GET['sexo'], $_GET['nacimiento'], $_GET['hab'], $_GET['cel'], $_GET['correo'], $_GET['venta'],$_GET['productoId'],$_GET['cuenta']);
 
 				if ($result == true){
 					$json['response'] = 'true';

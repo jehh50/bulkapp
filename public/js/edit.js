@@ -57,38 +57,42 @@ $(document).ready(function () {
                 ${openProduct}</div>
                 <div class="form-group col-lg-4">
                   <span class="form-group-addon">Nombres</span>
-                  <input type="text" class="form-control" placeholder="Julio Cesar" aria-describedby="nombre" id="nombre${i}" oninput="onlyLetters(this);" value="${datos.data[i].nombre}">
+                  <input type="text" class="form-control" placeholder="Julio Cesar" maxlength="50" aria-describedby="nombre" id="nombre${i}" oninput="onlyLetters(this);" value="${datos.data[i].nombre}">
                 </div>
                 <div class="form-group col-lg-4">
                   <span class="form-group-addon">Apellidos</span>
-                  <input type="text" class="form-control" placeholder="Perez Gomez" aria-describedby="apellido" id="apellido${i}" oninput="onlyLetters(this);" value="${datos.data[i].apellido}">
+                  <input type="text" class="form-control" placeholder="Perez Gomez" maxlength="50" aria-describedby="apellido" id="apellido${i}" oninput="onlyLetters(this);" value="${datos.data[i].apellido}">
                 </div>
                 <div class="form-group col-lg-4">
                   <span class="form-group-addon">Cédula</span>
-                  <input type="text" class="form-control" placeholder="12345678" aria-describedby="cedula" id="cedula${i}" oninput="onlyNumbers(this);" value="${datos.data[i].cedula}">
+                  <input type="text" class="form-control" placeholder="12345678" maxlength="8" aria-describedby="cedula" id="cedula${i}" oninput="onlyNumbers(this);" value="${datos.data[i].cedula}">
                 </div>
                 <div class="form-group col-lg-4">
                   <span class="form-group-addon">Sexo</span>
                   <select class="form-control" id="genero${i}">${gender}</select>
                   <div class="form-group col-lg-4">
                     <span class="form-group-addon">Fecha de nacimiento</span>
-                    <input type="text" class="form-control" placeholder="01/01/2024" aria-describedby="d_nacimiento" id="d_nacimiento${i}" oninput="formatDate(this);" value="${datos.data[i].nacimiento}">
+                    <input type="text" class="form-control" placeholder="01/01/2024" maxlength="10" aria-describedby="d_nacimiento" id="d_nacimiento${i}" oninput="formatDate(this);" value="${datos.data[i].nacimiento}">
                   </div>
                   <div class="form-group col-lg-4">
                     <span class="form-group-addon">Teléfono habitación</span>
-                    <input type="text" class="form-control telefono" placeholder="(0212)345.67.89" aria-describedby="tlf_hab" id="telf_hab${i}" value="${datos.data[i].telf_hab}">
+                    <input type="text" class="form-control telefono" placeholder="(0212)345.67.89"  maxlength="15" aria-describedby="tlf_hab" id="telf_hab${i}" value="${datos.data[i].telf_hab}">
                   </div>
                   <div class="form-group col-lg-4">
                     <span class="form-group-addon">Teléfono celular</span>
-                    <input type="text" class="form-control telefono" placeholder="(0424)234.56.78" aria-describedby="tlf_celu" id="telf_cel${i}" value="${datos.data[i].telf_celular}">
+                    <input type="text" class="form-control telefono" placeholder="(0424)234.56.78" maxlength="15" aria-describedby="tlf_celu" id="telf_cel${i}" value="${datos.data[i].telf_celular}">
                   </div>
                   <div class="form-group col-lg-4">
                     <span class="form-group-addon">Correo</span>
-                    <input type="email" class="form-control" placeholder="usuario@dominio.com" aria-describedby="correo" id="correo${i}" onkeyup="mayus(this); validateMail(this);" value="${datos.data[i].correo}">
+                    <input type="email" class="form-control" placeholder="usuario@dominio.com" aria-describedby="correo" id="correo${i}" maxlength="50" onkeyup="mayus(this); validateMail(this);" value="${datos.data[i].correo}">
                   </div>
                   <div class="form-group col-lg-4">
                     <span class="form-group-addon">Fecha de venta</span>
-                    <input type="text" class="form-control" placeholder="20240101" aria-describedby="saleDate" id="saleDate${i}" oninput="formatDate_(this)" value="${datos.data[i].fecha_venta}">
+                    <input type="text" class="form-control" placeholder="20240101" maxlength="8" aria-describedby="saleDate" id="saleDate${i}" oninput="formatDate_(this)" value="${datos.data[i].fecha_venta}">
+                  </div>
+                  <div class="form-group col-lg-4">
+                    <span class="form-group-addon">Número de cuenta</span>
+                    <input type="text" class="form-control" placeholder="12345678901234567890" maxlength="20" aria-describedby="account" id="account${i}" oninput="onlyNumbers(this)" value="${datos.data[i].cuenta}">
                   </div>
                   <input type="hidden" id="id_resultado${i}" value="${datos.data[i].id_resultado}">
                   <input type="hidden" id="gestion${i}" value="${datos.data[i].id_gestion}">
@@ -109,12 +113,6 @@ $(document).ready(function () {
               <button class="btn btn-md btn-success" id="btn-actualizar" data-toggle="modal" data-target="#modalActualiza${i}">
                       <span class="glyphicon glyphicon-floppy-disk"></span> Guardar
               </button>`;
-
-              // let otherButton = `
-              //   <button class="btn btn-md btn-success" id="btn-show">
-              //     <span class="glyphicon glyphicon-pencil"></span> Show
-              //   </button>
-              // `;
 
               let divClose = `</div></div></div></div>`;
 
@@ -162,24 +160,6 @@ $(document).ready(function () {
               } else {
                 console.error(`No se encontró el elemento con ID ${selectId}`);
               }
-
-
-              // function generarUrlActualizacion(i, datos) {
-              //   let productoId = $("select#producto" + i).val();
-              //   let nombre = $("#nombre" + i).val();
-              //   let apellido = $("#apellido" + i).val();
-              //   let cedula = $("#cedula" + i).val();
-              //   let sexo = $("select#genero" + i).val();
-              //   let nacimiento = $("#d_nacimiento" + i).val();
-              //   let hab = $("#telf_hab" + i).val();
-              //   let cel = $("#telf_cel" + i).val();
-              //   let correo = $("#correo" + i).val();
-              //   let venta = $("#saleDate" + i).val();
-
-              //   return `?view=configuracion&mode=actualiza&productoId=${productoId}&id=${datos.data[i].id_resultado}&nombre=${nombre}&apellido=${apellido}&cedula=${cedula}&sexo=${sexo}&nacimiento=${nacimiento}&hab=${hab}&cel=${cel}&correo=${correo}&venta=${venta}`;
-              // }
-
-              // let url = generarUrlActualizacion(i, datos);
 
               let modalDelete = `
                 <div class="modal fade" id="modalRechazo${i}" tabindex="-1" role="dialog" aria-labelledby="modalRechazo${i}">
@@ -262,6 +242,7 @@ function actualizarRegistro(i, idResultado) {
   let cel = $("#telf_cel" + i).val();
   let correo = $("#correo" + i).val();
   let venta = $("#saleDate" + i).val();
+  let cuenta = $("#account" + i).val();
 
   let url = `?view=configuracion&mode=actualiza`
           + `&productoId=${productoId}`
@@ -274,6 +255,7 @@ function actualizarRegistro(i, idResultado) {
           + `&hab=${encodeURIComponent(hab)}`
           + `&cel=${encodeURIComponent(cel)}`
           + `&correo=${encodeURIComponent(correo)}`
+          + `&cuenta=${encodeURIComponent(cuenta)}`
           + `&venta=${encodeURIComponent(venta)}`;
 
   window.location.href = url;
