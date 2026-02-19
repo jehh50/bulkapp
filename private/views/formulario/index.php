@@ -14,10 +14,10 @@
             <h2><strong>Datos de cliente</strong></h2>
           </section>
           
-          <div class="form-group">
+          <!--div class="form-group">
             <h5>Producto a ofrecer</h5>
             <input type="text" class="form-control success" aria-describedby="oferta"  name="oferta" id="oferta" disabled/>
-          </div>
+          </div-->
           
           <div class="form-group">
             <h5>Nombre del cliente</h5>
@@ -30,22 +30,22 @@
           </div>
 
           <div class="form-group">
-            <h5>Teléfono 1</h5>
+            <h5>Fecha de nacimiento</h5>
             <input type="text" class="form-control" aria-describedby="phone1"  name="phone1" id="phone1" disabled/>
           </div>
 
           <div class="form-group">
-            <h5>Teléfono 2</h5>
+            <h5>Genero</h5>
             <input type="text" class="form-control" aria-describedby="phone2"  name="phone2" id="phone2" disabled/>
           </div>
           
           <div class="form-group">
-            <h5>Teléfono 3</h5>
+            <h5>Teléfono</h5>
             <input type="text" class="form-control"  aria-describedby="phone3"  name="phone3" id="phone3" disabled/>
           </div>
 
           <div class="form-group">
-            <h5>Fecha de nacimiento</h5>
+            <h5>Ubicación</h5>
             <input type="text" class="form-control"  aria-describedby="birthday"  name="birthday" id="birthday" disabled/>
           </div>
 
