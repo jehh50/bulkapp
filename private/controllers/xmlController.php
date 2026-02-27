@@ -31,7 +31,7 @@ if (empty($_SESSION)) {
         $datosXML = $conexion->datosXML($fecha_, 1);
 
         $encabezado = '<bulk_sales xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="bulk_sales.xsd">
-  <company code="17">
+  <company code="5">
     <company_name>CORPF1</company_name> 
       <agencies>
         <agency code="804">
