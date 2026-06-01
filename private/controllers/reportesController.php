@@ -146,7 +146,7 @@ if (empty($_SESSION)) {
       case 'detalleventas':
         include(PUBLIC_DIR . 'general/header.php');
         include(PUBLIC_DIR . 'general/navbar.php');
-        $id = '(1)';
+        $id = '(1,5)';
         $servicio = $conn->servicio($id);
 
         if (isset($_POST['fecha_d']) || isset($_POST['fecha_h'])) {
