@@ -53,7 +53,7 @@ if (empty($_SESSION)) {
 						}, $datos);
 
 						if ($servicio == 1 || $servicio == 5) {
-							$fila = array_slice($datos, 0, 9);
+							$fila =  array_slice($datos, 0, 9);
 							$paramTypes = str_repeat('s', 9);
 						} else {
 							$fila = array_slice($datos, 0, 20);
