@@ -25,7 +25,7 @@ class database
 
   public function servicio()
   {
-    $sql = $this->db->query("SELECT * FROM servicios ORDER BY descripcion");
+    $sql = $this->db->query("SELECT * FROM servicios WHERE status_id = 2 ORDER BY descripcion");
     if ($this->db->rows($sql) > 0) {
       while ($data = $this->db->recorrer($sql)) {
         $respuesta[] = $data;

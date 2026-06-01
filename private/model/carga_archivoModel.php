@@ -27,11 +27,11 @@ class database
 		$tabla = '';
 		$columnasEsperadas = 0;
 
-		if ($servicio == 1) {
+		if ($servicio == 1 || $servicio == 5) {
 			$tabla = 'clientes';
 			$columnas = ['identificacion', 'nombre_legal', 'telf_hab', 'telf_ofi', 'telf_cel', 'correo', 'direccion', 'cuenta', 'oferta'];
 			$columnasEsperadas = 9;
-			$queryUpdate = "UPDATE clientes SET is_active = 0 WHERE is_active = 1";
+			//$queryUpdate = "UPDATE clientes SET is_active = 0 WHERE is_active = 1";
 
 		} else {
 			$tabla = 'cashea_customers';
@@ -158,7 +158,7 @@ class database
 
 	public function servicio()
 	{
-		$sql = $this->db->query("SELECT * FROM servicios");
+		$sql = $this->db->query("SELECT id,descripcion FROM servicios WHERE status_id = 2 ORDER BY id desc");
 		if ($this->db->rows($sql) > 0) {
 			while ($data = $this->db->recorrer($sql)) {
 				$respuesta[] = $data;
