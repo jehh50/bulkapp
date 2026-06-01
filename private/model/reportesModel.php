@@ -46,7 +46,7 @@ class database
 
   public function ventaDetallada($desde, $hasta, $servicio)
   {
-    if ($servicio == 1) {
+    if ($servicio == 1 || $servicio == 5) {
       $sql = $this->db->query("SELECT r.nombre, r.apellido, r.cedula, r.fecha_nacimiento, r.telf_hab, r.telf_celular, r.correo, p.descripcion, CONCAT(u.nombre,' ',u.apellido) as agente, r.fecha_venta FROM `resultados` r INNER JOIN productos p ON r.producto_id = p.id INNER JOIN gestion g ON r.gestion_id = g.id INNER JOIN users u ON g.user_id = u.id WHERE r.fecha_venta BETWEEN $desde AND $hasta AND r.servicio_id = $servicio ORDER BY r.fecha_venta DESC");
       if ($this->db->rows($sql) > 0) {
         while ($data = $this->db->recorrer($sql)) {
@@ -217,7 +217,7 @@ class database
 
   public function servicio($id)
   {
-    $sql = $this->db->query("SELECT * FROM servicios WHERE status_id = 2 and id in $id ORDER BY descripcion");
+    $sql = $this->db->query("SELECT id, descripcion FROM servicios WHERE status_id = 2 and id in $id ORDER BY descripcion");
     if ($this->db->rows($sql) > 0) {
       while ($data = $this->db->recorrer($sql)) {
         $respuesta[] = $data;
