@@ -39,7 +39,7 @@ class database
 
   public function servicio()
   {
-    $sql = $this->db->query("SELECT * FROM servicios WHERE status_id = 2");
+    $sql = $this->db->query("SELECT id,descripcion FROM servicios WHERE status_id = 2");
     if ($this->db->rows($sql) > 0) {
       while ($data = $this->db->recorrer($sql)) {
         $respuesta[] = $data;

@@ -28,7 +28,12 @@ if (empty($_SESSION)) {
           $json['response'] = 'true';
         }
         //ajustar el codigo del servicio
-        $datosXML = $conexion->datosXML($fecha_, 1);
+        $datosXML = $conexion->datosXML($fecha_, $_POST['servicio']);
+        $folder = match($_POST['servicio']) {
+          '1' => 'bancamiga',
+          '5' => 'bancaribe',
+          default => 'bancamiga',
+        };
 
         $encabezado = '<bulk_sales xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="bulk_sales.xsd">
   <company code="5">
@@ -259,12 +264,9 @@ if (empty($_SESSION)) {
                   </receipt>
                 </policy>
               </transaction>';
-
             $k++;
-
             $insertTransaccion = $conexion->insertTransaccion($k, $fecha_, $xml['id_resultado']);
-
-          }
+          } 
         }
         $fin = '      
           </transactions>
@@ -273,7 +275,6 @@ if (empty($_SESSION)) {
     </company>
   <total_operations>' . count($datosXML) . '</total_operations>
 </bulk_sales>';
-
 
         /* #ARCHIVO XML
          *
@@ -289,19 +290,13 @@ if (empty($_SESSION)) {
 
         $fileXml = $encabezado;
         $nombreXML = "{$fecha_}{$hora}{$min}_bulk_sales.xml";
-        $handler = fopen("public/archivos/bancamiga/$nombreXML", "w+");
+        $handler = fopen("public/archivos/$folder/$nombreXML", "w+");
         fwrite($handler, $encabezado);
-
-        // for ($i = 0; $i < $count; $i++) {
-        //   $fileXml .= $contenido[$i];
-        //   fwrite($handler, $contenido[$i]);
-        // }
 
         foreach ($contenido as $item) {
           $fileXml .= $item;
           fwrite($handler, $item);
         }
-        
 
         fwrite($handler, $fin);
         fclose($handler);
@@ -310,11 +305,11 @@ if (empty($_SESSION)) {
         $fileXml .= $fin;
         $fileMd5 = md5($fileXml) . "  " . $nombreXML;
         $nameMd5 = "MD5SUM";
-        $handler = fopen("public/archivos/bancamiga/$nameMd5", "w+");
+        $handler = fopen("public/archivos/$folder/$nameMd5", "w+");
         fwrite($handler, $fileMd5);
         fclose($handler);
         $nameMd5 = "{$fecha_}{$hora}{$min}_MD5SUM";
-        $handler = fopen("public/archivos/bancamiga/$nameMd5", "w+");
+        $handler = fopen("public/archivos/$folder/$nameMd5", "w+");
         fwrite($handler, $fileMd5);
         fclose($handler);
 

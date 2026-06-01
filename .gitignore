@@ -1,2 +1,29 @@
+# Cache
+storage/cache/
 
+# Logs
+storage/logs/
+
+# Uploads
+public/uploads/
+
+# Temporary files
+*.tmp
+
+# Database dumps
+*.sql
+
+# Vendor (optional, but often large and version controlled)
+# vendor/
+
+# Agent
 .codegpt
+*.md
+
+# Environment variables
+.env
+
+# IDE and Editor settings
+.idea/
+.vscode/
+*~

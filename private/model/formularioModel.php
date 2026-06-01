@@ -7,9 +7,9 @@ class database
     $this->db = new Conexion();
   }
 
-  public function contactoEfectivo($e)
+  public function contactoEfectivo($id)
   {
-    $sql = $this->db->query("SELECT * FROM efectivo WHERE servicio_id = '$e'");
+    $sql = $this->db->query("SELECT * FROM efectivo WHERE servicio_id = '$id'");
     if ($this->db->rows($sql) > 0) {
       while ($data = $this->db->recorrer($sql)) {
         $respuesta[] = $data;
@@ -61,7 +61,7 @@ class database
 
   public function buscaCliente($telefono, $servicio)
   {
-    if ($servicio == 1) {
+    if ($servicio == 1 || $servicio == 5) {
       $sql = $this->db->query("SELECT * FROM clientes WHERE (identificacion = '$telefono' OR telf_hab LIKE '%" . $telefono . "' or telf_ofi LIKE '%" . $telefono . "' OR telf_cel LIKE '%" . $telefono . "') and servicio_id = '$servicio'");
       if ($this->db->rows($sql) > 0) {
         while ($data = $this->db->recorrer($sql)) {
@@ -144,20 +144,27 @@ class database
   {
     $this->db->query("INSERT INTO gestion (contacto_id, efectivo_id, producto_id, user_id, fecha, cliente_id, status_id, hora, servicio_id) VALUES ($contacto,$efectivo,$producto,$id_usuario,'$date',$id_cliente,$status,'$hora','$servicio')");
 
+    echo "<br>GESTION: ". ("INSERT INTO gestion (contacto_id, efectivo_id, producto_id, user_id, fecha, cliente_id, status_id, hora, servicio_id) VALUES ($contacto,$efectivo,$producto,$id_usuario,'$date',$id_cliente,$status,'$hora','$servicio')");
     $id_gestion = $this->db->insert_id;
 
     $this->db->query("UPDATE clientes SET status_id = $status WHERE id = $id_cliente");
 
+    echo "<br>UPDATE CLIENTES: ". ("UPDATE clientes SET status_id = $status WHERE id = $id_cliente");
+
     $sql = $this->db->query("SELECT MAX(id) as id_gestion FROM gestion WHERE cliente_id = $id_cliente");
+
+    echo "<br>MAX ID: ".("SELECT MAX(id) as id_gestion FROM gestion WHERE cliente_id = $id_cliente");
     $data = $this->db->recorrer($sql);
     $id_gestion = $data['id_gestion'];
 
     $this->db->query("INSERT INTO resultados (gestion_id,nombre,apellido,genero,fecha_nacimiento,nacionalidad,cedula,telf_hab,telf_celular,correo,estado_id,ciudad_id,municipio_id,cuenta,tipo_cuenta_id,producto_id,observaciones,fecha_venta,servicio_id) VALUES ($id_gestion,'$nombre','$apellido','$genero','$fecha_nac','$nacionalidad',$cedula,'$telf_hab','$telf_cel','$correo',$estado,$ciudad,$municipio,'$cuenta','$tipocuenta',$producto,'$obs','$fecha','$servicio')");
+
+    echo "<br>RESULTADOS: ".("INSERT INTO resultados (gestion_id,nombre,apellido,genero,fecha_nacimiento,nacionalidad,cedula,telf_hab,telf_celular,correo,estado_id,ciudad_id,municipio_id,cuenta,tipo_cuenta_id,producto_id,observaciones,fecha_venta,servicio_id) VALUES ($id_gestion,'$nombre','$apellido','$genero','$fecha_nac','$nacionalidad',$cedula,'$telf_hab','$telf_cel','$correo',$estado,$ciudad,$municipio,'$cuenta','$tipocuenta',$producto,'$obs','$fecha','$servicio')");
   }
 
   public function registroGestion($contacto, $efectivo, $producto, $noefectivo, $subcontacto, $id_usuario, $date, $id_cliente, $status, $hora, $servicio, $dni, $idQuote, $gestion)
   {
-    if ($servicio == 1) {
+    if ($servicio == 1 || $servicio == 5) {
       $table = 'clientes';
       $where = 'id = ' . $id_cliente;
     } else {

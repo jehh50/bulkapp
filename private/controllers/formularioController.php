@@ -5,18 +5,20 @@ if (empty($_SESSION)) {
 } else {
   include_once(MODEL_DIR . 'formularioModel.php');
   $conn = new database();
-
+  
   if (isset($_GET['mode'])) {
     switch ($_GET['mode']) {
       case 'index':
+        $id = $_SESSION['servicio_id'] == 5 ? 1 : $_SESSION['servicio_id'];
         include(PUBLIC_DIR . 'general/header.php');
         include(PUBLIC_DIR . 'general/navbar.php');
-        $noefectivo = $conn->contactoNoEfectivo($_SESSION['servicio_id']);
-        $efectivo = $conn->contactoEfectivo($_SESSION['servicio_id']);
-        switch ($_SESSION['servicio_id']) {
+        $noefectivo = $conn->contactoNoEfectivo($id);
+        $efectivo = $conn->contactoEfectivo($id);
+        switch ($id) {
           case 1:
+          case 5:
             // bancamiga bancaribe bancoActivo
-            $estado = $conn->estado($_SESSION['servicio_id']);
+            $estado = $conn->estado($id);
             $producto = $conn->ventaProducto($_SESSION['servicio_id']);
             $cuentas = $conn->cuentasBancarias();
             include(HTML_DIR . 'formulario/index.php');
@@ -51,8 +53,8 @@ if (empty($_SESSION)) {
         }
         include(PUBLIC_DIR . 'general/header.php');
         include(PUBLIC_DIR . 'general/navbar.php');
-        $noefectivo = $conn->contactoNoEfectivo($_SESSION['servicio_id']);
-        $efectivo = $conn->contactoEfectivo($_SESSION['servicio_id']);
+        $noefectivo = $conn->contactoNoEfectivo($id);
+        $efectivo = $conn->contactoEfectivo($id);
         include(HTML_DIR . 'formulario/cashea.php');
         include(PUBLIC_DIR . 'general/footer.php');
         break;
@@ -100,7 +102,9 @@ if (empty($_SESSION)) {
         break;
 
       case 'municipio':
-        $municipio = $conn->municipio($_POST['id_estado'], $_SESSION['servicio_id']);
+        $id = $_SESSION['servicio_id'] == 5 ? 1 : $_SESSION['servicio_id'];
+
+        $municipio = $conn->municipio($_POST['id_estado'], $id);
         $json['municipio'] = "";
         if ($municipio) {
           foreach ($municipio as $m) {
@@ -146,6 +150,7 @@ if (empty($_SESSION)) {
 
         switch ($_POST['servicio']) {
           case 1: // bancamiga bancaribe      
+          case 5: // bancamiga bancaribe      
             if (isset($_POST['nacionalidad'])) {
               $nacionalidad = $_POST['nacionalidad'];
             } else {
@@ -187,6 +192,20 @@ if (empty($_SESSION)) {
 
               $registro = $conn->registroResultados($_POST['contacto'], $efectivo, $producto, $noefectivo, $_POST['usuario'], $date, $nombre, $apellido, $genero, $fecha_nac, $nacionalidad, $cedula, $telf_hab, $telf_cel, $correo, $estado, $ciudad, $municipio, $cuenta, $tipocuenta, $obs, $fecha, $status, $_POST['id_cliente'], $var, $hora, $_POST['servicio']);
             } else {
+              //echo "HOLA";
+              echo "CONTACTO: ".($_POST['contacto']);
+              echo "<br>PRODUCTO: ".($producto);
+              echo "<br>NOEFECTIVO: ".($noefectivo);
+              echo "<br>SUBCONTACTO: ".($subContacto);
+              echo "<br>IDUSUARIO: ".($_POST['usuario']);
+              echo "<br>FECHA: ".($date);
+              echo "<br>IDCLIENTE: ".($_POST['id_cliente']);
+              echo "<br>STATUS: ".($status);
+              echo "<br>HORA: ".($hora);
+              echo "<br>SERVICIO: ".($_POST['servicio']);
+              echo "<br>DNI: ".($dni);
+              echo "<br>IDQUOTE: ".($idQuote);
+              echo "<br>GESTION: ".($gestion);
               $registro = $conn->registroGestion($_POST['contacto'], $efectivo, $producto, $noefectivo, $subContacto, $_POST['usuario'], $date, $_POST['id_cliente'], $status, $hora, $_POST['servicio'], $dni, $idQuote,$gestion);
             }
             header('location:?view=formulario&mode=index');
@@ -213,7 +232,7 @@ if (empty($_SESSION)) {
             break;
 
           default:
-            header('location:' . HTML_DIR . 'error.html');
+           // header('location:' . HTML_DIR . 'error.html');
             break;
         }
     }

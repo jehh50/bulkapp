@@ -10,7 +10,7 @@ if (empty($_SESSION)) {
       case 'index':
         include(PUBLIC_DIR . 'general/header.php');
         include(PUBLIC_DIR . 'general/navbar.php');
-        $id = '(1,2)';
+        $id = '(1,5)';
         $servicio = $conn->servicio($id);
         include(HTML_DIR . 'reportes/index.php');
         include(PUBLIC_DIR . 'general/footer.php');
@@ -23,11 +23,11 @@ if (empty($_SESSION)) {
           $desde = $_POST['fecha_d'];
           $hasta = $_POST['fecha_h'];
         } else {
-          $desde = date('Y-m-d');
+          $desde = date('Y-m-d'); 
           $hasta = $desde;
         }
         if (!empty($_POST['servicio'])) {
-          $serv = '(1,2)';
+          $serv = '(1,5)';
         }
 
         $servicio = $conn->servicio($serv);
@@ -53,7 +53,7 @@ if (empty($_SESSION)) {
         } else {
           $serv = $_POST['servicio'];
         }
-        $id = '(1,2)';
+        $id = '(1,5)';
 
         $servicio = $conn->servicio($id);
         $resultn = $conn->gestionContactonoefectivo($desde, $hasta, $serv);
@@ -123,7 +123,7 @@ if (empty($_SESSION)) {
           $d = $h = date('Y-m-d');
         }
 
-        $id = '(1)';
+        $id = '(1,5)';
         $servicio = $conn->servicio($id);
         $result = $conn->ventasEstado($desde, $hasta, $serv);
         include(HTML_DIR . 'reportes/ventas.php');

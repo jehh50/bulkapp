@@ -20,15 +20,13 @@
         <div class="panel-body">
           <div class="form-group">
             <label>BANCAMIGA</label>
-            <select class="selectpicker show-menu-arrow show-tick form-control" name="file" id="file">
+            <select class="selectpicker show-menu-arrow show-tick form-control" name="file_bancamiga" id="file_bancamiga">
               <option value='' disabled selected style='display:none;'>Seleccione...</option>
               <?php
               $path = opendir("public/archivos/bancamiga/");
               $fileList = [];
               while ($file = readdir($path)) {
-                // if ($file != 'MD5SUM') {
-                  $fileList[] = $file;
-                // }
+                $fileList[] = $file;
               }
               sort($fileList);
               foreach ($fileList as $file) {
@@ -38,7 +36,38 @@
             </select>
           </div>
           <div class="form-group">
-            <input type="button" class="btn btn-md btn-success btn-block" id="btn-download" name="btn-download"
+            <input type="button" class="btn btn-md btn-success btn-block" id="btn-download-bancamiga" name="btn-download"
+              value="Descargar" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6 col-md-6 col-sm-12">
+      <div class="panel panel-default">
+        <div class="panel-heading panel-primary">
+          <p class="panel-title">Descarga de XML - MD5SUM</p>
+        </div>
+        <div class="panel-body">
+          <div class="form-group">
+            <label>BANCARIBE</label>
+            <select class="selectpicker show-menu-arrow show-tick form-control" name="file_bancaribe" id="file_bancaribe">
+              <option value='' disabled selected style='display:none;'>Seleccione...</option>
+              <?php
+              $path = opendir("public/archivos/bancaribe/");
+              $fileList = [];
+              while ($file = readdir($path)) {
+                $fileList[] = $file;
+              }
+              sort($fileList);
+              foreach ($fileList as $file) {
+                echo "<option value='" . $file . "'>" . $file . "</option>";
+              }
+              ?>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <input type="button" class="btn btn-md btn-success btn-block" id="btn-download-bancaribe" name="btn-download"
               value="Descargar" />
           </div>
         </div>
@@ -91,7 +120,7 @@
       type: 'POST',
       url: url,
       dataType: 'json',
-      data: { fecha_: fecha_ },
+      data: { fecha_: fecha_ ,servicio:servicio},
       success: function (datos) {
         if (datos.response === 'true') {
           alert('Archivo Generado');
