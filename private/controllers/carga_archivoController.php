@@ -52,7 +52,7 @@ if (empty($_SESSION)) {
 							return mb_convert_encoding($value, 'UTF-8', $encoding);
 						}, $datos);
 
-						if ($servicio == 1) {
+						if ($servicio == 1 || $servicio == 5) {
 							$fila = array_slice($datos, 0, 9);
 							$paramTypes = str_repeat('s', 9);
 						} else {
