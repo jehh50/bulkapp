@@ -189,7 +189,7 @@ if (empty($_SESSION)) {
               $fecha = date('Ymd');
               $status = 7;
               $var = 0;
-
+ 
               $registro = $conn->registroResultados($_POST['contacto'], $efectivo, $producto, $noefectivo, $_POST['usuario'], $date, $nombre, $apellido, $genero, $fecha_nac, $nacionalidad, $cedula, $telf_hab, $telf_cel, $correo, $estado, $ciudad, $municipio, $cuenta, $tipocuenta, $obs, $fecha, $status, $_POST['id_cliente'], $var, $hora, $_POST['servicio']);
             } else {
               //echo "HOLA";
