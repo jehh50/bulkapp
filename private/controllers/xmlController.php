@@ -28,15 +28,17 @@ if (empty($_SESSION)) {
           $json['response'] = 'true';
         }
         //ajustar el codigo del servicio
-        $datosXML = $conexion->datosXML($fecha_, $_POST['servicio']);
-        $folder = match($_POST['servicio']) {
-          '1' => 'bancamiga',
-          '5' => 'bancaribe',
-          default => 'bancamiga',
-        };
+        $servicio = intval($_POST['servicio']);
+        $datosXML = $conexion->datosXML($fecha_, $servicio);
+
+        if ($datosXML === false) {
+          $json['response'] = 'false';
+          echo json_encode($json);
+          exit;
+        }
 
         $encabezado = '<bulk_sales xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="bulk_sales.xsd">
-  <company code="5">
+  <company code="'.$datosXML[0]['company_code'].'">
     <company_name>CORPF1</company_name> 
       <agencies>
         <agency code="804">
@@ -276,12 +278,7 @@ if (empty($_SESSION)) {
   <total_operations>' . count($datosXML) . '</total_operations>
 </bulk_sales>';
 
-        /* #ARCHIVO XML
-         *
-         * Corregir que la carpeta se cree sola en caso de no existir, y pasar el nombre de la carpeta
-         * como variable
-         * 
-         */
+        /* #ARCHIVO XML */
 
         $hora = new DateTime("now", new DateTimeZone('America/Caracas'));
         $min = new DateTime("now", new DateTimeZone('America/Caracas'));
@@ -289,8 +286,18 @@ if (empty($_SESSION)) {
         $min = $min->format('i');
 
         $fileXml = $encabezado;
+        $carpeta = strtolower(trim($datosXML[0]['nombre_servicio']));
+        $rutaCarpeta = "public/archivos/{$carpeta}";
+        if (!is_dir($rutaCarpeta)) {
+          mkdir($rutaCarpeta, 0755, true);
+        }
         $nombreXML = "{$fecha_}{$hora}{$min}_bulk_sales.xml";
-        $handler = fopen("public/archivos/$folder/$nombreXML", "w+");
+        $handler = fopen("{$rutaCarpeta}/{$nombreXML}", "w+");
+        if ($handler === false) {
+          $json['response'] = 'false';
+          echo json_encode($json);
+          exit;
+        }
         fwrite($handler, $encabezado);
 
         foreach ($contenido as $item) {
@@ -305,13 +312,17 @@ if (empty($_SESSION)) {
         $fileXml .= $fin;
         $fileMd5 = md5($fileXml) . "  " . $nombreXML;
         $nameMd5 = "MD5SUM";
-        $handler = fopen("public/archivos/$folder/$nameMd5", "w+");
-        fwrite($handler, $fileMd5);
-        fclose($handler);
+        $handler = fopen("{$rutaCarpeta}/{$nameMd5}", "w+");
+        if ($handler !== false) {
+          fwrite($handler, $fileMd5);
+          fclose($handler);
+        }
         $nameMd5 = "{$fecha_}{$hora}{$min}_MD5SUM";
-        $handler = fopen("public/archivos/$folder/$nameMd5", "w+");
-        fwrite($handler, $fileMd5);
-        fclose($handler);
+        $handler = fopen("{$rutaCarpeta}/{$nameMd5}", "w+");
+        if ($handler !== false) {
+          fwrite($handler, $fileMd5);
+          fclose($handler);
+        }
 
         echo json_encode($json);
 
