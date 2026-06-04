@@ -323,7 +323,7 @@ if (empty($_SESSION)) {
           fwrite($handler, $fileMd5);
           fclose($handler);
         }
-
+ 
         echo json_encode($json);
 
         break;

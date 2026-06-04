@@ -10,7 +10,7 @@ class database
   {
     $this->db = new Conexion();
   }
-
+ 
   public function datosXML($fecha, $servicio)
   {
     $data = $this->db->selectQuery(
