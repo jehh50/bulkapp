@@ -88,3 +88,4 @@ class Conexion extends mysqli
     return $queryDebug;
   }
 }
+//Fin del archivo

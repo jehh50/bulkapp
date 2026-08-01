@@ -30,6 +30,7 @@
                   <th>Costo</th>
                   <th>Fecha activación</th>
                   <th>Plan</th>
+                  <th>Servicio</th>
                   <th>Editar</th>
                 </tr>
               </thead>
@@ -43,6 +44,7 @@
                     <td class="text-right"><?= $u['costo_prod']; ?></td>
                     <td class="text-center"><?= $u['fecha']; ?></td>
                     <td class="text-center"><?= $u['codplan']; ?></td>
+                    <td class="text-center"><?= $u['servicio']; ?></td>
                     <td class="text-center">
                       <a href="?view=configuracion&mode=editarProducto&id=<?= $u['id']; ?>"
                         class="btn btn-success btn-xs">

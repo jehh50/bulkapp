@@ -11,7 +11,6 @@ if (empty($_SESSION)) {
 			case 'editarProducto':
 				include(PUBLIC_DIR . 'general/header.php');
 				include(PUBLIC_DIR . 'general/navbar.php');
-				$servicio = $con->servicio();
 				$product = $con->products($_GET['id']);
 				include(HTML_DIR . 'configuracion/editarProducto.php');
 				include(PUBLIC_DIR . 'general/footer.php');

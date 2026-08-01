@@ -254,7 +254,7 @@ class database
 
   public function listarProductos()
   {
-    $sql = $this->db->query("SELECT * FROM productos WHERE status_id = 2");
+    $sql = $this->db->query("SELECT p.id,p.descripcion,p.codigo_producto,p.costo_prod, p.fecha,p.codplan, s.descripcion as servicio FROM productos p JOIN servicios s ON p.servicio_id = s.id WHERE p.status_id = 2");
     if ($this->db->rows($sql) > 0) {
       while ($data = $this->db->recorrer($sql)) {
         $respuesta[] = $data;
@@ -267,7 +267,7 @@ class database
 
   public function products($id = null)
   {
-    $sql = $this->db->query("SELECT * FROM productos WHERE id = " . $id);
+    $sql = $this->db->query("SELECT p.id,p.descripcion,p.codigo_producto,p.costo_prod, p.fecha,p.codplan, s.descripcion as servicio FROM productos p JOIN servicios s ON p.servicio_id = s.id WHERE p.id = " . $id);
     if ($this->db->rows($sql) > 0) {
       return $this->db->recorrer($sql);
     } else {

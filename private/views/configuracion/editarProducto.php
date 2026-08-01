@@ -10,7 +10,7 @@
 
 <div class="container" style="margin-top:40px;">
   <div class="row">
-    <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
+    <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-10">
       
       <div class="panel panel-default">
 
@@ -28,6 +28,19 @@
           <form name="editProduct" method="POST" action="?view=configuracion&mode=actualizarProducto">
 
             <div class="row">
+
+              <!-- Servicio -->
+              <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="form-group">
+                  <label>Servicio</label>
+                  <input type="text"
+                         class="form-control"
+                         name="nombre"
+                         onkeyup="upperCase(this);"
+                         value="<?=$product['servicio']?>"
+                         readonly>
+                </div>
+              </div>
 
               <!-- Nombre -->
               <div class="col-xs-12 col-sm-6 col-md-4">
