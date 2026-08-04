@@ -286,7 +286,7 @@ if (empty($_SESSION)) {
         $min = $min->format('i');
 
         $fileXml = $encabezado;
-        $carpeta = strtolower(trim($datosXML[0]['nombre_servicio']));
+        $carpeta = strtolower(trim(str_replace(' ','',($datosXML[0]['nombre_servicio']))));
         $rutaCarpeta = "public/archivos/{$carpeta}";
         if (!is_dir($rutaCarpeta)) {
           mkdir($rutaCarpeta, 0755, true);

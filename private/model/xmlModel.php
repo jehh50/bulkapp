@@ -18,6 +18,7 @@ class database
       [$fecha, $servicio],
       'si'
     );
+
     return !empty($data) ? $data : false;
   }
 
