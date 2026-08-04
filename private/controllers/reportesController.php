@@ -72,7 +72,6 @@ if (empty($_SESSION)) {
       case 'cliente':
         $cliente = $_POST['cliente'];
         $cliente = $conn->buscarCliente($cliente);
-        //print_r($cliente);
         if ($cliente == false) {
           $json['response'] = 'false';
         } else {
@@ -152,7 +151,7 @@ if (empty($_SESSION)) {
         if (isset($_POST['fecha_d']) || isset($_POST['fecha_h'])) {
           $desde = date('Ymd', strtotime($_POST['fecha_d']));
           $hasta = date('Ymd', strtotime($_POST['fecha_h']));
-          $ventas = $conn->ventaDetallada($desde, $hasta, $servicio[0]['id']);
+          $ventas = $conn->ventaDetallada($desde, $hasta, $_POST['servicio']);
         }
 
         include(HTML_DIR . 'reportes/ventasDetalle.php');
@@ -163,7 +162,6 @@ if (empty($_SESSION)) {
         header("Content-type: application/vnd.ms-excel");
         header("Content-Disposition: attachment; filename=gestionDetalladas.xls");
         $ventas = $conn->ventaDetallada($_GET['from'], $_GET['to'], $_GET['servicio']);
-        if($_GET['servicio'] == 1) {
           echo '<table class="table table-responsive table-hover table-condensed">';
           echo '<thead>
                   <tr>
@@ -199,45 +197,6 @@ if (empty($_SESSION)) {
           }
 
           echo '</tbody></table>';
-        }else{
-          echo '<table class="table table-responsive table-hover table-condensed">';
-          echo '<thead>
-                  <tr>
-                    <th>Nombre del cliente</th>
-                    <th>Cédula</th>
-                    <th>ID Cuota</th>
-                    <th>Monto</th>
-                    <th>Fecha de pago</th>
-                    <th>Plan de pago</th>
-                    <th>Parentesco</th>
-                    <th>Nombre del contacto</th>
-                    <th>Operador</th>
-                    <th>Observaciones</th>
-                    <th>Fecha</th>
-                  </tr>
-                </thead>
-                <tbody>';
-
-          if (!empty($ventas)) {
-            foreach ($ventas as $venta) {
-              echo '<tr>
-                      <td>' . $venta['nombreCliente'] . '</td>
-                      <td>' . $venta['cedula'] . '</td>
-                      <td>' . $venta['idCuota'] . '</td>
-                      <td>' . $venta['monto'] . '</td>
-                      <td>' . $venta['fechaPago'] . '</td>
-                      <td>' . $venta['planDePago'] . '</td>
-                      <td>' . $venta['parentesco'] . '</td>
-                      <td>' . $venta['nombreEncargado'] . '</td>
-                      <td>' . $venta['operador'] . '</td>
-                      <td>' . $venta['observaciones'] . '</td>
-                      <td>' . $venta['fechaCreacion'] . '</td>
-                    </tr>';
-            }
-          }
-
-          echo '</tbody></table>';
-        }
 
         break;
       
