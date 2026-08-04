@@ -11,37 +11,7 @@
 </style>
 <div class="container box-marging-top">
   <div class="row">
-    <!-- Bancaribe Download Panel -->
-    <div class="col-lg-6 col-md-6 col-sm-12">
-      <div class="panel panel-default">
-        <div class="panel-heading panel-primary">
-          <p class="panel-title">Descarga de XML - MD5SUM</p>
-        </div>
-        <div class="panel-body">
-          <div class="form-group">
-            <label>BANCAMIGA</label>
-            <select class="selectpicker show-menu-arrow show-tick form-control" name="file_bancamiga" id="file_bancamiga">
-              <option value='' disabled selected style='display:none;'>Seleccione...</option>
-              <?php
-              $path = opendir("public/archivos/bancamiga/");
-              $fileList = [];
-              while ($file = readdir($path)) {
-                $fileList[] = $file;
-              }
-              sort($fileList);
-              foreach ($fileList as $file) {
-                echo "<option value='" . $file . "'>" . $file . "</option>";
-              }
-              ?>
-            </select>
-          </div>
-          <div class="form-group">
-            <input type="button" class="btn btn-md btn-success btn-block" id="btn-download-bancamiga" name="btn-download"
-              value="Descargar" />
-          </div>
-        </div>
-      </div>
-    </div>
+  <!-- BANCARIBE -->
     <div class="col-lg-6 col-md-6 col-sm-12">
       <div class="panel panel-default">
         <div class="panel-heading panel-primary">
@@ -70,9 +40,35 @@
             <input type="button" class="btn btn-md btn-success btn-block" id="btn-download-bancaribe" name="btn-download"
               value="Descargar" />
           </div>
+
+    <!-- Banco Activo Download Panel -->
+
+          <div class="form-group">
+            <label>BANCO ACTIVO</label>
+            <select class="selectpicker show-menu-arrow show-tick form-control" name="file_bancoactivo" id="file_bancoactivo">
+              <option value='' disabled selected style='display:none;'>Seleccione...</option>
+              <?php
+              $path = opendir("public/archivos/bancoactivo/");
+              $fileList = [];
+              while ($file = readdir($path)) {
+                $fileList[] = $file;
+              }
+              sort($fileList);
+              foreach ($fileList as $file) {
+                echo "<option value='" . $file . "'>" . $file . "</option>";
+              }
+              ?>
+            </select>
+          </div>
+          <div class="form-group">
+            <input type="button" class="btn btn-md btn-success btn-block" id="btn-download-bancoactivo" name="btn-download"
+              value="Descargar" />
+          </div>
         </div>
       </div>
     </div>
+
+    
     <!-- Generate XML Panel -->
     <div class="col-lg-6 col-md-6 col-sm-12">
       <div class="panel panel-default">
