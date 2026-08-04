@@ -48,6 +48,7 @@ class database
   {
     if ($servicio == 1 || $servicio == 5) {
       $sql = $this->db->query("SELECT r.nombre, r.apellido, r.cedula, r.fecha_nacimiento, r.telf_hab, r.telf_celular, r.correo, p.descripcion, CONCAT(u.nombre,' ',u.apellido) as agente, r.fecha_venta FROM `resultados` r INNER JOIN productos p ON r.producto_id = p.id INNER JOIN gestion g ON r.gestion_id = g.id INNER JOIN users u ON g.user_id = u.id WHERE r.fecha_venta BETWEEN $desde AND $hasta AND r.servicio_id = $servicio ORDER BY r.fecha_venta DESC");
+      echo ("SELECT r.nombre, r.apellido, r.cedula, r.fecha_nacimiento, r.telf_hab, r.telf_celular, r.correo, p.descripcion, CONCAT(u.nombre,' ',u.apellido) as agente, r.fecha_venta FROM `resultados` r INNER JOIN productos p ON r.producto_id = p.id INNER JOIN gestion g ON r.gestion_id = g.id INNER JOIN users u ON g.user_id = u.id WHERE r.fecha_venta BETWEEN $desde AND $hasta AND r.servicio_id = $servicio ORDER BY r.fecha_venta DESC");
       if ($this->db->rows($sql) > 0) {
         while ($data = $this->db->recorrer($sql)) {
           $respuesta[] = $data;
@@ -154,11 +155,7 @@ class database
 
   public function gestionContactonoefectivo($desde, $hasta, $serv)
   {
-    // if (empty($serv)) {
-    //   $sql = $this->db->query("SELECT n.descripcion, COUNT(g.noefectivo_id) AS total FROM gestion g INNER JOIN noefectivo n ON g.noefectivo_id = n.id WHERE g.fecha BETWEEN '$desde' AND '$hasta' GROUP BY n.descripcion");
-    // } else {
     $sql = $this->db->query("SELECT n.descripcion, COUNT(g.noefectivo_id) AS total FROM gestion g INNER JOIN noefectivo n ON g.noefectivo_id = n.id WHERE g.fecha BETWEEN '$desde' AND '$hasta' AND g.servicio_id = '$serv' GROUP BY n.descripcion");
-    // }
 
     if ($this->db->rows($sql) > 0) {
       while ($data = $this->db->recorrer($sql)) {
