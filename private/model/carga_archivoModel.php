@@ -29,10 +29,10 @@ class database
 
 		if ($servicio == 1 || $servicio == 5) {
 			$tabla = 'clientes';
-			$columnas = ['identificacion', 'nombre_legal', 'telf_hab', 'telf_ofi', 'telf_cel', 'correo', 'direccion', 'cuenta', 'oferta'];
-			$columnasEsperadas = 9;
-			$queryUpdate = "UPDATE clientes SET is_active = 0 WHERE is_active = 1";
-
+			$columnas = ['identificacion', 'nombre_legal', 'telf_hab', 'telf_ofi', 'telf_cel', 'correo', 'direccion', 'cuenta', 'oferta','servicio_id'];
+			$columnasEsperadas = 10;
+			//$queryUpdate = "UPDATE clientes SET is_active = 0 WHERE is_active = 1 and servicio_id = $servicio";
+			$queryUpdate = "";
 		} else {
 			$tabla = 'cashea_customers';
 			$columnas = ['cedula', 'id_cuota', 'nombre_grupo', 'fecha_pagar', 'monto_cuota', 'numero_cuota', 'fee', 'plata_por_cobrar', 'capital_asignado', 'id_orden', 'identificacion_orden', 'fecha_creacion_orden', 'email', 'telefono', 'nombre_usuario', 'local_origen', 'estado_deuda', 'tramo_inicial', 'tramo_actual', 'segmento'];
@@ -44,16 +44,18 @@ class database
 		$paramsAplanados = [];
 		$batchValido = [];
 
-		foreach ($batch as $indice => $fila) {
+foreach ($batch as $indice => $fila) {
 			if (count($fila) === $columnasEsperadas) {
 				$batchValido[] = $fila;
 			} else {
-				error_log("Error en la carga batch: La fila " . ($indice + 1) . " fue omitida. Se esperaban " . $columnasEsperadas . " columnas, pero se recibieron " . count($fila) . ".");
+				$msg = "Error en la carga batch: La fila " . ($indice + 1) . " fue omitida. Se esperaban " . $columnasEsperadas . " columnas, pero se recibieron " . count($fila) . ". Contenido: " . json_encode($fila);
+				error_log($msg);
+				echo "<pre>DEBUG: $msg</pre>";
 			}
 		}
 		
 		if (empty($batchValido)) {
-			error_log("Carga batch abortada: Ninguna fila pasó la validación de columnas.");
+			echo "<br>Carga batch abortada: Ninguna fila pasó la validación de columnas.";
 			return 0;
 		}
 
@@ -64,7 +66,9 @@ class database
 
 		try {
 			
-			$this->db->preparedQuery($queryUpdate);
+			if(!empty($queryUpdate)){
+				$this->db->preparedQuery($queryUpdate);
+			}
 			$query .= implode(',', $placeHolders);
 			$tiposParams = str_repeat('s', count($paramsAplanados));		
             $stmt = $this->db->preparedQuery($query, $paramsAplanados, $tiposParams);

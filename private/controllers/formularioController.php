@@ -173,12 +173,12 @@ if (empty($_SESSION)) {
             }
 
             if ($efectivo == 1) {
-              $nombre = str_replace(',', ' ', $_POST['nombre2']);
-              $apellido = str_replace(',', ' ', $_POST['apellido2']);
+              $nombre = trim(str_replace(',', ' ', $_POST['nombre2']));
+              $apellido = trim(str_replace(',', ' ', $_POST['apellido2']));
               $genero = $_POST['genero'];
               $fecha_nac = $_POST['fecha_nac'];
               $cedula = $_POST['cedula2'];
-              $correo = $_POST['correo2'];
+              $correo = trim($_POST['correo2']);
               $telf_hab = $_POST['telf_hab'];
               // $telf_ofi = $_POST['telf_ofi'];
               $telf_cel = $_POST['telf_cel'];
@@ -192,7 +192,6 @@ if (empty($_SESSION)) {
  
               $registro = $conn->registroResultados($_POST['contacto'], $efectivo, $producto, $noefectivo, $_POST['usuario'], $date, $nombre, $apellido, $genero, $fecha_nac, $nacionalidad, $cedula, $telf_hab, $telf_cel, $correo, $estado, $ciudad, $municipio, $cuenta, $tipocuenta, $obs, $fecha, $status, $_POST['id_cliente'], $var, $hora, $_POST['servicio']);
             } else {
-              //echo "HOLA";
               echo "CONTACTO: ".($_POST['contacto']);
               echo "<br>PRODUCTO: ".($producto);
               echo "<br>NOEFECTIVO: ".($noefectivo);

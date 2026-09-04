@@ -1,5 +1,5 @@
 $(function () {
-	$('[data-toggle="tooltip"]').tooltip()
+    $('[data-toggle="tooltip"]').tooltip()
 })
 
 function onlyLetters(e) {
@@ -19,80 +19,97 @@ function onlyNumbers(e) {
     }
 }
 
-function upperCase(e){
-	e.value = e.value
-		.toUpperCase()
+function upperCase(e) {
+    e.value = e.value
+        .toUpperCase()
+}
+
+// Detecta dominios con etiquetas repetidas: gmail.com.gmail.com, hotmail.com.com, etc.
+function dominioDuplicado(correo) {
+    let dominio = correo.split('@')[1];
+    if (!dominio) return false;
+    let etiquetas = dominio.toLowerCase().split('.');
+    return new Set(etiquetas).size !== etiquetas.length;
 }
 
 function validateEmail(e) {
-	valueForm = e.value;
-	let patron = new RegExp(/^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/)
-	if (valueForm.search(patron) != 0) {
-		alert('La dirección de correo es invalida, el formato debe coincidir con DIRECCION@DOMINIO.COM intente de nuevo.');
-		window.location.hash = "#correo2";
-	}
+    let valueForm = e.value.trim();
+    let patron = /^[a-zA-Z0-9_.+-]+@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,4}$/;
+
+    if (!patron.test(valueForm)) {
+        alert('La dirección de correo es invalida, el formato debe coincidir con DIRECCION@DOMINIO.COM intente de nuevo.');
+        e.focus();
+        return false;
+    }
+
+    if (dominioDuplicado(valueForm)) {
+        alert('El dominio del correo está repetido: ' + valueForm + '. Escriba el dominio una sola vez (ej. DIRECCION@GMAIL.COM).');
+        e.focus();
+        return false;
+    }
+
+    return true;
 }
 
 function validaTelf(e) {
-	valueForm = e.value
-	let patron = /^[(]\d{4}[)]\d{3}.\d{2}.\d{2}$/;
-	if (valueForm.search(patron) != 0) {
-		alert("El formato del número de telefono debe coincidir con (XXXX)XXX.XX.XX. Por favor verifique.");
-	}
+    valueForm = e.value
+    let patron = /^[(]\d{4}[)]\d{3}.\d{2}.\d{2}$/;
+    if (valueForm.search(patron) != 0) {
+        alert("El formato del número de telefono debe coincidir con (XXXX)XXX.XX.XX. Por favor verifique.");
+    }
 }
 
-function formatDate(e){
-      let value = e.value.replace(/\D/g, ''); // Eliminar todo lo que no sea dígito
-      let day, month, year;
+function formatDate(e) {
+    let value = e.value.replace(/\D/g, ''); // Eliminar todo lo que no sea dígito
+    let day, month, year;
 
-      if (value.length >= 1) {
+    if (value.length >= 1) {
         day = value.substring(0, 2); // Obtener los primeros 2 dígitos (día)
-      }
+    }
 
-      if (value.length >= 3) {
+    if (value.length >= 3) {
         month = value.substring(2, 4); // Obtener los siguientes 2 dígitos (mes)
-      }
+    }
 
-      if (value.length >= 5) {
+    if (value.length >= 5) {
         year = value.substring(4, 8); // Obtener los últimos 4 dígitos (año)
-      }
+    }
 
     if (year) {
         e.value = `${day}-${month}-${year}`;
     } else if (month) {
-    	e.value = `${day}-${month}`;
+        e.value = `${day}-${month}`;
     } else if (day) {
-    	e.value = day;
+        e.value = day;
     }
 }
 
 document.querySelectorAll('.telefono').forEach(function (element) {
-	element.addEventListener('input', function (event) {
-		let input = event.target.value.replace(/\D/g, ''); // Remueve todos los caracteres no numéricos
-		let formattedInput = '(0'; // Asegura el '0' en la primera posición
+    element.addEventListener('input', function (event) {
+        let input = event.target.value.replace(/\D/g, ''); // Remueve todos los caracteres no numéricos
+        let formattedInput = '(0'; // Asegura el '0' en la primera posición
 
-		// Controla la longitud del input para evitar concatenaciones incorrectas
-		if (input.length > 1) {
-			formattedInput += input.substring(1, 4); // Extrae los primeros 3 dígitos reales
-		}
-		if (input.length >= 5) {
-			formattedInput += ')' + input.substring(4, 7); // Extrae los siguientes 3 dígitos
-		}
-		if (input.length >= 8) {
-			formattedInput += '.' + input.substring(7, 9); // Extrae los siguientes 2 dígitos
-		}
-		if (input.length >= 10) {
-			formattedInput += '.' + input.substring(9, 11); // Extrae los últimos 2 dígitos
-		}
+        // Controla la longitud del input para evitar concatenaciones incorrectas
+        if (input.length > 1) {
+            formattedInput += input.substring(1, 4); // Extrae los primeros 3 dígitos reales
+        }
+        if (input.length >= 5) {
+            formattedInput += ')' + input.substring(4, 7); // Extrae los siguientes 3 dígitos
+        }
+        if (input.length >= 8) {
+            formattedInput += '.' + input.substring(7, 9); // Extrae los siguientes 2 dígitos
+        }
+        if (input.length >= 10) {
+            formattedInput += '.' + input.substring(9, 11); // Extrae los últimos 2 dígitos
+        }
 
-		event.target.value = formattedInput;
-	});
+        event.target.value = formattedInput;
+    });
 });
 
 
 function validateForm() {
-    console.log('Comienza la validación...');
-    
+
     // Solo procede si ambos elementos son visibles
     if ($('#d_venta').is(':visible') && $('#formulario').is(':visible')) {
         let venta = document.getElementById('venta').value;
@@ -116,10 +133,40 @@ function validateForm() {
             return false;
         }
 
-		if(cedula2 < 6){
-			alert('El campo cédula no puede estar vacio');
-			return false;
-		}
+        if (nombre2 == '' || nombre2.length < 3) {
+            alert("Debe ingresar el nombre");
+            return false;
+        }
+
+        if (apellido2 == '' || apellido2.length < 3) {
+            alert("Debe ingresar el apellido");
+            return false;
+        }
+
+        if (genero == '') {
+            alert("Debe seleccionar el género");
+            return false;
+        }
+
+        if (fecha_nac == '' || fecha_nac.length < 10) {
+            alert("Debe ingresar la fecha de nacimiento");
+            return false;
+        }
+
+        if (telf_hab == '' || telf_hab.length < 15) {
+            alert("Debe ingresar el teléfono");
+            return false;
+        }
+
+        if (telf_cel == '' || telf_cel.length < 15) {
+            alert("Debe ingresar el teléfono");
+            return false;
+        }
+
+        if (cedula2 == '' || cedula2.length < 6) {
+            alert('El campo cédula no puede estar vacio o no está completo');
+            return false;
+        }
 
         // Función para validar nombres y apellidos
         function validarNombreApellido(valor, tipo) {
@@ -155,7 +202,6 @@ function validateForm() {
             edad--;
         }
 
-        console.log('Edad calculada: ' + edad);
         if (edad < 18 || edad > 64) {
             alert('La edad debe ser mayor a 18 o menor de 64. Edad: ' + edad);
             return false;
@@ -175,15 +221,21 @@ function validateForm() {
             return false;
         }
 
+        // El dominio no puede repetirse (ej. juan@gmail.com.gmail.com)
+        if (dominioDuplicado(correo2)) {
+            alert('El dominio del correo está repetido: ' + correo2 + '. Escriba el dominio una sola vez.');
+            document.getElementById('correo2').focus();
+            return false;
+        }
+
         // Validación de PAN
-        if (pan === "") {
-            alert('El campo PAN no puede estar vacío.');
+        if (pan === "" || pan.length < 20) {
+            alert('El campo número de cuenta no esta completo o esta vacío.');
             document.getElementById('pan').focus();
             return false;
         }
 
         // Si todo está validado correctamente
-        console.log('Formulario validado con éxito');
         return true;
     }
 
@@ -192,7 +244,7 @@ function validateForm() {
 
 function validateFormCashea() {
     console.log('Comienza la validación del segundo formulario...');
-    
+
     // Obtener valores de los campos
     const amountField = document.getElementById('amount');
     const dAmount = document.getElementById('dAmount'); // Contenedor de Monto a abonar
@@ -201,12 +253,12 @@ function validateFormCashea() {
     const dPaymentDate = document.getElementById('dPaymentDate');
     if (dPaymentDate.style.display === 'none') {
         console.log('La sección de Fecha de compromiso no está visible, no se realizarán validaciones de compromiso.');
-        return true; 
+        return true;
     }
-   
+
     console.log('Valor de contacto: ' + $('#contacto').val());
     console.log('Valor de noefectivo: ' + $('#noefectivo').val());
-    
+
     // 1. Validación de monto (solo si el campo está visible, lo que implica paymentPlan=3)
     // dAmount está visible cuando el plan de pago es "Pago personalizado"
     if (dAmount.style.display !== 'none') {
@@ -219,7 +271,7 @@ function validateFormCashea() {
     }
 
     // 2. Validación de Fecha de compromiso (paymentDate)
-    
+
     // Usamos querySelectorAll con el atributo NAME, que agrupa todos los radio buttons.
     const paymentDateRadios = document.querySelectorAll('input[name="paymentDate"]');
     let isPaymentDateSelected = false;
@@ -240,12 +292,12 @@ function validateFormCashea() {
 
     // Si todas las validaciones pasan, permite el envío del formulario
     console.log('Validación del formulario 2 exitosa.');
-    return true; 
+    return true;
 }
 
 function validateForm2() {
     console.log('Comienza la validación del segundo formulario...');
-    
+
     // Obtener valores de los campos
     const amountField = document.getElementById('amount');
     const dAmount = document.getElementById('dAmount'); // Contenedor de Monto a abonar
@@ -254,12 +306,12 @@ function validateForm2() {
     const dPaymentDate = document.getElementById('dPaymentDate');
     if (dPaymentDate.style.display === 'none') {
         console.log('La sección de Fecha de compromiso no está visible, no se realizarán validaciones de compromiso.');
-        return true; 
+        return true;
     }
-   
+
     console.log('Valor de contacto: ' + $('#contacto').val());
     console.log('Valor de noefectivo: ' + $('#noefectivo').val());
-    
+
     // 1. Validación de monto (solo si el campo está visible, lo que implica paymentPlan=3)
     // dAmount está visible cuando el plan de pago es "Pago personalizado"
     if (dAmount.style.display !== 'none') {
@@ -272,7 +324,7 @@ function validateForm2() {
     }
 
     // 2. Validación de Fecha de compromiso (paymentDate)
-    
+
     // Usamos querySelectorAll con el atributo NAME, que agrupa todos los radio buttons.
     const paymentDateRadios = document.querySelectorAll('input[name="paymentDate"]');
     let isPaymentDateSelected = false;
@@ -293,5 +345,5 @@ function validateForm2() {
 
     // Si todas las validaciones pasan, permite el envío del formulario
     console.log('Validación del formulario 2 exitosa.');
-    return true; 
+    return true;
 }

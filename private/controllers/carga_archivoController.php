@@ -54,7 +54,8 @@ if (empty($_SESSION)) {
 
 						if ($servicio == 1 || $servicio == 5) {
 							$fila =  array_slice($datos, 0, 9);
-							$paramTypes = str_repeat('s', 9);
+							array_push($fila,$servicio);
+							$paramTypes = str_repeat('s', 10);
 						} else {
 							$fila = array_slice($datos, 0, 20);
 							$paramTypes = str_repeat('s', 20);
