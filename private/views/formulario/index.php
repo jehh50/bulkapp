@@ -13,12 +13,7 @@
           <section>
             <h2><strong>Datos de cliente</strong></h2>
           </section>
-          
-          <!--div class="form-group">
-            <h5>Producto a ofrecer</h5>
-            <input type="text" class="form-control success" aria-describedby="oferta"  name="oferta" id="oferta" disabled/>
-          </div-->
-          
+                    
           <div class="form-group">
             <h5>Nombre del cliente</h5>
             <input type="text" class="form-control" aria-describedby="name"  name="name" id="name" disabled/>
@@ -68,7 +63,7 @@
     <div class="col-offset-lg-6 col-sm-6 col-md-6 col-lg-6" id="formularioCliente" hidden>
       <div class="panel panel-default">
         <div class="panel-body">  <!-- onpaste="alert('No puedes pegar');return false"  -->
-          <form name="form1" enctype="multipart/form-data" method="POST" onsubmit="return validaform(this);" action="?view=formulario&mode=registro" autocomplete="off">
+          <form name="form1" enctype="multipart/form-data" method="POST" onsubmit="return validateForm(this);" action="?view=formulario&mode=registro" autocomplete="off">
           <input type="hidden" name="id_cliente" id="id_cliente">
           <input type="text" style="display:none;" name="hora_actual" id="hora_actuall">
 
@@ -121,18 +116,18 @@
 
             <div class="form-group">
               <span class="form-group-addon">Nombre del cliente</span>
-              <input type="text" class="form-control" placeholder="Carolina" aria-describedby="nombre2" name="nombre2" id="nombre2" oninput="onlyLetters(this);">
+              <input type="text" class="form-control" placeholder="Carolina" aria-describedby="nombre2" name="nombre2" id="nombre2" oninput="onlyLetters(this);" minlength="3" maxlength="60" required>
             </div>
 
             <div class="form-group">
               <span class="form-group-addon">Apellido del cliente</span>
-              <input type="text" class="form-control" placeholder="Perez" aria-describedby="apellido2" name="apellido2" id="apellido2" oninput="onlyLetters(this);">
+              <input type="text" class="form-control" placeholder="Perez" aria-describedby="apellido2" name="apellido2" id="apellido2" oninput="onlyLetters(this);" minlength="3" maxlength="60" required>
             </div>
             <div class="form-group">
               <section>
                 <span class="form-group-addon">Sexo</span>
               </section>
-              <select class="form-control" name="genero" id="genero">
+              <select class="form-control" name="genero" id="genero" required>
                   <option value=''>Seleccione...</option>
                   <option value='F'>FEMENINO</option>
                   <option value='M'>MASCULINO</option>
@@ -141,14 +136,14 @@
 
             <div class="form-group">
               <span class="form-group-addon">Fecha de nacimiento</span>
-              <input type="text" class="form-control" aria-describedby="fecha_nac" name="fecha_nac" id="fecha_nac" placeholder="01/01/2024" oninput="formatDate(this)"/>
+              <input type="text" class="form-control" aria-describedby="fecha_nac" name="fecha_nac" id="fecha_nac" placeholder="01-01-2024" oninput="formatDate(this);" minlength="10" maxlength="10" required/>
             </div>
 
             <div class="form-group">
               <section>
                 <span class="form-group-addon">Nacionalidad</span>
               </section>
-              <select class="form-control" name="nacionalidad" id="nacionalidad">
+              <select class="form-control" name="nacionalidad" id="nacionalidad" required>
                   <option value=''>Seleccione...</option>
                   <option value='1'>VENEZOLANA</option>
                   <option value='2'>EXTRANJERA</option>
@@ -157,8 +152,8 @@
             </div>
 
             <div class="form-group">
-              <span class="form-group-addon">Cedula del cliente</span>
-              <input type="text" class="form-control" oninput="onlyNumbers(this)" placeholder="12456345" aria-describedby="cedula2" name="cedula2" id="cedula2" maxlength="8" required/>
+              <span class="form-group-addon">Cédula del cliente</span>
+              <input type="text" class="form-control" placeholder="12456345" aria-describedby="cedula2" name="cedula2" id="cedula2" maxlength="8" minlength="6" oninput="onlyNumbers(this)" required/>
             </div>
 
             <div class="form-group">
@@ -168,12 +163,12 @@
             
             <div class="form-group">
               <span class="form-group-addon">Teléfono Celular</span>
-              <input type="text" class="form-control telefono" placeholder="(0424)234.56.78" aria-describedby="telf_cel" name="telf_cel" id="telf_cel" maxlength="15" required/>
+              <input type="text" class="form-control telefono" placeholder="(0424)234.56.78" aria-describedby="telf_cel" name="telf_cel" id="telf_cel" onchange="validaTelf(this);" maxlength="15" required/>
             </div>
 
             <div class="form-group">
               <span class="form-group-addon">Correo electrónico</span>
-              <input type="text" class="form-control" placeholder="usario@dominio.com" aria-describedby="correo2" name="correo2" id="correo2" oninput="upperCase(this);" onchange="validateEmail(this)" required/>
+              <input type="email" class="form-control" placeholder="usuario@dominio.com" aria-describedby="correo2" name="correo2" id="correo2" oninput="upperCase(this);" onchange="validateEmail(this);" maxlength="60" required/>
             </div>
 
 
@@ -226,7 +221,7 @@
 
             <div class="form-group">
               <span class="form-group-addon">Número de cuenta</span>
-              <input type="text" class="form-control" placeholder="123456********7890" aria-describedby="pan" name="pan" id="pan" oninput="onliNumbers(this);" maxlength="20"/>
+              <input type="text" class="form-control" placeholder="123456********7890" aria-describedby="pan" name="pan" id="pan" oninput="onlyNumbers(this);" maxlength="20"/>
             </div>
             
             <div class="form-group">
