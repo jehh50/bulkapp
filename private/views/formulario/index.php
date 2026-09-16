@@ -62,7 +62,7 @@
 
     <div class="col-offset-lg-6 col-sm-6 col-md-6 col-lg-6" id="formularioCliente" hidden>
       <div class="panel panel-default">
-        <div class="panel-body">  <!-- onpaste="alert('No puedes pegar');return false"  -->
+        <div class="panel-body"> 
           <form name="form1" enctype="multipart/form-data" method="POST" onsubmit="return validateForm(this);" action="?view=formulario&mode=registro" autocomplete="off">
           <input type="hidden" name="id_cliente" id="id_cliente">
           <input type="text" style="display:none;" name="hora_actual" id="hora_actuall">
@@ -230,7 +230,6 @@
             </div>        
           </div>
           <button type="submit" class="btn btn-success btn-md" onclick="validateForm()">Guardar</button>
-          <!-- <a href="#" class="btn btn-success btn-md" onclick="validateForm()">Valida</a> -->
         </div>
       </div>
     </div>
