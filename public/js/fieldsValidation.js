@@ -19,6 +19,13 @@ function onlyNumbers(e) {
     }
 }
 
+function onlyPanNumber(e) { //Validación del campo número de cuenta
+    //
+    // Campo PAN: permite solo números y asteriscos, máximo 20 caracteres
+    // (ej. 123456789******1234 o 12345678901234567890)
+    e.value = e.value.replace(/[^0-9*]/g, '').slice(0, 20);
+}
+
 function upperCase(e) {
     e.value = e.value
         .toUpperCase()
@@ -191,7 +198,6 @@ function validateForm() {
             return false;
         }
 
-        console.log('Cálculo de edad');
         let [dia, mes, año] = fecha_nac.split('-').map(Number);  // Cambiado para dd/mm/yyyy
         let fechaNacimiento = new Date(año, mes - 1, dia);
         let fechaHoy = new Date();
@@ -228,9 +234,10 @@ function validateForm() {
             return false;
         }
 
-        // Validación de PAN
-        if (pan === "" || pan.length < 20) {
-            alert('El campo número de cuenta no esta completo o esta vacío.');
+        // Validación de PAN: exactamente 20 caracteres, solo números y asteriscos
+        let patron_pan_number = /^[0-9*]{20}$/;
+        if (!patron_pan_number.test(pan)) {
+            alert('El campo número de cuenta debe tener exactamente 20 caracteres (números y asteriscos). Ej: 123456789******1234');
             document.getElementById('pan').focus();
             return false;
         }
