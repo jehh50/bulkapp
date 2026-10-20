@@ -90,7 +90,7 @@
             <option value='<?php echo $e['id'];?>'><?php echo $e['descripcion'];}?></option>
             </select>
           </div>
-
+ 
           <div class="form-group" id="d_venta";>
             <span class="form-group-addon">Tipo de producto</span>
             <select class="form-control" name="venta" id="venta" required">

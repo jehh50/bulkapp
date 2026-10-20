@@ -246,7 +246,6 @@ function validateForm() {
         return true;
     }
 
-    return false;
 }
 
 function validateFormCashea() {
