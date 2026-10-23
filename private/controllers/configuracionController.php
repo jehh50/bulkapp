@@ -1,327 +1,243 @@
 <?php
 ob_start();
 include(PUBLIC_DIR . 'general/session.php');
-if (empty($_SESSION)) {
+security_requerir_rol(array(Constantes::USUARIO_ADMINISTRADOR));
+if (!security_usuario_autenticado()) {
 	header('location:index.php');
+	exit;
 } else {
 	include_once(MODEL_DIR . 'configuracionModel.php');
 	$con = new database();
 	if (isset($_GET['mode'])) {
-		switch ($_GET['mode']) {
-			case 'editarProducto':
-				include(PUBLIC_DIR . 'general/header.php');
-				include(PUBLIC_DIR . 'general/navbar.php');
-				$product = $con->products($_GET['id']);
-				include(HTML_DIR . 'configuracion/editarProducto.php');
-				include(PUBLIC_DIR . 'general/footer.php');
-				break;
+		try {
+  		switch ($_GET['mode']) {
+  			case 'index':
+  				$nav_crumb = "Configuración / Productos";
+  				$nav_title = "Productos activos";
+  				$nav_subtitle = "Consulta, crea y edita los productos de cada servicio.";
+  				include(PUBLIC_DIR . 'general/nheader.php');
+  				include(PUBLIC_DIR . 'general/nnavbar.php');
+  				$listarProducto = $con->listarProductos();
+  				$servicio = $con->servicio(); // para el alta inline (diseño unified)
+  				include(HTML_DIR . 'configuracion/index.php');
+  				include(PUBLIC_DIR . 'general/nfooter.php');
+  				break;
 
-			case 'actualizarProducto':
-				$res = $con->updateProd($_POST["id"], $_POST["nombre"], $_POST["codigo"], $_POST['costo']);
-				header("location:?view=configuracion&mode=index");
-				break;
+  			case 'actualizarProductos':
+  				// Edición masiva (checkboxes o botón por fila): actualiza nombre, código, costo y plan
+  				$ids     = input_int_array(isset($_POST['id']) ? $_POST['id'] : []);
+  				$nombres = isset($_POST['nombre']) && is_array($_POST['nombre']) ? $_POST['nombre'] : [];
+  				$codigos = isset($_POST['codigo']) && is_array($_POST['codigo']) ? $_POST['codigo'] : [];
+  				$costos  = isset($_POST['costo']) && is_array($_POST['costo']) ? $_POST['costo'] : [];
+  				$planes  = isset($_POST['plan']) && is_array($_POST['plan']) ? $_POST['plan'] : [];
+  				foreach ($ids as $i => $id) {
+  					if (!isset($nombres[$i], $codigos[$i], $costos[$i])) {
+  						continue;
+  					}
+  					$plan = isset($planes[$i]) && $planes[$i] !== '' ? input_string($planes[$i], 50) : null;
+  					$con->updateProd($id, input_string($nombres[$i], 255), input_string($codigos[$i], 100), input_amount($costos[$i]) ?? '0', $plan);
+  				}
+  				header("location:?view=configuracion&mode=index&mensaje=actualizado");
+  				break;
 
-			case 'agregarProducto':
-				include(PUBLIC_DIR . 'general/header.php');
-				include(PUBLIC_DIR . 'general/navbar.php');
-				$servicio = $con->servicio();
-				include(HTML_DIR . 'configuracion/agregarProducto.php');
-				include(PUBLIC_DIR . 'general/footer.php');
-				break;
+  			case 'editarProducto':
+  				$idProducto = input_int(isset($_GET['id']) ? $_GET['id'] : null, 1);
+  				if ($idProducto === null) {
+  					header('location:?view=configuracion&mode=index&mensaje=error');
+  					exit;
+  				}
+  				include(PUBLIC_DIR . 'general/header.php');
+  				include(PUBLIC_DIR . 'general/navbar.php');
+  				$product = $con->products($idProducto);
+  				include(HTML_DIR . 'configuracion/editarProducto.php');
+  				include(PUBLIC_DIR . 'general/footer.php');
+  				break;
 
-			case 'index':
-				include(PUBLIC_DIR . 'general/header.php');
-				include(PUBLIC_DIR . 'general/navbar.php');
-				$listarProducto = $con->listarProductos();
-				include(HTML_DIR . 'configuracion/index.php');
-				include(PUBLIC_DIR . 'general/footer.php');
-				break;
+  			case 'actualizarProducto':
+  				$idProducto = input_int(isset($_POST['id']) ? $_POST['id'] : null, 1);
+  				$nombreProducto = input_string(isset($_POST['nombre']) ? $_POST['nombre'] : '', 255);
+  				$codigoProducto = input_string(isset($_POST['codigo']) ? $_POST['codigo'] : '', 100);
+  				$costoProducto = input_amount(isset($_POST['costo']) ? $_POST['costo'] : null);
+  				if ($idProducto === null || $nombreProducto === '' || $costoProducto === null) {
+  					header('location:?view=configuracion&mode=index&mensaje=error');
+  					exit;
+  				}
+  				$res = $con->updateProd($idProducto, $nombreProducto, $codigoProducto, $costoProducto);
+  				header("location:?view=configuracion&mode=index");
+  				break;
 
-			case 'guardarProductos':
-				$servicio = $_POST['venta'];
-				$gestion = $con->updateStatus($servicio);
-				for ($i = 0; $i < count($_POST['producto']);) {
-					$gestion = $con->guardarProductos($_POST['producto'][$i], $_POST['codigo'][$i], $_POST['costo'][$i], $servicio, $_POST['plan'][$i]);
-					$i++;
-				}
-				header('location:?view=configuracion&mode=index&mensaje=exito');
-				break;
+  			case 'addProduct':
+  				include(PUBLIC_DIR . 'general/header.php');
+  				include(PUBLIC_DIR . 'general/navbar.php');
+  				$servicio = $con->servicio();
+  				include(HTML_DIR . 'configuracion/agregarProducto.php');
+  				include(PUBLIC_DIR . 'general/footer.php');
+  				break;
 
-			case 'cargaArchivo':
-				include(PUBLIC_DIR . 'general/header.php');
-				include(PUBLIC_DIR . 'general/navbar.php');
-				$servicio = $con->servicio();
-				include(HTML_DIR . 'configuracion/cargaArchivo.php');
-				include(PUBLIC_DIR . 'general/footer.php');
-				break;
+  			case 'guardarProductos':
+  				$servicio = input_enum(isset($_POST['venta']) ? $_POST['venta'] : null, Constantes::servicios());
+  				$productos = isset($_POST['producto']) && is_array($_POST['producto']) ? $_POST['producto'] : [];
+  				$codigos = isset($_POST['codigo']) && is_array($_POST['codigo']) ? $_POST['codigo'] : [];
+  				$costos = isset($_POST['costo']) && is_array($_POST['costo']) ? $_POST['costo'] : [];
+  				$planes = isset($_POST['plan']) && is_array($_POST['plan']) ? $_POST['plan'] : [];
+  				if ($servicio === null) {
+  					header('location:?view=configuracion&mode=index&mensaje=error');
+  					exit;
+  				}
+  				$servicio = (int) $servicio;
+  				$gestion = $con->updateStatus($servicio);
+  				foreach ($productos as $i => $producto) {
+  					if (!isset($codigos[$i], $costos[$i])) {
+  						continue;
+  					}
+  					$gestion = $con->guardarProductos(
+  						input_string($producto, 255),
+  						input_string($codigos[$i], 100),
+  						input_amount($costos[$i]) ?? '0',
+  						$servicio,
+  						isset($planes[$i]) ? input_string($planes[$i], 50) : null
+  					);
+  				}
+  				header('location:?view=configuracion&mode=index&mensaje=exito');
+  				break;
 
-			case 'download':
-				header("Content-disposition: attachment; filename=modelo_bbdd.csv");
-				header("Content-type: application/vnd.ms-excel");
-				readfile(PUBLIC_DIR . "/carga_bbdd/modelo_bbdd.csv");
-				break;
+  			case 'editarResultado':
+  				$nav_crumb = 'Configuración / Resultados';
+  				$nav_title = 'Edición de resultados';
+  				$nav_subtitle = 'Busca una venta por cédula para corregir sus datos.';
+  				include(PUBLIC_DIR . 'general/nheader.php');
+  				include(PUBLIC_DIR . 'general/nnavbar.php');
+  				include(HTML_DIR . 'configuracion/editarResultado.php');
+  				include(PUBLIC_DIR . 'general/nfooter.php');
+  				break;
 
-			case 'registro':
-				ob_clean(); // Limpia el buffer de salida
-				$time = date('H:i:s');
-				// Validaciones básicas de seguridad y existencia del archivo
-				if (empty($_FILES["archivo"]) || $_FILES["archivo"]['error'] !== UPLOAD_ERR_OK) {
-					echo json_encode(['error' => 'No se recibió el archivo o hubo un error al subirlo.']);
-					break;
-				}
-				$archivo = $_FILES["archivo"]['tmp_name'];
-				$servicio = $_POST['servicio'];
-				$batchSize = 500; // Tamaño del lote para inserciones
-				$response = json_encode(['mensaje' => 'No se procesaron filas.']); // Respuesta por defecto
+  			case 'buscar':
+  				$cedulaBuscada = input_string(isset($_POST['cedula']) ? $_POST['cedula'] : '', 30);
+  				$resultados = ($cedulaBuscada === '') ? false : $con->busquedaResultados($cedulaBuscada);
+  				if ($resultados) {
+  					$json = [
+  						'response' => 'true',
+  						'count' => count($resultados),
+  						'data' => []
+  					];
 
-				if (($fp = fopen($archivo, "r")) !== false) {
-					// Detectar la codificación del archivo una sola vez
-					$encoding = mb_detect_encoding(file_get_contents($archivo), 'UTF-8, ISO-8859-1', true);
-
-					// 1. LEER Y DESCARTAR LA CABECERA (HEADER) ANTES DEL BUCLE
-					// Esto posiciona el puntero del archivo en la primera fila de datos.
-					fgetcsv($fp, 0, ";");
-
-					$paramsBatch = [];
-					$paramTypes = '';
-
-					// 2. CORRECCIÓN DEL BUCLE: Leer una nueva línea del archivo en cada iteración
-					while (($datos = fgetcsv($fp, 0, ";")) !== false) {
-
-						// Omitir filas vacías que fgetcsv a veces puede retornar
-						if (empty($datos) || $datos[0] === null) {
-							continue;
-						}
-
-						// Convertir la codificación de cada celda a UTF-8
-						$datos = array_map(function ($value) use ($encoding) {
-							return mb_convert_encoding($value, 'UTF-8', $encoding);
-						}, $datos);
-
-						// Preparar la fila actual según el servicio
-						if ($servicio == 1) {
-							$fila = array_slice($datos, 0, 9);
-							$paramTypes = str_repeat('s', 8) . 'i'; // Tipos para el servicio 1
-						} else {
-							$fila = array_slice($datos, 0, 20);
-							$paramTypes = str_repeat('s', 19) . 'i'; // Tipos para el servicio 2
-						}
-
-						// 3. CORRECCIÓN DEL LOTE: Añadir la fila al lote (array de arrays)
-						$paramsBatch[] = $fila;
-
-						// Si el lote alcanza el tamaño definido, insertarlo en la BD
-						if (count($paramsBatch) >= $batchSize) {
-							$response = $con->guardarRegistrosTemporalBatch($paramsBatch, $paramTypes, $servicio);
-							$paramsBatch = []; // Reiniciar el lote para el siguiente grupo de filas
-						}
-					}
-
-					// 4. CORRECCIÓN DE LÓGICA: Mover el cierre y la inserción final FUERA del bucle
-					fclose($fp);
-
-					// Insertar cualquier fila restante que no completó un lote
-					if (!empty($paramsBatch)) {
-						$response = $con->guardarRegistrosTemporalBatch($paramsBatch, $paramTypes, $servicio);
-					}
-
-					// Puedes usar una respuesta más informativa si lo deseas
-					header('Location: ?view=configuracion&mode=preload&servicio=' . $servicio.'paginaActual=1');
-				} else {
-					echo json_encode(['error' => 'No se pudo abrir el archivo.']);
-				}
-
-				break;
-
-			case 'preload':
-				ob_clean();
-				include(PUBLIC_DIR . 'general/header.php');
-				include(PUBLIC_DIR . 'general/navbar.php');
-
-				$paginaActual = isset($_GET['paginaActual']) ? $_GET['paginaActual'] : 1;
-				$registrosPorPagina = 1; // Puedes ajustar este valor según tus necesidades
-				
-				$registros = $con->listarTemporal($_GET['servicio'],$paginaActual, $registrosPorPagina);
-				var_dump($registros);
-				 if (isset($registros['registros'])) {
-					$registros = $registros['registros'];
-					$totalPaginas = $registros['totalPaginas'];
-					$paginaActual = $registros['paginaActual'];
-
-				} else {
-					$registros = [];
-				}
-
-				include(HTML_DIR . 'configuracion/confirmaCargaArchivo.php');
-				include(PUBLIC_DIR . 'general/footer.php');
-
-				//header('location:?view=configuracion&mode=cargaArchivo&mensaje=exito');
-				break;
+  					foreach ($resultados as $resultado) {
+  						$json['data'][] = [
+  							'id_resultado' => $resultado['resultado_id'],
+  							'nombre' => $resultado['nombre'],
+  							'apellido' => $resultado['apellido'],
+  							'cedula' => $resultado['cedula'],
+  							'telf_hab' => $resultado['telf_hab'],
+  							'telf_celular' => $resultado['telf_celular'],
+  							'correo' => $resultado['correo'],
+  							'cuenta' => $resultado['cuenta'],
+  							'servicio' => $resultado['descripcion'],
+  							'cod_servicio' => $resultado['servicio_id'],
+  							'genero' => $resultado['genero'],
+  							'nacimiento' => $resultado['fecha_nacimiento'],
+  							'id_gestion' => $resultado['gestion_id'],
+  							'producto_id' => $resultado['producto_id'],
+  							'name_product' => $resultado['name_product'],
+  							'fecha_venta' => $resultado['fecha_venta']
+  						];
+  					}
+  				} else {
+  					$json = ['response' => 'false'];
+  				}
+  				echo json_encode($json);
+  				break;
 
 
-			case 'guardarRegistros':
+  			case 'actualiza':
+  				$idResultado = input_int(isset($_POST['id']) ? $_POST['id'] : null, 1);
+  				$nombreResultado = input_string(isset($_POST['nombre']) ? $_POST['nombre'] : '', 100);
+  				$apellidoResultado = input_string(isset($_POST['apellido']) ? $_POST['apellido'] : '', 100);
+  				$cedulaResultado = input_digits(isset($_POST['cedula']) ? $_POST['cedula'] : '', 10);
+  				$sexoResultado = input_enum(isset($_POST['sexo']) ? $_POST['sexo'] : null, ['M', 'F', '']);
+  				$nacimientoResultado = input_string(isset($_POST['nacimiento']) ? $_POST['nacimiento'] : '', 10);
+  				$habResultado = input_phone(isset($_POST['hab']) ? $_POST['hab'] : '');
+  				$celResultado = input_phone(isset($_POST['cel']) ? $_POST['cel'] : '');
+  				$correoResultado = input_email(isset($_POST['correo']) ? $_POST['correo'] : '', 150);
+  				$ventaResultado = input_string(isset($_POST['venta']) ? $_POST['venta'] : '', 20);
+  				$productoResultado = input_int(isset($_POST['productoId']) ? $_POST['productoId'] : null, 1);
+  				$cuentaResultado = input_pan(isset($_POST['cuenta']) ? $_POST['cuenta'] : '');
 
-				if (isset($_POST['data'])) {
-					$registros = json_decode($_POST['data'], true);
-					if (json_last_error() === JSON_ERROR_NONE) {
-						if ($_POST['servicio'] == 1) {
-							foreach ($registros as $registro) {
-								$con->registro(
-									$registro['identificacion'],
-									$registro['nombre_legal'],
-									$registro['telf_hab'],
-									$registro['telf_ofi'],
-									$registro['telf_cel'],
-									$registro['correo'],
-									$registro['direccion'],
-									$registro['cuenta'],
-									$registro['oferta'],
-									$_POST['servicio']
-								);
-							}
-							$var = 200;
-						} else {
-							foreach ($registros as $registro) {
-								$con->registroCashea(
-									$registro['cedula'],
-									$registro['id_cuota'],
-									$registro['nombre_grupo'],
-									$registro['fecha_pagar'],
-									$registro['monto_cuota'],
-									$registro['numero_cuota'],
-									$registro['fee'],
-									$registro['plata_por_cobrar'],
-									$registro['capital_asignado'],
-									$registro['id_orden'],
-									$registro['identificacion_orden'],
-									$registro['fecha_creacion_orden'],
-									$registro['email'],
-									$registro['telefono'],
-									$registro['nombre_usuario'],
-									$registro['local_origen'],
-									$registro['estado_deuda'],
-									$registro['tramo_inicial'],
-									$registro['tramo_actual'],
-									$registro['segmento'],
-									$_POST['servicio']
-								);
-							}
-							$var = 200;
-						}
-					} else {
-						$var = 'Error al decodificar los datos JSON: ' . json_last_error_msg();
-						header("Location: ?view=configuracion&mode=cargaArchivo&estatus=$var");
-					}
-				} else {
-					$var = 'No se enviaron datos para guardar.';
-					header("Location: ?view=configuracion&mode=cargaArchivo&estatus=$var");
-				}
-				header("Location: ?view=configuracion&mode=cargaArchivo&estatus=$var");
-				break;
+  				if ($idResultado === null || $nombreResultado === '' || $apellidoResultado === '' || $cedulaResultado === '' || $sexoResultado === null || $nacimientoResultado === '' || $correoResultado === null || $productoResultado === null) {
+  					header("Location: ?view=configuracion&mode=editarResultado&mensaje=error");
+  					exit;
+  				}
 
-			case 'editarResultado':
-				include(PUBLIC_DIR . 'general/header.php');
-				include(PUBLIC_DIR . 'general/navbar.php');
-				// $servicio = $con->servicio();
-				// $productos = $con->productos($_SESSION['servicio_id']);
-				include(HTML_DIR . 'configuracion/editarResultado.php');
-				include(PUBLIC_DIR . 'general/footer.php');
-				break;
+  				$result = $con->updateResultados($idResultado, $nombreResultado, $apellidoResultado, $cedulaResultado, $sexoResultado, $nacimientoResultado, $habResultado, $celResultado, $correoResultado, $ventaResultado, $productoResultado, $cuentaResultado);
 
-			case 'buscar':
-				$resultados = $con->busquedaResultados($_POST['cedula']);
-				if ($resultados) {
-					$json = [
-						'response' => 'true',
-						'count' => count($resultados),
-						'data' => []
-					];
+  				if ($result == true){
+  					$json['response'] = 'true';
+  					header("Location: ?view=configuracion&mode=editarResultado&mensaje=exito");
+  				} else {
+  					$json['response'] = 'false';
+  					header("Location: ?view=configuracion&mode=editarResultado&mensaje=error");
 
-					foreach ($resultados as $resultado) {
-						$json['data'][] = [
-							'id_resultado' => $resultado['resultado_id'],
-							'nombre' => $resultado['nombre'],
-							'apellido' => $resultado['apellido'],
-							'cedula' => $resultado['cedula'],
-							'telf_hab' => $resultado['telf_hab'],
-							'telf_celular' => $resultado['telf_celular'],
-							'correo' => $resultado['correo'],
-							'cuenta' => $resultado['cuenta'],
-							'servicio' => $resultado['descripcion'],
-							'cod_servicio' => $resultado['servicio_id'],
-							'genero' => $resultado['genero'],
-							'nacimiento' => $resultado['fecha_nacimiento'],
-							'id_gestion' => $resultado['gestion_id'],
-							'producto_id' => $resultado['producto_id'],
-							'name_product' => $resultado['name_product'],
-							'fecha_venta' => $resultado['fecha_venta']
-						];
-					}
-				} else {
-					$json = ['response' => 'false'];
-				}
-				echo json_encode($json);
-				break;
+  				}
+  				break;
 
+  			case 'eliminar':
+  				$idEliminar = input_int(isset($_POST['id']) ? $_POST['id'] : null, 1);
+  				if ($idEliminar === null) {
+  					header("Location: ?view=configuracion&mode=editarResultado&mensaje=error");
+  					exit;
+  				}
+  				$result = $con->eliminarVenta($idEliminar);
+  				if ($result == true){
+  					$json['response'] = 'true';
+  					header("Location: ?view=configuracion&mode=editarResultado&mensaje=eliminado");
+  				} else {
+  					$json['response'] = 'false';
+  					header("Location: ?view=configuracion&mode=editarResultado&mensaje=error");
 
-			case 'actualiza':
-				$result = $con->updateResultados($_GET['id'], $_GET['nombre'], $_GET['apellido'], $_GET['cedula'], $_GET['sexo'], $_GET['nacimiento'], $_GET['hab'], $_GET['cel'], $_GET['correo'], $_GET['venta'],$_GET['productoId'],$_GET['cuenta']);
+  				}
+  				break;
 
-				if ($result == true){
-					$json['response'] = 'true';
-					header("Location: ?view=configuracion&mode=editarResultado&mensaje=exito");
-				} else {
-					$json['response'] = 'false';
-					header("Location: ?view=configuracion&mode=editarResultado&mensaje=error");
+  			case 'ciudad_':
+  				$id_estado = input_int(isset($_POST['id_estado']) ? $_POST['id_estado'] : null, 1);
+  				$ciudad = ($id_estado === null) ? false : $con->ciudad_($id_estado);
+  				$json['ciudad'] = "";
+  				if ($ciudad) {
+  					foreach ($ciudad as $c) {
+  						$json['response'] = 'true';
+  						$json['ciudad'] = $json['ciudad'] . $c['id_ciudad'] . "," . $c['ciudad'] . "|";
+  					}
+  				} else {
+  					$json['response'] = 'false';
+  				}
+  				echo json_encode($json);
+  				break;
 
-				}
-				break;
+  			case 'productos':
+  				$productos = $con->listarProductos();
+  								$json['productos'] = "";
+  				if ($productos) {
+  					foreach ($productos as $c) {
+  						$json['response'] = 'true';
+  						$json['productos'] = $json['productos'] . $c['id'] . "," . strtoupper($c['descripcion']) . "|";
+  					}
+  				} else {
+  					$json['response'] = 'false';
+  				}
+  				echo json_encode($json);
+  				break;
 
-			case 'eliminar':
-				$result = $con->eliminarVenta($_GET['id']);
-				if ($result == true){
-					$json['response'] = 'true';
-					header("Location: ?view=configuracion&mode=editarResultado&mensaje=eliminado");
-				} else {
-					$json['response'] = 'false';
-					header("Location: ?view=configuracion&mode=editarResultado&mensaje=error");
+  			default:
+  				header('location:' . HTML_DIR . 'error.html');
+  				break;
+  		}
+		} catch (Throwable $e) {
+		  app_log('error', 'Error en el controlador configuracion: ' . $e->getMessage(), array(
+		    'excepcion' => get_class($e),
+		    'archivo' => $e->getFile(),
+		    'linea' => $e->getLine(),
+		    'modo' => isset($_GET['mode']) ? $_GET['mode'] : '',
+		  ));
 
-				}
-				break;
-
-			case 'ciudad_':
-				$id_estado = $_POST['id_estado'];
-				$ciudad = $con->ciudad_($id_estado);
-				$json['ciudad'] = "";
-				if ($ciudad) {
-					foreach ($ciudad as $c) {
-						$json['response'] = 'true';
-						$json['ciudad'] = $json['ciudad'] . $c['id_ciudad'] . "," . $c['ciudad'] . "|";
-					}
-				} else {
-					$json['response'] = 'false';
-				}
-				echo json_encode($json);
-				break;
-
-			case 'productos':
-				$productos = $con->listarProductos();
-				// var_dump($productos);
-				$json['productos'] = "";
-				if ($productos) {
-					foreach ($productos as $c) {
-						$json['response'] = 'true';
-						$json['productos'] = $json['productos'] . $c['id'] . "," . strtoupper($c['descripcion']) . "|";
-					}
-				} else {
-					$json['response'] = 'false';
-				}
-				echo json_encode($json);
-				break;
-
-			default:
-				header('location:' . HTML_DIR . 'error.html');
-				break;
+		  app_responder_error();
 		}
 	}
 }

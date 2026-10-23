@@ -4,8 +4,8 @@
       <section class="container">
         <header><h1>Directorio de llamadas<h1></header>
       </section>
-      <div class="panel panel-default">
-        <div class="panel-body" >
+      <div class="card">
+        <div class="card-body" >
         <?php
         $root = "public/llamadas/";
         if ($handler = opendir($root)) {

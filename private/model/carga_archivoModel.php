@@ -17,7 +17,7 @@ class database
 	 * @param int $servicio El identificador del servicio (1 para clientes, otro valor para cashea).
 	 * @return int|false El número de filas insertadas con éxito, o false si hubo un error.
 	 */
-	public function guardarRegistrosBatch($batch, $paramTypes,$servicio)
+	public function guardarRegistrosBatch(array $batch, string $paramTypes, int $servicio)
 	{
 		if (empty($batch)) {
 			return 0;
@@ -27,7 +27,7 @@ class database
 		$tabla = '';
 		$columnasEsperadas = 0;
 
-		if ($servicio == 1 || $servicio == 5) {
+		if (Constantes::esServicioBancario($servicio)) {
 			$tabla = 'clientes';
 			$columnas = ['identificacion', 'nombre_legal', 'telf_hab', 'telf_ofi', 'telf_cel', 'correo', 'direccion', 'cuenta', 'oferta','servicio_id'];
 			$columnasEsperadas = 10;
@@ -44,18 +44,17 @@ class database
 		$paramsAplanados = [];
 		$batchValido = [];
 
-foreach ($batch as $indice => $fila) {
+		foreach ($batch as $indice => $fila) {
 			if (count($fila) === $columnasEsperadas) {
 				$batchValido[] = $fila;
 			} else {
 				$msg = "Error en la carga batch: La fila " . ($indice + 1) . " fue omitida. Se esperaban " . $columnasEsperadas . " columnas, pero se recibieron " . count($fila) . ". Contenido: " . json_encode($fila);
-				error_log($msg);
-				echo "<pre>DEBUG: $msg</pre>";
+				app_log('warning', $msg);
 			}
 		}
 		
 		if (empty($batchValido)) {
-			echo "<br>Carga batch abortada: Ninguna fila pasó la validación de columnas.";
+			app_log('warning', 'Carga batch abortada: ninguna fila pasó la validación de columnas.');
 			return 0;
 		}
 
@@ -81,34 +80,13 @@ foreach ($batch as $indice => $fila) {
             return 0;
 			
 		} catch (Exception $e) {
-			error_log("Error en guardarRegistrosBatch: " . $e->getMessage());
+			app_log('error', 'Error en guardarRegistrosBatch: ' . $e->getMessage());
 			return false;
 		}
 	}
 
 
-	public function registroCashea(
-		$cedula,
-		$id_cuota,
-		$nombre_grupo,
-		$fecha_pagar,
-		$monto_cuota,
-		$numero_cuota,
-		$fee,
-		$plata_por_cobrar,
-		$capital_asignado,
-		$id_orden,
-		$identificacion_orden,
-		$fecha_creacion_orden,
-		$email,
-		$telefono,
-		$nombre_usuario,
-		$local_origen,
-		$estado_deuda,
-		$tramo_inicial,
-		$tramo_actual,
-		$segmento
-	) {
+	public function registroCashea(string $cedula, string $id_cuota, string $nombre_grupo, string $fecha_pagar, string $monto_cuota, string $numero_cuota, string $fee, string $plata_por_cobrar, string $capital_asignado, string $id_orden, string $identificacion_orden, string $fecha_creacion_orden, string $email, string $telefono, string $nombre_usuario, string $local_origen, string $estado_deuda, string $tramo_inicial, string $tramo_actual, string $segmento): bool {
 		$cedula = iconv(mb_detect_encoding($cedula, mb_detect_order(), true), "UTF-8", $cedula);
 		$nombre_grupo = iconv(mb_detect_encoding($nombre_grupo, mb_detect_order(), true), "UTF-8", $nombre_grupo);
 		$email = iconv(mb_detect_encoding($email, mb_detect_order(), true), "UTF-8", $email);
@@ -156,47 +134,50 @@ foreach ($batch as $indice => $fila) {
 			$stmt->close();
 			return true;
 		} catch (Exception $e) {
-			echo "Error al guardar en cashea_customers => " . $e->getMessage();
+			app_log('error', 'Error al guardar en cashea_customers: ' . $e->getMessage());
+			return false;
 		}
 	}
 
-	public function servicio()
+	public function servicio(): array
 	{
-		$sql = $this->db->query("SELECT id,descripcion FROM servicios WHERE status_id = 2 ORDER BY id ASC");
-		if ($this->db->rows($sql) > 0) {
-			while ($data = $this->db->recorrer($sql)) {
-				$respuesta[] = $data;
-			}
-		} else {
-			$respuesta = false;
-		}
-		return $respuesta;
+		return $this->db->selectQuery("SELECT id,descripcion FROM servicios WHERE status_id = 2 ORDER BY id ASC");
 	}
 
-	public function updateQuotes($paramsBatch, $paramTypes)
+	public function updateQuotes(array $paramsBatch, string $paramTypes): bool
 	{
 		try {
 			foreach ($paramsBatch as $param) {
-				if($param[1] === 'Pago'):
-					$status = 7;
-					$set = ", cc.plata_por_cobrar = REPLACE(CAST(REPLACE(cc.plata_por_cobrar,',','.') AS DECIMAL (10,2)) - $param[2],'.',',')";
-				elseif ($param[1] === 'Pago parcial'):
-					$status = 13;
-					$set = ", cc.plata_por_cobrar = REPLACE(CAST(REPLACE(cc.plata_por_cobrar,',','.') AS DECIMAL (10,2)) - $param[2],'.',',')";
-				else:
+				$tipo = isset($param[1]) ? trim((string) $param[1]) : '';
+				$idCuota = isset($param[0]) ? trim((string) $param[0]) : '';
+				$monto = isset($param[2]) ? str_replace(',', '.', trim((string) $param[2])) : '';
+
+				if ($idCuota === '') {
+					continue;
+				}
+
+				if ($tipo === 'Pago' || $tipo === 'Pago parcial') {
+					if (!is_numeric($monto)) {
+						continue;
+					}
+					$status = ($tipo === 'Pago') ? 7 : 13;
+					$query = "UPDATE cashea_customers cc SET cc.status_id = ?, cc.plata_por_cobrar = REPLACE(CAST(REPLACE(cc.plata_por_cobrar,',','.') AS DECIMAL (10,2)) - ?, '.', ',') WHERE cc.id_cuota = ?";
+					$params = [$status, $monto, $idCuota];
+					$types = 'iss';
+				} else {
 					$status = 10;
-					$set = '';
-				endif;
-				
-				// Reactivar cuota
-				$query = "UPDATE cashea_customers cc SET cc.status_id = $status $set WHERE cc.id_cuota = ?";
-				$stmt = $this->db->preparedQuery($query, [$param[0]], $paramTypes);
+					$query = "UPDATE cashea_customers cc SET cc.status_id = ? WHERE cc.id_cuota = ?";
+					$params = [$status, $idCuota];
+					$types = 'is';
+				}
+
+				$stmt = $this->db->preparedQuery($query, $params, $types);
 				if ($stmt) $stmt->close();
 
 			}
 			return true;
 		} catch (Exception $e) {
-			echo "Error en updateQuotes: " . $e->getMessage();
+			app_log('error', 'Error en updateQuotes: ' . $e->getMessage());
 			return false;
 		}
 	}

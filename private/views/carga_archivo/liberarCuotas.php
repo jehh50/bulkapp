@@ -45,13 +45,13 @@ if (isset($_GET['mensaje'])=='exito') {
 
 <div class="container">
     <div class="row">
-        <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1 col-lg-10 col-lg-offset-1">
+        <div class="col-12 col-sm-10 offset-sm-1 col-md-10 offset-md-1 col-lg-10 offset-lg-1">
         	<section class="container text-center">
             	<header><h1></h1></header>
           	</section>
-          	<div class="panel panel-default">
-            	<div class="panel-body text-center">
-              		<div class="form-group">
+          	<div class="card">
+            	<div class="card-body text-center">
+              		<div class="mb-3">
                         <section>
                           	<label><h1>Liberación de cuotas Cashea</h1></label>
                         </section>
@@ -61,7 +61,7 @@ if (isset($_GET['mensaje'])=='exito') {
                         <br>
                         <form id="formulario" onsubmit="return validacion();" action="?view=carga_archivo&mode=freeQuotes" method="POST" class="form-horizontal" enctype="multipart/form-data">
                             <div class="form-row text-center">
-                                <div class="col-xs-12">
+                                <div class="col-12">
                                     <div class="form-row">
                                         <div class="md-form">
                                             <div class="btn btn-success btn-lg">

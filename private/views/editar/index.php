@@ -1,4 +1,4 @@
-<script src="public/js/edit.js"></script>
+<script src="<?php echo asset('public/js/edit.js'); ?>"></script>
 <script type="text/javascript">
   function mayus(e) {
     e.value = e.value.toUpperCase();
@@ -47,68 +47,68 @@ if (isset($_GET['mensaje'])=='exito') {
   echo '  <script type="text/javascript">alert("REGISTRO EXITOSO"); $(location).attr("href","?view=editar&mode=index");</script>';
 }
 ?>
-<div class="">
+<div>
   <div class="row">
-    <div class="col-sm-10 col-md-10 col-lg-offset-1 col-lg-10">
+    <div class="col-sm-10 col-md-10 offset-lg-1 col-lg-10">
       <section class="container">
         <header><h1></h1></header>
       </section>
-      <div class="panel panel-default" >
-        <div class="panel-body">
-          <div class="form-group">
+      <div class="card" >
+        <div class="card-body">
+          <div class="mb-3">
             <section>
               <label><h1>Edición de resultados</h1></label>
             </section>
-              <div class="form-group col-lg-12" id="servicio" hidden>
+              <div class="mb-3 col-lg-12" id="servicio" hidden>
               </div>
               <input type="hidden" id="id_resultado">
               <input type="hidden" id="cod_servicio">
               <input type="hidden" id="gestion">
 
-              <div class="form-group col-lg-6">
-                <span class="form-group-addon">Cedula</span>
+              <div class="mb-3 col-lg-6">
+                <span class="input-group-text">Cedula</span>
                 <input type="text" class="form-control" placeholder="12658457" aria-describedby="cedula" id="cedula"/>
               </div>
-              <div class="form-group col-lg-6">
-                <span class="form-group-addon">Nombres</span>
+              <div class="mb-3 col-lg-6">
+                <span class="input-group-text">Nombres</span>
                 <input type="text" class="form-control" placeholder="Julio Cesar" aria-describedby="nombre" id="nombre" onkeyup="mayus(this);" onchange="soloLetras(this)" readonly/>
               </div>
-              <div class="form-group col-lg-6">
-                <span class="form-group-addon">Apellidos</span>
+              <div class="mb-3 col-lg-6">
+                <span class="input-group-text">Apellidos</span>
                 <input type="text" class="form-control" placeholder="Perez Gomez" aria-describedby="apellido" id="apellido" onkeyup="mayus(this);" onchange="soloLetras(this)" readonly/>
               </div>
               
-              <div class="form-group col-lg-6" id="d_genero">                
+              <div class="mb-3 col-lg-6" id="d_genero">                
               </div>
 
-              <div class="form-group col-lg-6" id="d_nacimiento">
+              <div class="mb-3 col-lg-6" id="d_nacimiento">
               </div>
-              <div class="form-group col-lg-6">
-                <span class="form-group-addon">Teléfono habitación</span>
+              <div class="mb-3 col-lg-6">
+                <span class="input-group-text">Teléfono habitación</span>
                 <input type="text" class="form-control" placeholder="(0212)345.67.89" aria-describedby="tlf_hab" id="telf_hab" onchange="validaTelf(this);" readonly/>
               </div>
-              <div class="form-group col-lg-6">
-                <span class="form-group-addon">Teléfono oficina</span>
+              <div class="mb-3 col-lg-6">
+                <span class="input-group-text">Teléfono oficina</span>
                 <input type="text" class="form-control" placeholder="(0212)345.67.89"  aria-describedby="tlf_ofic" id="telf_ofi" onchange="validaTelf(this);" readonly/>
               </div>
-              <div class="form-group col-lg-6">
-                <span class="form-group-addon">Teléfono celular</span>
+              <div class="mb-3 col-lg-6">
+                <span class="input-group-text">Teléfono celular</span>
                 <input type="text" class="form-control" placeholder="(0424)234.56.78" aria-describedby="tlf_celu" id="telf_cel" onchange="validaTelf(this);" readonly/>
               </div>
-              <div class="form-group col-lg-6">
-                <span class="form-group-addon">Correo</span>
+              <div class="mb-3 col-lg-6">
+                <span class="input-group-text">Correo</span>
                 <input type="text" class="form-control" placeholder="usario@dominio.com" aria-describedby="correo" id="correo" onkeyup="mayus(this);" onchange="validateMail(this);" readonly/>
               </div>
-              <div class="form-group col-lg-6">
-                <span class="form-group-addon">Cuenta</span>
+              <div class="mb-3 col-lg-6">
+                <span class="input-group-text">Cuenta</span>
                 <input type="text" class="form-control"  placeholder="00000000000000001111" maxlength="20" aria-describedby="cuenta" id="cuenta" onchange="soloNumeros(this)" readonly/>
               </div>
               
               <div class="container-fluid">
-                <button class="btn btn-md btn-primary btn-md" id="btn-buscar"><span class="glyphicon glyphicon-search"></span> Buscar</button>
-                <button class="btn btn-md btn-success btn-md" id="btn-actualizar"><span class="glyphicon glyphicon-floppy-disk"></span> Actualizar</button>
-                <button class="btn btn-md btn-warning btn-md" id="btn-limpiar"><span class="glyphicon glyphicon-refresh"></span> Limpiar</button>
-                <button class="btn btn-md btn-danger btn-md" id="btn-eliminar" data-toggle="modal" data-target="#modalRechazo"><span class="glyphicon glyphicon-remove"></span> Eliminar</button>
+                <button class="btn btn-md btn-primary" id="btn-buscar"><i class="bi bi-search"></i> Buscar</button>
+                <button class="btn btn-md btn-success" id="btn-actualizar"><i class="bi bi-save"></i> Actualizar</button>
+                <button class="btn btn-md btn-warning" id="btn-limpiar"><i class="bi bi-arrow-clockwise"></i> Limpiar</button>
+                <button class="btn btn-md btn-danger" id="btn-eliminar" data-bs-toggle="modal" data-bs-target="#modalRechazo"><i class="bi bi-x"></i> Eliminar</button>
               </div>
             <!--/form-->
           </div>
@@ -123,19 +123,19 @@ if (isset($_GET['mensaje'])=='exito') {
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         <h4 class="modal-title" id="modalRechazo">Seleccione el motivo por el cual esta eliminando la venta</h4>
       </div>
       <div class="modal-body">     
-        <select class="form-control" id="eliminar_venta" required>
+        <select class="form-select" id="eliminar_venta" required>
           <option value="0" disabled selected style="display:none;">Seleccione...</option>
           <option value="error">Venta con error</option>
           <option value="forzada">Venta con mala gestión o forzadas</option>
         </select>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Descartar</button>
-        <button type="button" class="btn btn-primary" id="btn-guardar"><span class="glyphicon glyphicon-floppy-disk"></span> Guardar</button>
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Descartar</button>
+        <button type="button" class="btn btn-primary" id="btn-guardar"><i class="bi bi-save"></i> Guardar</button>
       </div>
     </div>
   </div>

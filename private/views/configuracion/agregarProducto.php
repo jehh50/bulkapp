@@ -9,29 +9,29 @@ function agregarproducto(){
   $('#productosS').append(
     '<div id="productosS'+conS+'" class="producto-item">'+
       '<div class="row">'+
-        '<div class="col-xs-12 col-sm-6 col-md-4">'+
-          '<div class="form-group">'+
+        '<div class="col-12 col-sm-6 col-md-4">'+
+          '<div class="mb-3">'+
             '<input type="text" class="form-control" name="producto[]" placeholder="PRODUCTO I" onkeyup="mayus(this);" required>'+
           '</div>'+
         '</div>'+
-        '<div class="col-xs-12 col-sm-6 col-md-2">'+
-          '<div class="form-group">'+
+        '<div class="col-12 col-sm-6 col-md-2">'+
+          '<div class="mb-3">'+
             '<input type="text" class="form-control" name="codigo[]" placeholder="025" onkeyup="mayus(this);" required>'+
           '</div>'+
         '</div>'+
-        '<div class="col-xs-12 col-sm-6 col-md-2">'+
-          '<div class="form-group">'+
+        '<div class="col-12 col-sm-6 col-md-2">'+
+          '<div class="mb-3">'+
             '<input type="text" class="form-control" name="costo[]" placeholder="12345.67" required>'+
           '</div>'+
         '</div>'+
-        '<div class="col-xs-12 col-sm-6 col-md-2">'+
-          '<div class="form-group">'+
+        '<div class="col-12 col-sm-6 col-md-2">'+
+          '<div class="mb-3">'+
             '<input type="text" class="form-control" name="plan[]" placeholder="54A" onkeyup="mayus(this);" required>'+
           '</div>'+
         '</div>'+
-        '<div class="col-xs-12 col-sm-12 col-md-2 text-right">'+
+        '<div class="col-12 col-sm-12 col-md-2 text-end">'+
           '<button type="button" class="btn btn-danger btn-sm" onclick="quitarProductos('+conS+')">'+
-            '<span class="glyphicon glyphicon-minus"></span> Quitar'+
+            '<i class="bi bi-dash"></i> Quitar'+
           '</button>'+
         '</div>'+
       '</div>'+
@@ -45,9 +45,6 @@ function quitarProductos(e){
   $('#productosS'+e).remove();
 }
 
-$(function () {
-  $('[data-toggle="tooltip"]').tooltip();
-});
 </script>
 
 <style>
@@ -55,7 +52,7 @@ $(function () {
   margin-top: 40px;
 }
 
-.panel-title .btn {
+.card-title .btn {
   float: right;
 }
 
@@ -66,29 +63,29 @@ $(function () {
 
 <div class="container loginbox">
   <div class="row">
-    <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
+    <div class="col-12 col-sm-10 offset-sm-1 col-md-8 offset-md-2">
       
-      <div class="panel panel-default">
-        <div class="panel-heading clearfix">
-          <h3 class="panel-title pull-left">
+      <div class="card">
+        <div class="card-header clearfix">
+          <h3 class="card-title float-start">
             <strong>Nuevo Producto</strong>
           </h3>
           <button type="button" 
-                  class="btn btn-info btn-sm pull-right"
+                  class="btn btn-info btn-sm float-end"
                   onclick="agregarproducto();">
-            <span class="glyphicon glyphicon-plus"></span> Agregar
+            <i class="bi bi-plus"></i> Agregar
           </button>
         </div>
 
-        <div class="panel-body">
+        <div class="card-body">
           <form name="resultados" method="POST" action="?view=configuracion&mode=guardarProductos">
 
             <!-- SELECT -->
             <div class="row">
-              <div class="col-xs-12 col-sm-6">
-                <div class="form-group">
+              <div class="col-12 col-sm-6">
+                <div class="mb-3">
                   <label>Servicio</label>
-                  <select class="form-control" name="venta" required>
+                  <select class="form-select" name="venta" required>
                     <option value="" disabled selected>Seleccione...</option>
                     <?php foreach ($servicio as $s) { ?>
                       <option value="<?php echo $s['id']; ?>">
@@ -106,31 +103,31 @@ $(function () {
             <div id="productosS">
               <div class="row">
                 
-                <div class="col-xs-12 col-sm-6 col-md-4">
-                  <div class="form-group">
+                <div class="col-12 col-sm-6 col-md-4">
+                  <div class="mb-3">
                     <label>Nombre</label>
                     <input type="text" class="form-control" name="producto[]" onkeyup="mayus(this);" required>
                   </div>
                 </div>
 
-                <div class="col-xs-12 col-sm-6 col-md-2">
-                  <div class="form-group">
+                <div class="col-12 col-sm-6 col-md-2">
+                  <div class="mb-3">
                     <label>Código</label>
                     <input type="text" class="form-control" name="codigo[]" required>
                   </div>
                 </div>
 
-                <div class="col-xs-12 col-sm-6 col-md-2">
-                  <div class="form-group">
+                <div class="col-12 col-sm-6 col-md-2">
+                  <div class="mb-3">
                     <label>Precio</label>
                     <input type="text" class="form-control" name="costo[]" 
-                           data-toggle="tooltip"
+                           data-bs-toggle="tooltip"
                            title="Formato 12345.67" required>
                   </div>
                 </div>
 
-                <div class="col-xs-12 col-sm-6 col-md-2">
-                  <div class="form-group">
+                <div class="col-12 col-sm-6 col-md-2">
+                  <div class="mb-3">
                     <label>Plan</label>
                     <input type="text" class="form-control" name="plan[]" required>
                   </div>
@@ -139,10 +136,10 @@ $(function () {
               </div>
             </div>
 
-            <div class="text-left">
-              <a href="?view=configuracion&mode=index" class="btn btn-default">Regresar</a>
+            <div class="text-start">
+              <a href="?view=configuracion&mode=index" class="btn btn-outline-secondary">Regresar</a>
               <button type="submit" class="btn btn-success">
-                <span class="glyphicon glyphicon-floppy-disk"></span> Guardar
+                <i class="bi bi-save"></i> Guardar
               </button>
             </div>
 

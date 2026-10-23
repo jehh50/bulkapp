@@ -1,15 +1,15 @@
-<script type="text/javascript" src="public/js/loader.js"></script>
+<script type="text/javascript" src="<?php echo asset('public/js/loader.js'); ?>"></script>
 <div class="container-fluid" style="margin-top:15px;">
   <div class="row">
-    <div class="col-xs-12 col-md-10 col-md-offset-1">
-      <div class="panel panel-default">
-        <div class="panel-body">
+    <div class="col-12 col-md-10 offset-md-1">
+      <div class="card">
+        <div class="card-body">
           <h2 class="text-center">Resumen de gestión por Contactos</h2>
           <hr>
           <form method="POST" action="?view=reportes&mode=contactabilidad">
             <div class="row">
 
-              <div class="form-group col-xs-12 col-sm-6 col-md-3">
+              <div class="mb-3 col-12 col-sm-6 col-md-3">
                 <label>Desde</label>
                 <input type="date"
                        class="form-control"
@@ -17,7 +17,7 @@
                        value="<?= $desde ?>">
               </div>
 
-              <div class="form-group col-xs-12 col-sm-6 col-md-3">
+              <div class="mb-3 col-12 col-sm-6 col-md-3">
                 <label>Hasta</label>
                 <input type="date"
                        class="form-control"
@@ -25,9 +25,9 @@
                        value="<?= $hasta ?>">
               </div>
 
-              <div class="form-group col-xs-12 col-sm-6 col-md-3">
+              <div class="mb-3 col-12 col-sm-6 col-md-3">
                 <label>Servicio</label>
-                <select class="form-control" name="servicio" required>
+                <select class="form-select" name="servicio" required>
                   <option value="" disabled selected>Seleccione...</option>
                   <?php foreach ($servicio as $s) { ?>
                     <option value="<?= $s['id']; ?>">
@@ -37,7 +37,7 @@
                 </select>
               </div>
 
-              <div class="form-group col-xs-12 col-sm-6 col-md-3" style="margin-top:25px;">
+              <div class="mb-3 col-12 col-sm-6 col-md-3" style="margin-top:25px;">
                 <button type="submit"
                         class="btn btn-success btn-block">
                   Buscar
@@ -56,17 +56,17 @@
 
 <div class="container-fluid">
   <div class="row">
-    <div class="col-xs-12 col-md-10 col-md-offset-1">
+    <div class="col-12 col-md-10 offset-md-1">
 
       <!-- NO CONTACTO -->
-      <div class="col-xs-12 col-md-6">
-        <div class="panel panel-danger">
-          <div class="panel-heading text-center">
+      <div class="col-12 col-md-6">
+        <div class="card">
+          <div class="card-header text-center">
             <strong>Gestión NO CONTACTO</strong>
           </div>
-          <div class="panel-body">
+          <div class="card-body">
             <div class="table-responsive">
-              <table class="table table-striped table-condensed">
+              <table class="table table-striped table-sm">
                 <thead>
                   <tr class="text-center">
                     <th>Descripción</th>
@@ -98,15 +98,15 @@
       </div>
 
       <!-- CONTACTO -->
-      <div class="col-xs-12 col-md-6">
-        <div class="panel panel-success">
-          <div class="panel-heading text-center">
+      <div class="col-12 col-md-6">
+        <div class="card">
+          <div class="card-header text-center">
             <strong>Gestión CONTACTO</strong>
           </div>
-          <div class="panel-body">
+          <div class="card-body">
 
             <div class="table-responsive">
-              <table class="table table-striped table-condensed">
+              <table class="table table-striped table-sm">
                 <thead>
                   <tr class="text-center">
                     <th>Descripción</th>

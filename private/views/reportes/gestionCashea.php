@@ -1,39 +1,39 @@
-<link href="public/css/jquery.datatables.min.css" rel="stylesheet">
+<link href="<?php echo asset('public/css/jquery.datatables.min.css'); ?>" rel="stylesheet">
 
 <div class="container" style="margin-top:1em;">
   <div class="row">
-    <div class="col-xs-12 col-sm-12 col-md-10 col-lg-12">
-      <div class="panel panel-default">
-        <div class="panel-body">
-          <div class="form-group">
+    <div class="col-12 col-sm-12 col-md-10 col-lg-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="mb-3">
             <section>
               <h1>Resumen de gestión CASHEA</h1>
             </section>
             <form name="resultados" method="POST" action="?view=reportes&mode=gestionCashea">
-              <div class="form-group">
-                <div class="form-group col-lg-3">
+              <div class="mb-3">
+                <div class="mb-3 col-lg-3">
                   <label>Desde</label>
                   <input type="date" class="form-control" aria-describedby="fecha_d" name="fecha_d" id="fecha_d" required autofocus />
                 </div>
-                <div class="form-group col-lg-3">
+                <div class="mb-3 col-lg-3">
                   <label>Hasta</label>
                   <input type="date" class="form-control" aria-describedby="fecha_h" name="fecha_h" id="fecha_h" required />
                 </div>
                   <input type="hidden" name="servicio" id="servicio" value="2">
               </div>
-              <div class="form-group col-lg-12">
+              <div class="mb-3 col-lg-12">
                 <input type="submit" class="btn btn-medium btn-success" value="Buscar" id="btn-buscar">
-                <a href="?view=reportes&mode=download&from=<?= date('Y-m-d', strtotime($desde)); ?>&to=<?= date('Y-m-d', strtotime($hasta)); ?>&servicio=2" class="btn btn-medium btn-info" id="btn-download">Descargar</a>
+                <a href="?view=reportes&mode=downloadCashea&from=<?= date('Y-m-d', strtotime($desde)); ?>&to=<?= date('Y-m-d', strtotime($hasta)); ?>" class="btn btn-medium btn-info" id="btn-download">Descargar</a>
               </div>
             </form>
-            <div class="form-group col-lg-12">
+            <div class="mb-3 col-lg-12">
             </div>
 
             <div class="table-responsive col-lg-12" style="max-height: 500px; overflow-y: auto; overflow-x: auto;">
               <?php if ($_POST) { ?>
                 <p class="sub-title">Total resultados: <?=count($ventas)?>. Período consultado <?= date('d-m-Y', strtotime($desde)); ?> - <?= date('d-m-Y', strtotime($hasta)) ?></p>
               <?php } ?>
-              <table class="table table-hover table-condensed" id="tableResult">
+              <table class="table table-hover table-sm" id="tableResult">
                 <thead>
                   <tr class="bg-success">
                     <th style="text-align: center;">#</th>
@@ -104,6 +104,6 @@ $(document).ready(function() {
 } );
 </script>
 
-<script src="public/js/download.js"></script>
-<script src="public/js/jquery.dataTables.min.js"></script>
+<script src="<?php echo asset('public/js/download.js'); ?>"></script>
+<script src="<?php echo asset('public/js/jquery.dataTables.min.js'); ?>"></script>
 

@@ -6,9 +6,9 @@
                <h1></h1>
             </header>
          </section>
-         <div class="panel panel-default">
-            <div class="panel-body">
-               <div class="form-group">
+         <div class="card">
+            <div class="card-body">
+               <div class="mb-3">
                   <section>
                      <label>
                         <h1>Bandeja de clientes a llamar luego</h1>
@@ -24,7 +24,7 @@
                   </form>
                   <div class="form-row col-lg-12">
                      <div style="overflow-y: scroll; height: 550px; margin-top: 10px;">
-                        <table class="table table-hover table-condensed table-responsive">
+                        <table class="table table-hover table-sm table-responsive">
                            <thead>
                               <tr>
                                  <th style="text-align: center;">

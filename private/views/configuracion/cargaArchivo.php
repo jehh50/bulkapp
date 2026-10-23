@@ -44,18 +44,18 @@ if (isset($_GET['estatus'])==200) {
 }
 ?>
 	<div class="row">
-		<div class="col-xs-12 col-sm-12 col-md-10 col-lg-12">
+		<div class="col-12 col-sm-12 col-md-10 col-lg-12">
 	    	<section class="container">
 	        	<header><h1></h1></header>
 	      	</section>
-	      	<div class="panel panel-default">
-	        	<div class="panel-body">
-	          		<div class="form-group">
+	      	<div class="card">
+	        	<div class="card-body">
+	          		<div class="mb-3">
 			            <section>
 			              	<label><h1>Carga de base de datos</h1></label>
 			            </section>
 						<div class="alert alert-info alert-dismissable" style="text-align: center; ">
-							<span class="">Recuerda que se debe guardar el archivo con extensión .csv</span>
+							<span>Recuerda que se debe guardar el archivo con extensión .csv</span>
 							<center><a href="?view=configuracion&mode=download">Descarga de archivo modelo</a></center>
 						</div>
 	          			<div class="row">
@@ -64,11 +64,11 @@ if (isset($_GET['estatus'])==200) {
 						<form id="formulario" onsubmit="return validacion();" action="?view=configuracion&mode=registro" method="POST" class="form-horizontal" enctype="multipart/form-data">
 							<center>
 							<div class="form-row">
-								<div class="col-md-offset-4 col-lg-offset-4 col-md-4 col-lg-4"> 
+								<div class="offset-md-4 offset-lg-4 col-md-4 col-lg-4"> 
 									<div class="form-row">
 											<div class="md-form">
 								                    <div class="row">
-									                    <select class="form-control" name="servicio" id="servicio" required>
+									                    <select class="form-select" name="servicio" id="servicio" required>
 										                      <?php foreach ($servicio as $s) { ?>
 									    	                  <option value='0' disabled selected style='display:none;'>Seleccione...</option>
 									        	              <option value='<?php echo $s['id'];?>'><?php echo $s['descripcion'];}?></option>

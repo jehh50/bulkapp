@@ -80,7 +80,12 @@ class phpAMI{
 	 * @param string $host Host a conertar
 	 * @param string $port Puerto a conectar 
 	 */
-	function __construct($username='javier',$password='javier1+',$host="192.168.5.100",$port="5038"){
+	function __construct($username=null,$password=null,$host=null,$port=null){
+		$username = ($username === null) ? env('AMI_USER', '') : $username;
+		$password = ($password === null) ? env('AMI_PASS', '') : $password;
+		$host = ($host === null) ? env('AMI_HOST', '192.168.5.100') : $host;
+		$port = ($port === null) ? env('AMI_PORT', '5038') : $port;
+
 		if($username != '' and $password != ''){
 			$this->USER=$username;
 			$this->SECRET=$password;

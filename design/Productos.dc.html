@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#f4f6fa;font-family:Poppins,system-ui,sans-serif;color:#252525}a{color:#1a4391}a:hover{color:#12306b}input[type=checkbox]{width:18px;height:18px;accent-color:#1a4391;cursor:pointer}</style>
+</helmet>
+<nav style="background:#12306b;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 {{ padX }}px;position:relative;z-index:10">
+  <a href="Dashboard.dc.html" style="display:flex;align-items:center;gap:10px;color:#fff;font-weight:700;font-size:18px;text-decoration:none"><span style="width:28px;height:28px;border-radius:8px;background:#f5b83d;color:#12306b;display:flex;align-items:center;justify-content:center;font-size:15px">B</span>Bulksales</a>
+  <button onClick="{{ toggleMenu }}" aria-label="Menú" style="display:{{ toggleDisplay }};width:44px;height:44px;border:1px solid #2d57a8;border-radius:10px;background:transparent;cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:0">
+    <span style="width:20px;height:2px;background:#fff;border-radius:1px;transform:{{ bar1 }};transition:transform .2s"></span>
+    <span style="width:20px;height:2px;background:#fff;border-radius:1px;opacity:{{ bar2 }};transition:opacity .2s"></span>
+    <span style="width:20px;height:2px;background:#fff;border-radius:1px;transform:{{ bar3 }};transition:transform .2s"></span>
+  </button>
+  <div style="display:{{ linksDisplay }};flex-direction:{{ linksDir }};gap:{{ linksGap }}px;font-size:14px;color:#c9d6f0;align-items:stretch;height:{{ linksH }};position:{{ linksPos }};top:56px;left:0;right:0;background:#12306b;padding:{{ linksPad }};box-shadow:{{ linksShadow }}">
+    <a href="Dashboard.dc.html" style="display:flex;align-items:center;padding:{{ itemPad }};text-decoration:none;color:inherit;">Dashboard</a>
+    <span style="display:flex;align-items:center;padding:{{ itemPad }}">Formulario</span>
+    <span style="display:flex;align-items:center;padding:{{ itemPad }};color:#fff;box-shadow:{{ activeShadow }}">Configuración ▾</span>
+    <div style="position:{{ repWrapPos }};display:flex;flex-direction:column;align-items:stretch">
+      <div onClick="{{ repToggle }}" style="display:flex;align-items:center;justify-content:space-between;gap:6px;padding:{{ itemPad }};cursor:pointer;height:{{ repRowH }}">Reportes <span style="font-size:11px">▾</span></div>
+      <div style="display:{{ repDisplay }};position:{{ repPanelPos }};top:56px;left:0;min-width:240px;background:{{ repBg }};color:{{ repColor }};border-radius:0 0 12px 12px;box-shadow:{{ repShadow }};padding:6px;flex-direction:column;gap:2px">
+        <a href="Resumen de gestion.dc.html" style="display:block;text-decoration:none;color:inherit;padding:10px 14px;border-radius:8px" style-hover="background:rgba(245,184,61,.25)">Acumulado de gestión</a>
+        <a href="Detalle de ventas.dc.html" style="display:block;text-decoration:none;color:inherit;padding:10px 14px;border-radius:8px" style-hover="background:rgba(245,184,61,.25)">Detalle de ventas</a>
+        <a href="Listado de ventas.dc.html" style="display:block;text-decoration:none;color:inherit;padding:10px 14px;border-radius:8px" style-hover="background:rgba(245,184,61,.25)">Listado de ventas</a>
+        <a href="Desbloqueo de clientes.dc.html" style="display:block;text-decoration:none;color:inherit;padding:10px 14px;border-radius:8px" style-hover="background:rgba(245,184,61,.25)">Desbloqueo de cliente</a>
+      </div>
+    </div>
+    <span style="display:flex;align-items:center;padding:{{ itemPad }};color:#fff;font-weight:500">javier ▾</span>
+  </div>
+</nav>
+<header style="background:#1a4391;padding:{{ heroPad }};color:#fff">
+  <div style="max-width:1100px;margin:0 auto">
+    <div style="font-size:13px;color:#c9d6f0;margin-bottom:6px">Configuración / Productos{{ crumb }}</div>
+    <h1 style="margin:0;font-size:{{ h1Size }}px;font-weight:600;line-height:1.2">{{ title }}</h1>
+    <div style="font-size:14px;color:#c9d6f0;margin-top:6px">{{ subtitle }}</div>
+  </div>
+</header>
+<main style="max-width:1100px;margin:-48px auto 40px;padding:0 {{ mainPad }}px">
+  <div style="display:{{ toastDisplay }};align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;padding:12px 16px;border-radius:12px;background:#d3f0e6;border:1px solid #a9dcc8;font-size:14px;box-shadow:0 4px 12px rgba(18,48,107,.1)"><span>✓ {{ toast }}</span><button onClick="{{ closeToast }}" aria-label="Cerrar" style="border:0;background:transparent;font-size:18px;cursor:pointer;color:#252525;width:32px;height:32px">×</button></div>
+
+  <section style="display:{{ listDisplay }};background:#fff;border-radius:16px;box-shadow:0 8px 24px rgba(18,48,107,.12);padding:{{ cardPad }};flex-direction:column;gap:16px">
+    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
+      <input value="{{ q }}" onChange="{{ setQ }}" placeholder="Buscar producto, código, plan…" style="flex:1 1 220px;max-width:360px;height:44px;border:1px solid #d1d5db;border-radius:10px;padding:0 14px;font:inherit;font-size:14px;color:#252525" style-focus="border-color:#1a4391;outline:2px solid #c9d6f0">
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button onClick="{{ editSelected }}" style="height:44px;padding:0 18px;border:0;border-radius:10px;background:{{ selBg }};color:{{ selColor }};font:inherit;font-size:14px;font-weight:600;cursor:pointer">{{ selLabel }}</button>
+        <button onClick="{{ goCreate }}" style="height:44px;padding:0 18px;border:0;border-radius:10px;background:#f5b83d;color:#252525;font:inherit;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#e9a924">+ Agregar productos</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto;border:1px solid #dfe5f2;border-radius:12px">
+      <table style="width:100%;min-width:780px;border-collapse:collapse;font-size:14px">
+        <thead><tr style="background:#f1f4fa;text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px">
+          <th style="padding:12px 14px;width:44px"><input type="checkbox" checked="{{ allChecked }}" onChange="{{ toggleAll }}" aria-label="Seleccionar todos"></th>
+          <th style="padding:12px 8px">#</th><th style="padding:12px 14px">Nombre</th><th style="padding:12px 14px">Código</th><th style="padding:12px 14px;text-align:right">Costo</th><th style="padding:12px 14px">Fecha activación</th><th style="padding:12px 14px">Plan</th><th style="padding:12px 14px">Servicio</th><th style="padding:12px 14px;text-align:center">Editar</th>
+        </tr></thead>
+        <tbody>
+          <sc-for list="{{ rows }}" as="p" hint-placeholder-count="3">
+            <tr style="border-top:1px solid #eef0f4;background:{{ p.bg }}">
+              <td style="padding:10px 14px"><input type="checkbox" checked="{{ p.checked }}" onChange="{{ p.onCheck }}" aria-label="Seleccionar {{ p.nombre }}"></td>
+              <td style="padding:10px 8px">{{ p.id }}</td><td style="padding:10px 14px;font-weight:500">{{ p.nombre }}</td><td style="padding:10px 14px">{{ p.codigo }}</td><td style="padding:10px 14px;text-align:right">{{ p.precioF }}</td><td style="padding:10px 14px">{{ p.fecha }}</td><td style="padding:10px 14px">{{ p.plan }}</td>
+              <td style="padding:10px 14px"><span style="font-size:12px;font-weight:600;padding:3px 12px;border-radius:20px;background:#e8eefb;color:#1a4391;white-space:nowrap">{{ p.servicio }}</span></td>
+              <td style="padding:10px 14px;text-align:center"><button onClick="{{ p.onEdit }}" aria-label="Editar {{ p.nombre }}" style="width:36px;height:36px;border:0;border-radius:8px;background:#1a4391;color:#fff;font-size:15px;cursor:pointer" style-hover="background:#12306b">✎</button></td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+      <div style="display:{{ emptyDisplay }};padding:28px;text-align:center;font-size:14px">Sin resultados.</div>
+    </div>
+    <div style="font-size:13px">Mostrando {{ count }} de {{ total }} productos activos</div>
+  </section>
+
+  <section style="display:{{ formDisplay }};background:#fff;border-radius:16px;box-shadow:0 8px 24px rgba(18,48,107,.12);padding:{{ cardPad }};flex-direction:column;gap:18px">
+    <label style="display:{{ svcDisplay }};flex-direction:column;gap:8px;font-size:14px;font-weight:600;max-width:360px">Servicio
+      <select value="{{ cSvc }}" onChange="{{ setCSvc }}" style="height:46px;border:1px solid #d1d5db;border-radius:10px;padding:0 12px;font:inherit;font-size:15px;font-weight:400;color:#252525;background:#fff" style-focus="border-color:#1a4391;outline:2px solid #c9d6f0">
+        <sc-for list="{{ services }}" as="s" hint-placeholder-count="2"><option value="{{ s }}">{{ s }}</option></sc-for>
+      </select>
+    </label>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <sc-for list="{{ drafts }}" as="r" hint-placeholder-count="1">
+        <div style="border:1px solid #dfe5f2;border-radius:12px;overflow:hidden">
+          <div style="background:#f1f4fa;padding:8px 8px 8px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:36px"><span style="font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.5px">{{ r.head }}</span><button onClick="{{ r.onRemove }}" style="display:{{ r.rmDisplay }};height:36px;padding:0 14px;border:0;border-radius:8px;background:#fde0e0;color:#b42318;font:inherit;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#f9caca">− Quitar</button></div>
+          <div style="padding:14px 16px;display:grid;grid-template-columns:{{ fieldCols }};gap:12px 14px">
+            <label style="display:{{ r.svcShow }};flex-direction:column;gap:6px;font-size:13px;font-weight:600">Servicio<input value="{{ r.servicio }}" readonly style="height:44px;border:1px solid #e1e5ee;border-radius:10px;padding:0 12px;font:inherit;font-size:14px;font-weight:400;color:#252525;background:#f1f4fa"></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;grid-column:{{ nameSpan }}">Nombre<input value="{{ r.nombre }}" onChange="{{ r.setNombre }}" placeholder="PRODUCTO 1" style="height:44px;border:1px solid {{ r.bNombre }};border-radius:10px;padding:0 12px;font:inherit;font-size:14px;font-weight:400;color:#252525" style-focus="border-color:#1a4391;outline:2px solid #c9d6f0"></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600">Código<input value="{{ r.codigo }}" onChange="{{ r.setCodigo }}" placeholder="025" style="height:44px;border:1px solid {{ r.bCodigo }};border-radius:10px;padding:0 12px;font:inherit;font-size:14px;font-weight:400;color:#252525" style-focus="border-color:#1a4391;outline:2px solid #c9d6f0"></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600">Precio<input value="{{ r.precio }}" onChange="{{ r.setPrecio }}" inputmode="decimal" placeholder="12345.67" style="height:44px;border:1px solid {{ r.bPrecio }};border-radius:10px;padding:0 12px;font:inherit;font-size:14px;font-weight:400;color:#252525" style-focus="border-color:#1a4391;outline:2px solid #c9d6f0"></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600">Plan<input value="{{ r.plan }}" onChange="{{ r.setPlan }}" placeholder="54A" style="height:44px;border:1px solid {{ r.bPlan }};border-radius:10px;padding:0 12px;font:inherit;font-size:14px;font-weight:400;color:#252525" style-focus="border-color:#1a4391;outline:2px solid #c9d6f0"></label>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:{{ addDisplay }}"><button onClick="{{ addRow }}" style="height:44px;padding:0 18px;border:1px dashed #1a4391;border-radius:10px;background:#f4f7fd;color:#1a4391;font:inherit;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#e8eefb">+ Agregar otro producto</button></div>
+    <div style="display:{{ errDisplay }};padding:12px 16px;border-radius:10px;background:#fdecec;border:1px solid #f3c2c2;font-size:14px">{{ error }}</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;border-top:1px solid #eef0f4;padding-top:18px">
+      <button onClick="{{ goList }}" style="height:46px;padding:0 22px;border:1px solid #d1d5db;border-radius:10px;background:#fff;color:#252525;font:inherit;font-size:15px;font-weight:500;cursor:pointer" style-hover="background:#f4f6fa">Regresar</button>
+      <button onClick="{{ save }}" style="height:46px;padding:0 26px;border:0;border-radius:10px;background:#1a4391;color:#fff;font:inherit;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#12306b">{{ saveLabel }}</button>
+    </div>
+  </section>
+</main>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { w: 1200, menu: false, rep: false, view: 'list', q: '', sel: [], toast: '', error: '', cSvc: 'Bancaribe', drafts: [], seq: 1,
+    products: [
+      { id: 7, nombre: 'PLAN CONSULTAS MÉDICAS FAMILIAR', codigo: '54', precio: '4.96', fecha: '2026-05-31', plan: 'PF23', servicio: 'Bancaribe' },
+      { id: 8, nombre: 'PLAN ODONTOLÓGICO', codigo: '73', precio: '4.99', fecha: '2026-08-03', plan: 'PF27', servicio: 'Bancaribe' },
+      { id: 9, nombre: 'PLAN ODONTOLÓGICO', codigo: '11', precio: '4.99', fecha: '2026-08-03', plan: 'SO06', servicio: 'Banco Activo' }
+    ] };
+  services = ['Bancaribe', 'Banco Activo'];
+  blank = () => { const k = this.state.seq + 1; this.setState({ seq: k }); return { k, nombre: '', codigo: '', precio: '', plan: '', bad: {} }; };
+  componentDidMount() {
+    this.onR = () => this.setState({ w: window.innerWidth });
+    window.addEventListener('resize', this.onR); this.onR();
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this.onR); }
+  upd = (k, f, v) => this.setState(s => ({ error: '', drafts: s.drafts.map(d => d.k === k ? { ...d, [f]: v, bad: { ...d.bad, [f]: false } } : d) }));
+  renderVals() {
+    const s = this.state, m = s.w < 768, o = s.menu, v = s.view, edit = v === 'edit', create = v === 'create';
+    const q = s.q.trim().toLowerCase();
+    const filtered = s.products.filter(p => !q || [p.nombre, p.codigo, p.plan, p.servicio, p.fecha].join(' ').toLowerCase().includes(q));
+    const rows = filtered.map(p => ({ ...p, precioF: Number(p.precio).toFixed(2), checked: s.sel.includes(p.id), bg: s.sel.includes(p.id) ? '#f4f7fd' : '#fff',
+      onCheck: () => this.setState(st => ({ sel: st.sel.includes(p.id) ? st.sel.filter(x => x !== p.id) : [...st.sel, p.id] })),
+      onEdit: () => this.setState({ view: 'edit', error: '', toast: '', drafts: [{ k: p.id, id: p.id, servicio: p.servicio, nombre: p.nombre, codigo: p.codigo, precio: p.precio, plan: p.plan, bad: {} }] }) }));
+    const drafts = s.drafts.map((d, i) => ({ ...d, head: edit ? '#' + d.id + ' · ' + d.servicio : 'Producto ' + (i + 1), svcShow: edit ? 'flex' : 'none',
+      rmDisplay: create && s.drafts.length > 1 ? 'inline-block' : 'none', onRemove: () => this.setState(st => ({ drafts: st.drafts.filter(x => x.k !== d.k) })),
+      setNombre: e => this.upd(d.k, 'nombre', e.target.value), setCodigo: e => this.upd(d.k, 'codigo', e.target.value), setPrecio: e => this.upd(d.k, 'precio', e.target.value), setPlan: e => this.upd(d.k, 'plan', e.target.value),
+      bNombre: d.bad.nombre ? '#d92d20' : '#d1d5db', bCodigo: d.bad.codigo ? '#d92d20' : '#d1d5db', bPrecio: d.bad.precio ? '#d92d20' : '#d1d5db', bPlan: d.bad.plan ? '#d92d20' : '#d1d5db' }));
+    const goList = () => this.setState({ view: 'list', error: '' });
+    const n = s.sel.length;
+    return {
+      rows, drafts, services: this.services, count: filtered.length, total: s.products.length, emptyDisplay: filtered.length ? 'none' : 'block',
+      q: s.q, setQ: e => this.setState({ q: e.target.value }),
+      allChecked: filtered.length > 0 && filtered.every(p => s.sel.includes(p.id)),
+      toggleAll: () => this.setState(st => ({ sel: filtered.every(p => st.sel.includes(p.id)) ? [] : filtered.map(p => p.id) })),
+      selLabel: n ? 'Editar seleccionados (' + n + ')' : 'Editar seleccionados', selBg: n ? '#1a4391' : '#e4e8f0', selColor: n ? '#fff' : '#252525',
+      editSelected: () => { if (!n) return; this.setState({ view: 'edit', error: '', toast: '', drafts: s.products.filter(p => s.sel.includes(p.id)).map(p => ({ k: p.id, id: p.id, servicio: p.servicio, nombre: p.nombre, codigo: p.codigo, precio: p.precio, plan: p.plan, bad: {} })) }); },
+      goCreate: () => this.setState({ view: 'create', error: '', toast: '', drafts: [this.blank()] }),
+      addRow: () => this.setState(st => ({ drafts: [...st.drafts, this.blank()] })),
+      goList, cSvc: s.cSvc, setCSvc: e => this.setState({ cSvc: e.target.value }),
+      save: () => {
+        let bad = false;
+        const dr = s.drafts.map(d => { const b = { nombre: !d.nombre.trim(), codigo: !d.codigo.trim(), precio: !d.precio.trim() || isNaN(Number(d.precio)), plan: !d.plan.trim() }; if (Object.values(b).some(Boolean)) bad = true; return { ...d, bad: b }; });
+        if (bad) return this.setState({ drafts: dr, error: 'Completa los campos marcados. El precio debe ser un número.' });
+        if (create) {
+          const base = Math.max(0, ...s.products.map(p => p.id));
+          const add = dr.map((d, i) => ({ id: base + i + 1, nombre: d.nombre.trim().toUpperCase(), codigo: d.codigo.trim(), precio: d.precio.trim(), fecha: '2026-10-19', plan: d.plan.trim().toUpperCase(), servicio: s.cSvc }));
+          this.setState({ products: [...s.products, ...add], view: 'list', sel: [], toast: add.length + (add.length > 1 ? ' productos creados' : ' producto creado') + ' en ' + s.cSvc + '.' });
+        } else {
+          this.setState({ products: s.products.map(p => { const d = dr.find(x => x.id === p.id); return d ? { ...p, nombre: d.nombre.trim().toUpperCase(), codigo: d.codigo.trim(), precio: d.precio.trim(), plan: d.plan.trim().toUpperCase() } : p; }), view: 'list', sel: [], toast: dr.length + (dr.length > 1 ? ' productos actualizados.' : ' producto actualizado.') });
+        }
+      },
+      saveLabel: edit ? 'Actualizar' : 'Guardar', addDisplay: create ? 'block' : 'none', svcDisplay: create ? 'flex' : 'none',
+      error: s.error, errDisplay: s.error ? 'block' : 'none', toast: s.toast, toastDisplay: s.toast && v === 'list' ? 'flex' : 'none', closeToast: () => this.setState({ toast: '' }),
+      listDisplay: v === 'list' ? 'flex' : 'none', formDisplay: v === 'list' ? 'none' : 'flex',
+      title: v === 'list' ? 'Productos activos' : create ? 'Nuevo producto' : (s.drafts.length > 1 ? 'Edición de ' + s.drafts.length + ' productos' : 'Edición de producto'),
+      subtitle: v === 'list' ? 'Consulta, crea y edita los productos de cada servicio.' : create ? 'Agrega uno o varios productos al servicio elegido.' : 'Modifica nombre, código, precio y plan. El servicio no se puede cambiar.',
+      crumb: v === 'list' ? '' : create ? ' / Nuevo' : ' / Edición',
+      fieldCols: m ? '1fr 1fr' : edit ? '1.1fr 2fr 1fr 1fr 1fr' : '3fr 1fr 1fr 1fr', nameSpan: m ? '1 / -1' : 'auto',
+      repWrapPos: m ? 'static' : 'relative', repRowH: m ? 'auto' : '56px',
+      repToggle: () => this.setState(st => ({ rep: !st.rep })),
+      repDisplay: s.rep ? 'flex' : 'none', repPanelPos: m ? 'static' : 'absolute', repBg: m ? '#1a3f85' : '#fff', repColor: m ? '#e6ecf8' : '#252525', repShadow: m ? 'none' : '0 12px 24px rgba(0,0,0,.25)',
+      padX: m ? 16 : 32, mainPad: m ? 16 : 24, cardPad: m ? '20px 16px' : '28px 28px', heroPad: m ? '24px 16px 72px' : '36px 32px 80px', h1Size: m ? 24 : 30,
+      toggleDisplay: m ? 'flex' : 'none', toggleMenu: () => this.setState(st => ({ menu: !st.menu })),
+      bar1: m && o ? 'translateY(7px) rotate(45deg)' : 'none', bar2: m && o ? 0 : 1, bar3: m && o ? 'translateY(-7px) rotate(-45deg)' : 'none',
+      linksDisplay: m && !o ? 'none' : 'flex', linksDir: m ? 'column' : 'row', linksGap: m ? 0 : 28, linksH: m ? 'auto' : '56px',
+      linksPos: m ? 'absolute' : 'static', linksPad: m ? '8px 0' : '0', linksShadow: m ? '0 12px 20px rgba(0,0,0,.25)' : 'none',
+      itemPad: m ? '14px 16px' : '0', activeShadow: m ? 'inset 4px 0 0 #f5b83d' : 'inset 0 -3px 0 #f5b83d'
+    };
+  }
+}
+</script>
+</body>
+</html>

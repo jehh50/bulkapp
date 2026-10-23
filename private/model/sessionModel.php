@@ -1,34 +1,23 @@
-<?php 
+<?php
 class database{
-  
+
   private $db;
 
   public function __construct() {
     $this->db = new Conexion();
   }
 
- 	public function sessionLogin($u){
-	    $sql = $this->db->query("SELECT * FROM users WHERE user = '$u'");
-	    if ($this->db->rows($sql) > 0) {
-	      while($data = $this->db->recorrer($sql)){
-	        $respuesta[] = $data;  
-	      }
-	    }
-	    else{
-	      $respuesta = false;
-	    }
-	    return  $respuesta;
-  	}
+	public function sessionLogin(string $u){
+	    $sql = "SELECT * FROM users WHERE user = ?";
+	    $data = $this->db->selectQuery($sql, [$u], 's');
+	    return !empty($data) ? $data[0] : false;
+	}
 
-  	public function sessionNew($u,$p_md5){
-		$sql = $this->db->query("SELECT * FROM users WHERE user = '$u' AND password = '$p_md5'");
-	    if ($this->db->rows($sql) > 0) {
-	     return $this->db->recorrer($sql);
-	    }
-	    else{
-	      return false;
-	    }
-  	}
-  	
+	public function updatePass(int $id, string $hash): bool
+	{
+		$this->db->preparedQuery("UPDATE users SET password = ? WHERE id = ?", [$hash, $id], 'ss');
+		return true;
+	}
+
 
  }

@@ -1,15 +1,15 @@
-<link href="public/css/jquery.datatables.min.css" rel="stylesheet">
-<script src="public/js/fieldsValidation.js"></script>
+<link href="<?php echo asset('public/css/jquery.datatables.min.css'); ?>" rel="stylesheet">
+<script src="<?php echo asset('public/js/fieldsValidation.js'); ?>"></script>
 
 
 <div class="container" style="margin-top:20px;">
   <div class="row">
     <div class="col-lg-12">
-      <div class="panel panel-default">
-        <div class="panel-body">
-          <div class="form-group">
+      <div class="card">
+        <div class="card-body">
+          <div class="mb-3">
             <form name="form1" id="form1" method="POST" action="?view=formulario&mode=buscarCliente" autocomplete="off">
-              <div class="row ">
+              <div class="row">
                 <div class="col-sm-6 col-md-4 col-lg-3">
                   <h5>Número de cédula</h5>
                   <input type="text" class="form-control" placeholder="12624422" aria-describedby="dni" name="dni" id="dni" maxlength="11" autofocus style="margin-bottom: 5px;" required />
@@ -27,10 +27,10 @@
         <?php
         if (empty($cliente) && empty($msg)) {
         } elseif ($msg) { ?>
-          <div class="panel-body">
-            <div class="form-group">
+          <div class="card-body">
+            <div class="mb-3">
               <div class="row">
-                <div class="col-xs-10 col-sm-11 col-md-12 col-lg-12">
+                <div class="col-10 col-sm-11 col-md-12 col-lg-12">
                   <div class='alert alert-success' role='alert'><?= $msg; ?></div>
                 </div>
               </div>
@@ -38,10 +38,10 @@
           </div>
           <?php } else {
           if ($msg) { ?>
-            <div class="panel-body">
-              <div class="form-group">
+            <div class="card-body">
+              <div class="mb-3">
                 <div class="row">
-                  <div class="col-xs-10 col-sm-11 col-md-12 col-lg-12">
+                  <div class="col-10 col-sm-11 col-md-12 col-lg-12">
                     <div class='alert alert-danger' role='alert'><?= $msg; ?></div>
                   </div>
                 </div>
@@ -53,8 +53,8 @@
           <div class="row" id="formularioCliente" style="padding-left: 20px;">
             <!-- Columna Izquierda: Tabla de compras -->
             <div class="col-lg-8 col-md-7 col-sm-11">
-              <div class="panel panel-default">
-                <div class="panel-body">
+              <div class="card">
+                <div class="card-body">
                   <div class="alert" style="background:#b9c1db63;" role="alert" id="customerData">
                     <span id="customer">
                       <?php
@@ -94,7 +94,7 @@
                         if (!in_array($c['local_origen'], $locales)) {
                           $locales[] = $c['local_origen'];
                           $tabId = str_replace(' ', '', $c['local_origen']);
-                          echo '<li class="' . ($firstTab ? 'active' : '') . '"><a href="#' . $tabId . '" data-toggle="tab">' . $c['local_origen'] . '</a></li>';
+                          echo '<li class="' . ($firstTab ? 'active' : '') . '"><a href="#' . $tabId . '" data-bs-toggle="tab">' . $c['local_origen'] . '</a></li>';
                           $firstTab = false;
                         }
                       }
@@ -109,8 +109,8 @@
                       if (!in_array($c['local_origen'], $locales)) {
                         $locales[] = $c['local_origen'];
                         $tabId = str_replace(' ', '', $c['local_origen']);
-                        echo '<div class="tab-pane fade' . ($firstPane ? ' in active' : '') . '" id="' . $tabId . '">';
-                        echo '<table class="table table-responsive table-striped table-condensed">';
+                        echo '<div class="tab-pane fade' . ($firstPane ? ' show active' : '') . '" id="' . $tabId . '">';
+                        echo '<table class="table table-responsive table-striped table-sm">';
                         echo '<thead>
                           <tr>
                             <th class="text-center"><h5><strong>ID Cuota</strong></h5></th>
@@ -144,7 +144,7 @@
                           }
                         }
                         echo '<tr>
-                                    <td colspan="3" class="text-right"><strong>Total</strong></td>
+                                    <td colspan="3" class="text-end"><strong>Total</strong></td>
                                     <td class="text-center"><strong>' . $suma_monto . '</strong></td>
                                     <td colspan="4"></td>
                                   </tr>';
@@ -155,9 +155,9 @@
                     ?>
                   </div>
                 </div>
-                <div class="panel-body">
+                <div class="card-body">
                   <div class="alert" style="background:#b9c1db63;">
-                  <h4><span class="form-group"><strong>Historial de gestiones</strong></span></h4>
+                  <h4><span class="mb-3"><strong>Historial de gestiones</strong></span></h4>
                   <!-- Tabla de historial de gestiones -->
                   <table class="table table-striped" id="historyTable">
                     <thead>
@@ -203,38 +203,38 @@
               </div>
             </div>
             <!-- Columna Derecha: Formulario -->
-            <div class="col-lg-3 col-md-4 col-sm-11 col-xs-11" style="float:none; display:inline-block; vertical-align:top; margin-bottom:20px;">
-              <div class="panel panel-default">
-                <div class="panel-body" style="background-color: #b9c1db63;">
+            <div class="col-lg-3 col-md-4 col-sm-11 col-11" style="float:none; display:inline-block; vertical-align:top; margin-bottom:20px;">
+              <div class="card">
+                <div class="card-body" style="background-color: #b9c1db63;">
                   <form name="form2" enctype="multipart/form-data" method="POST" onsubmit="return validateForm2();" action="?view=formulario&mode=registro" autocomplete="off">
                     <input type="hidden" id="dni_cliente" name="dni_cliente" value="<?php echo $cliente[0]['cedula']; ?>">
                     <input type="hidden" id="id_cliente" name="id_cliente" value="<?php echo $cliente[0]['id']; ?>">
                     <input type="hidden" id="usuario" name="usuario" value="<?php echo $_SESSION['id']; ?>">
                     <input type="hidden" id="servicio" name="servicio" value="<?php echo isset($_SESSION['servicio_id']) ? $_SESSION['servicio_id'] : ''; ?>">
 
-                    <h3 class="mb-3"><span class="form-group"><strong>Datos de contacto</strong></span></h3>
+                    <h3 class="mb-3"><span class="mb-3"><strong>Datos de contacto</strong></span></h3>
 
-                    <div class="form-group mb-3" id="d_gestion">
+                    <div class="mb-3" id="d_gestion">
                       <label class="form-label">Tipo de gestión</label>
-                      <select class="form-control" name="gestion" id="gestion" required>
+                      <select class="form-select" name="gestion" id="gestion" required>
                           <option value='' disabled selected style='display:none;'>Seleccione...</option>
                           <option value='telefonica'>Atención telefónica</option>
                           <option value='whastapp'>WhastApp</option>
                       </select>
                     </div>
 
-                    <div class="form-group mb-3">
+                    <div class="mb-3">
                       <label class="form-label">Contacto Efectivo</label>
-                      <select class="form-control" name="contacto" id="contacto" required>
+                      <select class="form-select" name="contacto" id="contacto" required>
                         <option value='' disabled selected style='display:none;'>Seleccione...</option>
                         <option value='1'>Si</option>
                         <option value='0'>No</option>
                       </select>
                     </div>
 
-                    <div class="form-group mb-3" id="d_efectivo">
+                    <div class="mb-3" id="d_efectivo">
                       <label class="form-label">Tipo de contacto</label>
-                      <select class="form-control" name="efectivo" id="efectivo">
+                      <select class="form-select" name="efectivo" id="efectivo">
                         <?php foreach ($efectivo as $e) { ?>
                           <option value='' disabled selected style='display:none;'>Seleccione...</option>
                           <option value='<?php echo $e['id']; ?>'><?php echo $e['descripcion']; ?></option>
@@ -242,9 +242,9 @@
                       </select>
                     </div>
 
-                    <div class="form-group mb-3" id="d_subContacto">
+                    <div class="mb-3" id="d_subContacto">
                       <label class="form-label">Motivo de contacto</label>
-                      <select class="form-control" name="subContacto" id="subContacto">
+                      <select class="form-select" name="subContacto" id="subContacto">
                         <?php foreach ($subContacto as $s) { ?>
                           <option value='' disabled selected style='display:none;'>Seleccione...</option>
                           <option value='<?php echo $s['id']; ?>'><?php echo $s['descripcion']; ?></option>
@@ -252,9 +252,9 @@
                       </select>
                     </div>
 
-                    <div class="form-group mb-3" id="d_noefectivo">
+                    <div class="mb-3" id="d_noefectivo">
                       <label class="form-label">Motivo de NO contacto</label>
-                      <select class="form-control" name="noefectivo" id="noefectivo">
+                      <select class="form-select" name="noefectivo" id="noefectivo">
                         <?php foreach ($noefectivo as $ne) { ?>
                           <option value='' disabled selected style='display:none;'>Seleccione...</option>
                           <option value='<?php echo $ne['id']; ?>'><?php echo $ne['descripcion']; ?></option>
@@ -264,12 +264,12 @@
 
                     <div id="formulario">
                       <section>
-                        <h4 style="margin-top:5px;"><span class="form-group" id="formTitle"><strong>Gestión de Cobranza</strong></span></h4>
+                        <h4 style="margin-top:5px;"><span class="mb-3" id="formTitle"><strong>Gestión de Cobranza</strong></span></h4>
                       </section>
 
-                      <div class="form-group mb-3" id="dPaymentPlan">
+                      <div class="mb-3" id="dPaymentPlan">
                         <label class="form-label">Plan de pago</label>
-                        <select class="form-control" name="paymentPlan" id="paymentPlan">
+                        <select class="form-select" name="paymentPlan" id="paymentPlan">
                           <option value=''>Seleccione...</option>
                           <option value='1'>Monto total</option>
                           <option value='2'>Cuota</option>
@@ -277,12 +277,12 @@
                         </select>
                       </div>
 
-                      <div class="form-group mb-3" id="dQuote">
+                      <div class="mb-3" id="dQuote">
                         <label class="form-label">ID de la cuota</label>
-                        <select class="form-control" name="idQuote[]" id="idQuote" multiple>
+                        <select class="form-select" name="idQuote[]" id="idQuote" multiple>
                           <?php
                           foreach ($cliente as $c) {
-                            if ($c['status_id'] == 9 || $c['status_id'] == 7) {
+                            if ($c['status_id'] == Constantes::ESTADO_COMPROMISO_PAGO || $c['status_id'] == Constantes::ESTADO_ATENDIDO) {
                             } else {
                               echo "<option value='" . $c['id_cuota'] . '|' . $c['plata_por_cobrar'] . "'>" . $c['id_cuota'] . " - " . $c['plata_por_cobrar'] . "</option>";
                             }
@@ -292,12 +292,12 @@
                       </div>
                     </div>
 
-                    <div class="form-group mb-3" id="dAmount">
+                    <div class="mb-3" id="dAmount">
                       <label class="form-label">Monto a abonar</label>
                       <input type="text" class="form-control" placeholder="545" aria-describedby="amount" name="amount" id="amount" oninput="onlyNumbers(this)" />
                     </div>
 
-                    <div class="form-group mb-3" id="dPaymentDate">
+                    <div class="mb-3" id="dPaymentDate">
                       <label class="form-label">Fecha de compromiso</label>
                       <ul class="list-unstyled">
                         <?php
@@ -312,14 +312,14 @@
                       </ul>
                     </div>
 
-                    <div class="form-group mb-3" id="dFullName">
+                    <div class="mb-3" id="dFullName">
                       <label class="form-label">Nombre y apellido</label>
                       <input type="text" class="form-control" placeholder="Simón Díaz" aria-describedby="fullName" name="fullName" id="fullName" oninput="onlyLetters(this)" />
                     </div>
 
-                    <div class="form-group mb-3" id="dRelationship">
+                    <div class="mb-3" id="dRelationship">
                       <label class="form-label">Parentesco</label>
-                      <select class="form-control" name="relationship" id="relationship">
+                      <select class="form-select" name="relationship" id="relationship">
                         <option value=''>Seleccione...</option>
                         <option value='PADRE'>Padre</option>
                         <option value='MADRE'>Madre</option>
@@ -330,7 +330,7 @@
                       </select>
                     </div>
 
-                    <div class="form-group mb-3" id="dObservaciones">
+                    <div class="mb-3" id="dObservaciones">
                       <label class="form-label">Observaciones</label>
                       <textarea class="form-control" rows=3 maxlength="250" name="observaciones" id="observaciones" oninput="upperCase(this);"></textarea>
                     </div>
@@ -374,5 +374,5 @@
       } );
     } );
 </script>
-<script src="public/js/formularioC.js"></script>
-<script src="public/js/jquery.dataTables.min.js"></script>
+<script src="<?php echo asset('public/js/formularioC.js'); ?>"></script>
+<script src="<?php echo asset('public/js/jquery.dataTables.min.js'); ?>"></script>

@@ -1,10 +1,10 @@
-<link href="public/css/jquery.datatables.min.css" rel="stylesheet">
+<link href="<?php echo asset('public/css/jquery.datatables.min.css'); ?>" rel="stylesheet">
 <div class="container">
   <div class="row" style="margin-top:1.5em">
     <div class="col-sm-12 col-md-12 col-lg-12">
-      <div class="panel panel-default">
-        <div class="panel-body">
-          <div class="form-group">
+      <div class="card">
+        <div class="card-body">
+          <div class="mb-3">
             <section>
               <label>
                 <h1>Registros a cargar</h1>
@@ -48,7 +48,7 @@
                   </tbody>
                 </table>
               <?php } else { ?>
-                <table id="example" class="hover ">
+                <table id="example" class="hover">
                   <thead>
                     <tr>
                       <th>#</th>
@@ -88,11 +88,11 @@
               <?php } ?>
 
               <div class="row" style="margin-top: 20px;">
-                <div class="col-sm-6 text-left">
+                <div class="col-sm-6 text-start">
                   <a href="?view=configuracion&mode=cargaArchivo" class="btn btn-sm btn-primary">Regresar</a>
                 </div>
-                <div class="col-sm-6 text-right">
-                  <input type="submit" class="btn btn-md btn-success" value="Cargar" id="btn-confirm" data-toggle="modal" data-target="#modalConfirm">
+                <div class="col-sm-6 text-end">
+                  <input type="submit" class="btn btn-md btn-success" value="Cargar" id="btn-confirm" data-bs-toggle="modal" data-bs-target="#modalConfirm">
                 </div>
               </div>
             </div>
@@ -113,8 +113,8 @@
         <form method="POST" action="?view=configuracion&mode=guardarRegistros">
           <input type="hidden" id="data" name="data">
           <input type="hidden" value="<?= $_POST['servicio'] ?>" name="servicio">
-          <button type="button" class="btn btn-danger" data-dismiss="modal">Descartar</button>
-          <input type="submit" class="btn btn-md btn-success" id="btn-guardar" data-dismiss="Modal" value="Iniciar">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Descartar</button>
+          <input type="submit" class="btn btn-md btn-success" id="btn-guardar" data-bs-dismiss="modal" value="Iniciar">
         </form>
       </div>
       <!-- <img src="public/images/refresh.gif" alt="refresh" height="50px" width="50px" /> -->
@@ -171,10 +171,11 @@
   document.getElementById('data').value = JSON.stringify(data);
 
   $('#btn-guardar').click(function() {
-    $('#modalConfirm').modal('hide');
-    $('#modalWait').modal('toggle');
-    $('#modalWait').modal('show')
+    var modalConfirm = bootstrap.Modal.getInstance(document.getElementById('modalConfirm'));
+    var modalWait = bootstrap.Modal.getInstance(document.getElementById('modalWait'));
+    if (modalConfirm) { modalConfirm.hide(); }
+    if (modalWait) { modalWait.show(); }
   })
 </script>
 
-<script src="public/js/jquery.dataTables.min.js"></script>
+<script src="<?php echo asset('public/js/jquery.dataTables.min.js'); ?>"></script>

@@ -10,47 +10,32 @@ class database
     $this->db = new Conexion();
   }
 
-  public function updateStatus($servicio)
+  public function updateStatus(int $servicio): bool
   {
-    $this->db->query("UPDATE productos SET status_id = 1 WHERE status_id = 2 AND servicio_id = '$servicio'");
+    $this->db->preparedQuery("UPDATE productos SET status_id = ? WHERE status_id = ? AND servicio_id = ?", [Constantes::REGISTRO_INACTIVO, Constantes::REGISTRO_ACTIVO, $servicio], 'sss');
     return true;
   }
 
-  public function guardarProductos($producto, $codigo, $costo, $servicio, $plan)
+  public function guardarProductos(string $producto, string $codigo, string $costo, int $servicio, ?string $plan): bool
   {
     $date = date('Y-m-d');
-    $this->db->query("INSERT INTO productos (descripcion, codigo_producto, costo_prod, status_id, servicio_id,fecha,codplan) VALUES ('$producto', '$codigo', '$costo', 2, '$servicio','$date','$plan')");
+    $this->db->preparedQuery(
+      "INSERT INTO productos (descripcion, codigo_producto, costo_prod, status_id, servicio_id,fecha,codplan) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      [$producto, $codigo, $costo, Constantes::REGISTRO_ACTIVO, $servicio, $date, $plan], 'sssssss'
+    );
     return true;
   }
 
-  public function servicio()
+  public function servicio(): array
   {
-    $sql = $this->db->query("SELECT * FROM servicios WHERE status_id = 2 ORDER BY descripcion");
-    if ($this->db->rows($sql) > 0) {
-      while ($data = $this->db->recorrer($sql)) {
-        $respuesta[] = $data;
-      }
-    } else {
-      $respuesta = false;
-    }
-    return $respuesta;
+    return $this->db->selectQuery("SELECT * FROM servicios WHERE status_id = ? ORDER BY descripcion", [Constantes::REGISTRO_ACTIVO], 'i');
   }
-  public function registro($identificacion, $nombre_legal, $telf_hab, $telf_ofi, $telf_cel, $correo, $direccion, $cuenta, $servicio_id, $oferta)
-  {
-    // $identificacion = iconv(mb_detect_encoding($identificacion, mb_detect_order(), true), "UTF-8", $identificacion);
-    // $nombre_legal = iconv(mb_detect_encoding($nombre_legal, mb_detect_order(), true), "UTF-8", $nombre_legal);
-    // $telf_hab = iconv(mb_detect_encoding($telf_hab, mb_detect_order(), true), "UTF-8", $telf_hab);
-    // $telf_ofi = iconv(mb_detect_encoding($telf_ofi, mb_detect_order(), true), "UTF-8", $telf_ofi);
-    // $telf_cel = iconv(mb_detect_encoding($telf_cel, mb_detect_order(), true), "UTF-8", $telf_cel);
-    // $correo = iconv(mb_detect_encoding($correo, mb_detect_order(), true), "UTF-8", $correo);
-    // $direccion = iconv(mb_detect_encoding($direccion, mb_detect_order(), true), "UTF-8", $direccion);
-    // $cuenta = iconv(mb_detect_encoding($cuenta, mb_detect_order(), true), "UTF-8", $cuenta);
-    // $servicio_id = iconv(mb_detect_encoding($servicio_id, mb_detect_order(), true), "UTF-8", $servicio_id);
-    // $oferta = iconv(mb_detect_encoding($oferta, mb_detect_order(), true), "UTF-8", $oferta);
 
+  public function registro(string $identificacion, string $nombre_legal, string $telf_hab, string $telf_ofi, string $telf_cel, string $correo, string $direccion, string $cuenta, int $servicio_id, ?string $oferta): bool
+  {
     $query = ("INSERT INTO clientes (identificacion, nombre_legal, telf_hab, telf_ofi, telf_cel, correo, direccion, cuenta, oferta, status_id,servicio_id) VALUES (?,?,?,?,?,?,?,?,?,?,?)");
     $params = [$identificacion, $nombre_legal, $telf_hab, $telf_ofi, $telf_cel, $correo, $direccion, $cuenta, $oferta, 3, $servicio_id];
-    // Tipos de datos: 
+    // Tipos de datos:
     // 's' -> string, 'i' -> integer, 'd' -> double (float)
     $paramTypes = 'ssssssssiis';
 
@@ -60,11 +45,12 @@ class database
       return true;
       // echo "Success";
     } catch (Exception $e) {
-      echo "Error al guardar => " . $e->getMessage();
+      app_log('error', 'Error al guardar: ' . $e->getMessage());
+      return false;
     }
   }
 
-  public function guardarRegistrosTemporalBatch($batch, $types, $servicio)
+  public function guardarRegistrosTemporalBatch(array $batch, string $types, int $servicio): bool
   {
     // CORRECCIÓN 1: Verificar la variable correcta ($batch)
     if (empty($batch)) {
@@ -96,13 +82,14 @@ class database
 
       return true;
     } catch (Exception $e) {
-      error_log("Error en guardarRegistrosTemporalBatch: " . $e->getMessage());
+      app_log('error', 'Error en guardarRegistrosTemporalBatch: ' . $e->getMessage());
       return false;
     }
   }
 
-  public function listarTemporal($servicio, $paginaActual, $registrosPorPagina)
+  public function listarTemporal(int $servicio, int $paginaActual, int $registrosPorPagina): array
   {
+    // Nombre de tabla desde lista blanca (no parametrizable como valor)
     if ($servicio == 1) {
       $tabla = "clientes";
     } else {
@@ -111,27 +98,12 @@ class database
 
     $offset = ($paginaActual - 1) * $registrosPorPagina;
 
-    $totalRegistrosQuery = "SELECT COUNT(*) as total FROM $tabla";
-    $totalRegistrosResult = $this->db->query($totalRegistrosQuery);
+    $filaTotal = $this->db->selectQuery("SELECT COUNT(*) as total FROM $tabla");
+    $totalRegistros = !empty($filaTotal) ? $filaTotal[0]['total'] : 0;
 
-    $filaTotal = $this->db->recorrer($totalRegistrosResult);
-    $totalRegistros = $filaTotal['total'];
-
-    $registrosQuery = "SELECT * FROM $tabla LIMIT $registrosPorPagina OFFSET $offset";
-    $registrosResult = $this->db->query($registrosQuery);
-
-    $registros = [];
-    if ($this->db->rows($registrosResult) > 0) {
-      while ($data = $this->db->recorrer($registrosResult)) {
-        $registros[] = $data;
-      }
-    }
+    $registros = $this->db->selectQuery("SELECT * FROM $tabla LIMIT ? OFFSET ?", [$registrosPorPagina, $offset], 'ii');
 
     $totalPaginas = ceil($totalRegistros / $registrosPorPagina);
-    echo 'Total registros ' . $totalRegistros;
-    echo '<br>Total páginas ' . $totalPaginas;
-    echo '<br>Pagina actual ' . $paginaActual;
-    echo '<br>registros por página: ' . $registrosPorPagina . '<br>';
     return [
       'registros' => $registros,
       'totalRegistros' => $totalRegistros,
@@ -141,39 +113,27 @@ class database
     ];
   }
 
-  public function busquedaResultados($cedula)
+  public function busquedaResultados(string $cedula): array
   {
-    $sql = $this->db->query("SELECT a.id as resultado_id, a.gestion_id, a.nombre, a.apellido, a.genero, a.fecha_nacimiento, a.cedula, a.telf_hab, a.telf_ofi, a.telf_celular, a.correo, a.cuenta, b.descripcion, b.id as servicio_id, a.producto_id, p.descripcion as name_product, a.fecha_venta FROM resultados a INNER JOIN servicios b  ON a.servicio_id = b.id INNER JOIN productos p ON a.producto_id = p.id WHERE a.cedula = '$cedula'");
-    if ($this->db->rows($sql) > 0) {
-      while ($data = $this->db->recorrer($sql)) {
-        $respuesta[] = $data;
-      }
-    } else {
-      return false;
-    }
-    return $respuesta;
+    return $this->db->selectQuery("SELECT a.id as resultado_id, a.gestion_id, a.nombre, a.apellido, a.genero, a.fecha_nacimiento, a.cedula, a.telf_hab, a.telf_ofi, a.telf_celular, a.correo, a.cuenta, b.descripcion, b.id as servicio_id, a.producto_id, p.descripcion as name_product, a.fecha_venta FROM resultados a INNER JOIN servicios b  ON a.servicio_id = b.id INNER JOIN productos p ON a.producto_id = p.id WHERE a.cedula = ?", [$cedula], 's');
   }
 
-  public function productos($id)
+  public function productos(int $id): array
   {
-    $sql = $this->db->query("SELECT id, descripcion FROM productos WHERE servicio_id = $id AND status_id = 2");
-    if ($this->db->rows($sql) > 0) {
-      while ($data = $this->db->recorrer($sql)) {
-        $respuesta[] = $data;
-      }
-    } else {
-      return false;
-    }
-    return $respuesta;
+    return $this->db->selectQuery("SELECT id, descripcion FROM productos WHERE servicio_id = ? AND status_id = ?", [$id, Constantes::REGISTRO_ACTIVO], 'si');
   }
-  public function updateResultados($id, $nombre, $apellido, $cedula, $genero, $fecha_nac, $hab, $cel, $correo, $venta, $productId, $cuenta)
-  {
-    $this->db->query("UPDATE resultados SET nombre='$nombre', apellido='$apellido', genero='$genero', fecha_nacimiento='$fecha_nac', cedula=$cedula, telf_hab='$hab', telf_celular='$cel', correo='$correo', fecha_venta='$venta', producto_id=$productId, cuenta='$cuenta' WHERE  id=$id");
 
+  public function updateResultados(int $id, string $nombre, string $apellido, string $cedula, string $genero, string $fecha_nac, ?string $hab, ?string $cel, ?string $correo, ?string $venta, ?int $productId, ?string $cuenta): bool
+  {
+    $this->db->preparedQuery(
+      "UPDATE resultados SET nombre=?, apellido=?, genero=?, fecha_nacimiento=?, cedula=?, telf_hab=?, telf_celular=?, correo=?, fecha_venta=?, producto_id=?, cuenta=? WHERE id=?",
+      [$nombre, $apellido, $genero, $fecha_nac, $cedula, $hab, $cel, $correo, $venta, $productId, $cuenta, $id],
+      'ssssssssssss'
+    );
     return true;
   }
 
-  public function eliminarVenta($resultadoId)
+  public function eliminarVenta(int $resultadoId): bool
   {
     try {
       $query = "DELETE FROM resultados WHERE id = ?";
@@ -183,101 +143,55 @@ class database
       $stmt->close();
       return true;
     } catch (Exception $e) {
-      return "Error al eliminar resultado con ID $resultadoId: " . $e->getMessage();
-    }
-  }
-
-  public function contactoEfectivo()
-  {
-    $sql = $this->db->query("SELECT * FROM efectivo");
-    if ($this->db->rows($sql) > 0) {
-      while ($data = $this->db->recorrer($sql)) {
-        $respuesta[] = $data;
-      }
-    } else {
-      $respuesta = false;
-    }
-    return $respuesta;
-  }
-
-  public function ventaProducto($servicio)
-  {
-    $sql = $this->db->query("SELECT * FROM productos WHERE id_producto != 1 AND status=1 AND id_servicio = '$servicio'");
-    if ($this->db->rows($sql) > 0) {
-      while ($data = $this->db->recorrer($sql)) {
-        $respuesta[] = $data;
-      }
-    } else {
-      $respuesta = false;
-    }
-    return $respuesta;
-  }
-
-  public function estado($var)
-  {
-    $sql = $this->db->query("SELECT * FROM estado WHERE cod_servicio = '$var'");
-    if ($this->db->rows($sql) > 0) {
-      while ($data = $this->db->recorrer($sql)) {
-        $respuesta[] = $data;
-      }
-    } else {
-      $respuesta = false;
-    }
-    return $respuesta;
-  }
-
-  public function ciudad($var)
-  {
-    $sql = $this->db->query("SELECT * FROM ciudad where id_estado = $var");
-    if ($this->db->rows($sql) > 0) {
-      while ($data = $this->db->recorrer($sql)) {
-        $respuesta[] = $data;
-      }
-    } else {
-      $respuesta = false;
-    }
-    return $respuesta;
-  }
-
-  public function ciudad_($var)
-  {
-    $sql = $this->db->query("SELECT * FROM ciudad WHERE id_estado = $var ORDER BY ciudad");
-    if ($this->db->rows($sql) > 0) {
-      while ($data = $this->db->recorrer($sql)) {
-        $respuesta[] = $data;
-      }
-    } else {
-      $respuesta = false;
-    }
-    return $respuesta;
-  }
-
-  public function listarProductos()
-  {
-    $sql = $this->db->query("SELECT p.id,p.descripcion,p.codigo_producto,p.costo_prod, p.fecha,p.codplan, s.descripcion as servicio FROM productos p JOIN servicios s ON p.servicio_id = s.id WHERE p.status_id = 2");
-    if ($this->db->rows($sql) > 0) {
-      while ($data = $this->db->recorrer($sql)) {
-        $respuesta[] = $data;
-      }
-    } else {
-      $respuesta = false;
-    }
-    return $respuesta;
-  }
-
-  public function products($id = null)
-  {
-    $sql = $this->db->query("SELECT p.id,p.descripcion,p.codigo_producto,p.costo_prod, p.fecha,p.codplan, s.descripcion as servicio FROM productos p JOIN servicios s ON p.servicio_id = s.id WHERE p.id = " . $id);
-    if ($this->db->rows($sql) > 0) {
-      return $this->db->recorrer($sql);
-    } else {
+      app_log('error', 'Error al eliminar resultado con ID ' . $resultadoId . ': ' . $e->getMessage());
       return false;
     }
   }
 
-  public function updateProd($id, $nombre, $codigo, $costo)
+  public function contactoEfectivo(): array
   {
-    $this->db->query("UPDATE productos SET descripcion = '$nombre', codigo_producto = '$codigo', costo_prod = $costo WHERE id = " . $id);
+    return $this->db->selectQuery("SELECT * FROM efectivo");
+  }
+
+  public function ventaProducto(int $servicio): array
+  {
+    return $this->db->selectQuery("SELECT * FROM productos WHERE id_producto != 1 AND status=1 AND id_servicio = ?", [$servicio], 's');
+  }
+
+  public function estado(string $var): array
+  {
+    return $this->db->selectQuery("SELECT * FROM estado WHERE cod_servicio = ?", [$var], 's');
+  }
+
+  public function ciudad(int $var): array
+  {
+    return $this->db->selectQuery("SELECT * FROM ciudad where id_estado = ?", [$var], 's');
+  }
+
+  public function ciudad_(int $var): array
+  {
+    return $this->db->selectQuery("SELECT * FROM ciudad WHERE id_estado = ? ORDER BY ciudad", [$var], 's');
+  }
+
+  public function listarProductos(): array
+  {
+    return $this->db->selectQuery("SELECT p.id,p.descripcion,p.codigo_producto,p.costo_prod, p.fecha,p.codplan, s.descripcion as servicio FROM productos p JOIN servicios s ON p.servicio_id = s.id WHERE p.status_id = ?", [Constantes::REGISTRO_ACTIVO], 'i');
+  }
+
+  public function products(?int $id = null)
+  {
+    $data = $this->db->selectQuery("SELECT p.id,p.descripcion,p.codigo_producto,p.costo_prod, p.fecha,p.codplan, s.descripcion as servicio FROM productos p JOIN servicios s ON p.servicio_id = s.id WHERE p.id = ?", [$id], 's');
+    return !empty($data) ? $data[0] : false;
+  }
+
+  public function updateProd(int $id, string $nombre, string $codigo, string $costo, ?string $plan = null): bool
+  {
+    if ($plan === null) {
+      // Compatibilidad: flujo anterior sin edición de plan
+      $this->db->preparedQuery("UPDATE productos SET descripcion = ?, codigo_producto = ?, costo_prod = ? WHERE id = ?", [$nombre, $codigo, $costo, $id], 'ssss');
+    } else {
+      $this->db->preparedQuery("UPDATE productos SET descripcion = ?, codigo_producto = ?, costo_prod = ?, codplan = ? WHERE id = ?", [$nombre, $codigo, $costo, $plan, $id], 'sssss');
+    }
     return true;
   }
 }

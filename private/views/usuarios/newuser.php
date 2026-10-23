@@ -1,4 +1,4 @@
-<script src="public/js/register.js"></script>
+<script src="<?php echo asset('public/js/register.js'); ?>"></script>
 
 <script>
 function mayus(e){
@@ -25,17 +25,17 @@ body {
 
 <div class="container login-wrapper">
   <div class="row">
-    <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-4 col-lg-offset-4">
+    <div class="col-12 col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4">
 
-      <div class="panel panel-default">
-        <div class="panel-heading text-center">
-          <h3 class="panel-title"><strong>Nuevo usuario</strong></h3>
+      <div class="card">
+        <div class="card-header text-center">
+          <h3 class="card-title"><strong>Nuevo usuario</strong></h3>
         </div>
 
-        <div class="panel-body">
+        <div class="card-body">
           <form name="f_newuser" id="f_newuser" autocomplete="off">
 
-            <div class="form-group">
+            <div class="mb-3">
               <label>Nombre</label>
               <input type="text"
                      id="nombre"
@@ -47,7 +47,7 @@ body {
                      required>
             </div>
 
-            <div class="form-group">
+            <div class="mb-3">
               <label>Apellido</label>
               <input type="text"
                      id="apellido"
@@ -59,7 +59,7 @@ body {
                      required>
             </div>
 
-            <div class="form-group">
+            <div class="mb-3">
               <label>Usuario</label>
               <input type="text"
                      id="user"
@@ -70,7 +70,7 @@ body {
                      required>
             </div>
 
-            <div class="form-group">
+            <div class="mb-3">
               <label>Contraseña</label>
               <input type="password"
                      id="password"
@@ -78,12 +78,13 @@ body {
                      placeholder="abcd1234."
                      name="password"
                      maxlength="15"
+                     minlength="8"
                      required>
             </div>
 
-            <div class="form-group">
+            <div class="mb-3">
               <label>Tipo de usuario</label>
-              <select class="form-control"
+              <select class="form-select"
                       name="tipo_usuario"
                       id="tipo_usuario"
                       required>
@@ -93,9 +94,9 @@ body {
               </select>
             </div>
 
-            <div class="form-group">
+            <div class="mb-3">
               <label>Servicio</label>
-              <select class="form-control"
+              <select class="form-select"
                       name="servicio"
                       id="servicio"
                       required>
@@ -108,7 +109,7 @@ body {
               </select>
             </div>
 
-            <a href="?view=usuarios&mode=index" id="btn-regresar" class="btn btn-default btn-md"> Regresar</a>
+            <a href="?view=usuarios&mode=index" id="btn-regresar" class="btn btn-outline-secondary btn-md"> Regresar</a>
             <button type="button" id="btn-register" class="btn btn-info btn-md"> Guardar </button>
 
           </form>

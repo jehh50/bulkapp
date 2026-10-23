@@ -1,290 +1,406 @@
 <?php
 include(PUBLIC_DIR . 'general/session.php');
-if (empty($_SESSION)) {
+security_requerir_rol(array(Constantes::USUARIO_ADMINISTRADOR));
+if (!security_usuario_autenticado()) {
   header('location:index.php');
+  exit;
 } else {
   include_once(MODEL_DIR . 'reportesModel.php');
   $conn = new database();
   if (isset($_GET['mode'])) {
-    switch ($_GET['mode']) {
-      case 'index':
-        include(PUBLIC_DIR . 'general/header.php');
-        include(PUBLIC_DIR . 'general/navbar.php');
-        $id = '(1,5)';
-        $servicio = $conn->servicio($id);
-        include(HTML_DIR . 'reportes/index.php');
-        include(PUBLIC_DIR . 'general/footer.php');
-        break;
-
-      case 'acumulado':
-        include(PUBLIC_DIR . 'general/header.php');
-        include(PUBLIC_DIR . 'general/navbar.php');
-        if (isset($_POST['fecha_d']) || isset($_POST['fecha_h'])) {
-          $desde = $_POST['fecha_d'];
-          $hasta = $_POST['fecha_h'];
-        } else {
-          $desde = date('Y-m-d'); 
-          $hasta = $desde;
-        }
-        if (!empty($_POST['servicio'])) {
-          $serv = '(1,5)';
-        }
-
-        $servicio = $conn->servicio($serv);
-        $idEfectivo = $conn->efectivo($serv);
-
-        $gestion = $conn->clientesGestionados($desde, $hasta, $_POST['servicio'], $idEfectivo[0]['id']);
-        include(HTML_DIR . 'reportes/index.php');
-        include(PUBLIC_DIR . 'general/footer.php');
-        break;
-
-      case 'contactabilidad':
-        include(PUBLIC_DIR . 'general/header.php');
-        include(PUBLIC_DIR . 'general/navbar.php');
-        if (isset($_POST['fecha_d']) || isset($_POST['fecha_h'])) {
-          $desde = $_POST['fecha_d'];
-          $hasta = $_POST['fecha_h'];
-        } else {
-          $desde = date('Y-m-d');
-          $hasta = $desde;
-        }
-        if (empty($_POST['servicio'])) {
-          $serv = 1;
-        } else {
-          $serv = $_POST['servicio'];
-        }
-        $id = '(1,5)';
-
-        $servicio = $conn->servicio($id);
-        $resultn = $conn->gestionContactonoefectivo($desde, $hasta, $serv);
-        $resulte = $conn->gestionContactoefectivo($desde, $hasta, $serv);
-        include(HTML_DIR . 'reportes/contactabilidad.php');
-        include(PUBLIC_DIR . 'general/footer.php');
-        break;
-
-      case 'liberar':
-        include(PUBLIC_DIR . 'general/header.php');
-        include(PUBLIC_DIR . 'general/navbar.php');
-        include(HTML_DIR . 'reportes/liberar.php');
-        include(PUBLIC_DIR . 'general/footer.php');
-        break;
-
-      case 'cliente':
-        $cliente = $_POST['cliente'];
-        $cliente = $conn->buscarCliente($cliente);
-        if ($cliente == false) {
-          $json['response'] = 'false';
-        } else {
-          $json['response'] = 'true';
-          if (isset($cliente['nombre_legal'])) {
-            $json['nombre'] = $cliente['nombre_legal'];
-            $json['hab'] = ($cliente['telf_hab'] == null)? 'No posee' : $cliente['telf_hab'];
-            $json['ofi'] = ($cliente['telf_ofi'] == null)? 'No posee' : $cliente['telf_ofi'];
-            $json['cel'] = ($cliente['telf_cel'] == null)? 'No posee' : $cliente['telf_cel'];
-            $json['cedula'] = $cliente['identificacion'];
-            $json['servicio'] = $cliente['descripcion'];
-            $json['status'] = strtoupper($cliente['name']);
-          } else {
-            $json['nombre'] = $cliente['nombre'] . ' ' . $cliente['apellido'];
-            $json['hab'] = $json['ofi'] = $json['cel'] = $cliente['telefono'];
-            $json['cedula'] = $cliente['cedula'];
-          }
-        }
-        echo json_encode($json);
-        break;
-
-      case 'disponible':
-        $cliente = $_POST['cliente'];
-        $cliente = $conn->liberarCliente($cliente);
-        if ($cliente == false) {
-          $json['response'] = 'false';
-        } else {
-          $json['response'] = 'true';
-        }
-        echo json_encode($json);
-        break;
-
-      case 'ventas':
-        include(PUBLIC_DIR . 'general/header.php');
-        include(PUBLIC_DIR . 'general/navbar.php');
-
-        if (empty($_POST['servicio'])) {
-          $serv = "";
-        } else {
-          $serv = $_POST['servicio'];
-        }
-        if (isset($_POST['fecha_d']) || isset($_POST['fecha_h'])) {
-          $desde = date('Ymd', strtotime($_POST['fecha_d']));
-          $hasta = date('Ymd', strtotime($_POST['fecha_h']));
-        } else {
-          $desde = date('Ymd');
-          $hasta = $desde;
-          $d = $h = date('Y-m-d');
-        }
-
-        $id = '(1,5)';
-        $servicio = $conn->servicio($id);
-        $result = $conn->ventasEstado($desde, $hasta, $serv);
-        include(HTML_DIR . 'reportes/ventas.php');
-        include(PUBLIC_DIR . 'general/footer.php');
-        break;
-
-      case 'ventasxestado':
-        include(PUBLIC_DIR . 'general/header.php');
-        include(PUBLIC_DIR . 'general/navbar.php');
-        $desde = $_GET['d'];
-        $hasta = $_GET['h'];
-        $id_estado = $_GET['id'];
-        $estado = $_GET['estado'];
-        $serv = $_GET['servicio'];
-        $result = $conn->ventasCiudad($desde, $hasta, $id_estado, $serv);
-        include(HTML_DIR . 'reportes/ventasxciudad.php');
-        include(PUBLIC_DIR . 'general/footer.php');
-        break;
-
-      case 'detalleventas':
-        include(PUBLIC_DIR . 'general/header.php');
-        include(PUBLIC_DIR . 'general/navbar.php');
-        $id = '(1,5)';
-        $servicio = $conn->servicio($id);
-
-        if (isset($_POST['fecha_d']) || isset($_POST['fecha_h'])) {
-          $desde = date('Ymd', strtotime($_POST['fecha_d']));
-          $hasta = date('Ymd', strtotime($_POST['fecha_h']));
-          $ventas = $conn->ventaDetallada($desde, $hasta, $_POST['servicio']);
-        }
-
-        include(HTML_DIR . 'reportes/ventasDetalle.php');
-        include(PUBLIC_DIR . 'general/footer.php');
-        break;
-
-      case 'download':
-        header("Content-type: application/vnd.ms-excel");
-        header("Content-Disposition: attachment; filename=gestionDetalladas.xls");
-        $ventas = $conn->ventaDetallada($_GET['from'], $_GET['to'], $_GET['servicio']);
-          echo '<table class="table table-responsive table-hover table-condensed">';
-          echo '<thead>
-                  <tr>
-                    <th>Nombre</th>
-                    <th>Apellido</th>
-                    <th>Cedula</th>
-                    <th>Fecha de nacimiento</th>
-                    <th>Teléfono 1</th>
-                    <th>Teléfono 2</th>
-                    <th>Correo</th>
-                   <th>Producto</th>
-                    <th>Agente</th>
-                    <th>Fecha</th>
-                  </tr>
-                </thead>
-                <tbody>';
-
-          if (!empty($ventas)) {
-            foreach ($ventas as $venta) {
-              echo '<tr>
-                      <td>' . $venta['nombre'] . '</td>
-                      <td>' . $venta['apellido'] . '</td>
-                      <td>' . $venta['cedula'] . '</td>
-                      <td>' . $venta['fecha_nacimiento'] . '</td>
-                      <td>' . $venta['telf_hab'] . '</td>
-                      <td>' . $venta['telf_celular'] . '</td>
-                      <td>' . $venta['correo'] . '</td>
-                      <td>' . $venta['descripcion'] . '</td>
-                      <td>' . $venta['agente'] . '</td>
-                      <td>' . $venta['fecha_venta'] . '</td>
-                    </tr>';
-            }
-          }
-
-          echo '</tbody></table>';
-
-        break;
-      
-      case 'gestionCashea':
-        include(PUBLIC_DIR . 'general/header.php');
-        include(PUBLIC_DIR . 'general/navbar.php');
-        
-        //$servicio = $conn->servicio($id);
-
-        if (isset($_POST['fecha_d']) || isset($_POST['fecha_h'])) {
-          $desde = date('Ymd', strtotime($_POST['fecha_d']));
-          $hasta = date('Ymd', strtotime($_POST['fecha_h']));
-          $ventas = $conn->ventaDetallada($_POST['fecha_d'], $_POST['fecha_h'], $_POST['servicio']);
-        }
-
-        include(HTML_DIR . 'reportes/gestionCashea.php');
-        include(PUBLIC_DIR . 'general/footer.php');
-        break;
-      
-      case 'gestionDetalladaCashea':
-        include(PUBLIC_DIR . 'general/header.php');
-        include(PUBLIC_DIR . 'general/navbar.php');
-
-        
-        if (isset($_POST['fecha_d']) || isset($_POST['fecha_h'])) {
-          $desde = date('Ymd', strtotime($_POST['fecha_d']));
-          $hasta = date('Ymd', strtotime($_POST['fecha_h']));
-          $detallados = $conn->gestionDetalladaCashea($_POST['fecha_d'], $_POST['fecha_h']);
-        }
-        include(HTML_DIR . 'reportes/gestionDetalladaCashea.php');
-        include(PUBLIC_DIR . 'general/footer.php');
-        break;
-      
-      case 'downloadCashea':
-        header("Content-type: application/vnd.ms-excel");
-        header("Content-Disposition: attachment; filename=gestionDetalladasCashea.xls");
-        $detallados = $conn->gestionDetalladaCashea($_GET['from'], $_GET['to']);
-          echo '<table class="table table-responsive table-hover table-condensed">';
-          echo '<thead>
-                  <tr> 
-                    <th>Tipo de contacto</th>
-                    <th>No efectivo</th>
-                    <th>Efectivo</th>
-                    <th>Sub Contacto </th>
-                    <th>Plan de pago</th>
-                    <th>Fecha de pago</th>
-                    <th>ID Cuota</th>
-                    <th>Monto</th>
-                    <th>Nombre del contacto</th>
-                    <th>Parentesco</th>
-                    <th>Observaciones</th>
-                    <th>Cliente</th>
-                    <th>Cédula</th>
-                    <th>Estatus</th>
-                    <th>Operador</th>
-                    <th>Fecha gestión</th>
-                    <th>Hora gestión</th>
-                  </tr>
-                </thead>
-                <tbody>';
-          if (!empty($detallados)) { $i=1;
-            foreach ($detallados as $detallado) {
-              echo '<tr>
-                      <td>' . $detallado['tipo_contacto'] . '</td>
-                      <td>' . $detallado['efectivo'] . '</td>
-                      <td>' . $detallado['no_efectivo'] . '</td>
-                      <td>' . $detallado['sub_contacto'] . '</td>
-                      <td>' . $detallado['planDePago'] . '</td>
-                      <td>' . $detallado['fechaPago'] . '</td>
-                      <td>' . $detallado['idCuota'] . '</td>
-                      <td>' . $detallado['monto'] . '</td>
-                      <td>' . $detallado['nombreEncargado'] . '</td>
-                      <td>' . $detallado['parentesco'] . '</td>
-                      <td>' . $detallado['observaciones'] . '</td>
-                      <td>' . $detallado['nombre_usuario'] . '</td>
-                      <td>' . $detallado['cedula'] . '</td>
-                      <td>' . $detallado['status'] . '</td>
-                      <td>' . $detallado['operador'] . '</td>
-                      <td>' . $detallado['fecha_gestion'] . '</td>
-                      <td>' . $detallado['hora_gestion'] . '</td>
-                    </tr>';
-            }
-          }
+    try {
+      switch ($_GET['mode']) {
+        case 'index':
+          include(PUBLIC_DIR . 'general/nheader.php');
+          include(PUBLIC_DIR . 'general/nnavbar.php');
+          $id = [Constantes::SERVICIO_BANCARIO, Constantes::SERVICIO_BANCARIO_ALIAS];
+          $servicio = $conn->servicio($id);
+          include(HTML_DIR . 'reportes/index.php');
+          include(PUBLIC_DIR . 'general/nfooter.php');
           break;
 
-      default:
-        header('location:' . HTML_DIR . 'error.html');
-        break;
+        case 'acumulado':
+          $desde = input_date(isset($_POST['fecha_d']) ? $_POST['fecha_d'] : null);
+          $hasta = input_date(isset($_POST['fecha_h']) ? $_POST['fecha_h'] : null);
+          if ($desde === null || $hasta === null) {
+            $desde = date('Y-m-d');
+            $hasta = $desde;
+          }
+          $servicioSel = (int) input_enum(isset($_POST['servicio']) ? $_POST['servicio'] : null, Constantes::servicios(), 1);
+          $serv = [Constantes::SERVICIO_BANCARIO, Constantes::SERVICIO_BANCARIO_ALIAS];
+
+          $servicio = $conn->servicio($serv);
+          $idEfectivo = $conn->efectivo($serv);
+          $idEfectivoId = !empty($idEfectivo[0]['id']) ? $idEfectivo[0]['id'] : 0;
+
+          $gestion = $conn->clientesGestionados($desde, $hasta, $servicioSel, $idEfectivoId);
+
+          // Motivos de contacto (para el modal "Ver motivos de contacto")
+          $motivosNC = $conn->gestionContactonoefectivo($desde, $hasta, $servicioSel);
+          $motivosC  = $conn->gestionContactoefectivo($desde, $hasta, $servicioSel);
+
+          // Datos para el hero del navbar
+          $nav_service = '';
+          foreach ($servicio as $s) {
+            if ($s['id'] == $servicioSel) { $nav_service = $s['descripcion']; break; }
+          }
+          $nav_period = ($desde === $hasta)
+            ? date('d/m/Y', strtotime($desde))
+            : date('d/m/Y', strtotime($desde)) . ' – ' . date('d/m/Y', strtotime($hasta));
+
+          include(PUBLIC_DIR . 'general/nheader.php');
+          include(PUBLIC_DIR . 'general/nnavbar.php');
+          include(HTML_DIR . 'reportes/index.php');
+          include(PUBLIC_DIR . 'general/nfooter.php');
+          break;
+
+        case 'contactabilidad':
+          include(PUBLIC_DIR . 'general/header.php');
+          include(PUBLIC_DIR . 'general/navbar.php');
+          $desde = input_date(isset($_POST['fecha_d']) ? $_POST['fecha_d'] : null);
+          $hasta = input_date(isset($_POST['fecha_h']) ? $_POST['fecha_h'] : null);
+          if ($desde === null || $hasta === null) {
+            $desde = date('Y-m-d');
+            $hasta = $desde;
+          }
+          $serv = (int) input_enum(isset($_POST['servicio']) ? $_POST['servicio'] : null, Constantes::servicios(), 1);
+          $id = [Constantes::SERVICIO_BANCARIO, Constantes::SERVICIO_BANCARIO_ALIAS];
+
+          $servicio = $conn->servicio($id);
+          $resultn = $conn->gestionContactonoefectivo($desde, $hasta, $serv);
+          $resulte = $conn->gestionContactoefectivo($desde, $hasta, $serv);
+          include(HTML_DIR . 'reportes/contactabilidad.php');
+          include(PUBLIC_DIR . 'general/footer.php');
+          break;
+
+        case 'liberar':
+          $nav_crumb    = 'Reportes / Desbloqueo de clientes';
+          $nav_title    = 'Desbloqueo de clientes Banca';
+          $nav_subtitle = 'Libera a un cliente que ya posee una venta para que pueda volver a ser gestionado.';
+          include(PUBLIC_DIR . 'general/nheader.php');
+          include(PUBLIC_DIR . 'general/nnavbar.php');
+          include(HTML_DIR . 'reportes/liberar.php');
+          include(PUBLIC_DIR . 'general/nfooter.php');
+          break;
+
+        case 'cliente':
+          $clienteBuscado = input_string(isset($_POST['cliente']) ? $_POST['cliente'] : '', 30);
+          $cliente = ($clienteBuscado === '') ? false : $conn->buscarCliente($clienteBuscado);
+          if ($cliente == false) {
+            $json['response'] = 'false';
+          } else {
+            $json['response'] = 'true';
+            if (isset($cliente['nombre_legal'])) {
+              $json['nombre'] = $cliente['nombre_legal'];
+              $json['hab'] = ($cliente['telf_hab'] == null)? 'No posee' : $cliente['telf_hab'];
+              $json['ofi'] = ($cliente['telf_ofi'] == null)? 'No posee' : $cliente['telf_ofi'];
+              $json['cel'] = ($cliente['telf_cel'] == null)? 'No posee' : $cliente['telf_cel'];
+              $json['cedula'] = $cliente['identificacion'];
+              $json['servicio'] = $cliente['descripcion'];
+              $json['status'] = strtoupper($cliente['name']);
+            } else {
+              $json['nombre'] = $cliente['nombre'] . ' ' . $cliente['apellido'];
+              $json['hab'] = $json['ofi'] = $json['cel'] = $cliente['telefono'];
+              $json['cedula'] = $cliente['cedula'];
+            }
+          }
+          echo json_encode($json);
+          break;
+
+        case 'disponible':
+          $clienteBuscado = input_string(isset($_POST['cliente']) ? $_POST['cliente'] : '', 30);
+          $cliente = ($clienteBuscado === '') ? false : $conn->liberarCliente($clienteBuscado);
+          if ($cliente == false) {
+            $json['response'] = 'false';
+          } else {
+            $json['response'] = 'true';
+          }
+          echo json_encode($json);
+          break;
+
+        case 'ventas':
+          $serv = null;
+          if (isset($_POST['servicio']) && $_POST['servicio'] !== '') {
+            $serv = input_enum($_POST['servicio'], Constantes::servicios());
+            $serv = ($serv === null) ? null : (int) $serv;
+          }
+
+          $fechaD = input_date(isset($_POST['fecha_d']) ? $_POST['fecha_d'] : null);
+          $fechaH = input_date(isset($_POST['fecha_h']) ? $_POST['fecha_h'] : null);
+          if ($fechaD !== null && $fechaH !== null) {
+            $desde = date('Ymd', strtotime($fechaD));
+            $hasta = date('Ymd', strtotime($fechaH));
+            $nav_period = ($fechaD === $fechaH)
+              ? date('d/m/Y', strtotime($fechaD))
+              : date('d/m/Y', strtotime($fechaD)) . ' – ' . date('d/m/Y', strtotime($fechaH));
+          } else {
+            $desde = date('Ymd');
+            $hasta = $desde;
+            $d = $h = date('Y-m-d');
+            $nav_period = date('d/m/Y');
+          }
+
+          $id = [Constantes::SERVICIO_BANCARIO, Constantes::SERVICIO_BANCARIO_ALIAS];
+          $servicio = $conn->servicio($id);
+          $result = $conn->ventasEstado($desde, $hasta, $serv);
+
+          $nav_crumb   = 'Reportes / Ventas por estado';
+          $nav_title   = 'Resumen de ventas por estado';
+          $nav_service = null;
+          foreach ($servicio as $s) { if ($s['id'] == $serv) { $nav_service = $s['descripcion']; break; } }
+          if ($nav_service === null) { $nav_period = null; }
+
+          include(PUBLIC_DIR . 'general/nheader.php');
+          include(PUBLIC_DIR . 'general/nnavbar.php');
+          include(HTML_DIR . 'reportes/ventas.php');
+          include(PUBLIC_DIR . 'general/nfooter.php');
+          break;
+
+        case 'ventasxestado':
+          $desde = input_digits(isset($_GET['d']) ? $_GET['d'] : '', 8);
+          $hasta = input_digits(isset($_GET['h']) ? $_GET['h'] : '', 8);
+          if ($desde === '' || $hasta === '') {
+            $desde = $hasta = date('Ymd');
+          }
+          $id_estado = (int) (input_int(isset($_GET['id']) ? $_GET['id'] : null, 0) ?? 0);
+          $estado = input_string(isset($_GET['estado']) ? $_GET['estado'] : '', 100);
+          $serv = (int) input_enum(isset($_GET['servicio']) ? $_GET['servicio'] : null, Constantes::servicios(), 1);
+          $result = $conn->ventasCiudad($desde, $hasta, $id_estado, $serv);
+
+          $id = [Constantes::SERVICIO_BANCARIO, Constantes::SERVICIO_BANCARIO_ALIAS];
+          $servicio = $conn->servicio($id);
+          $nav_service = null;
+          foreach ($servicio as $s) { if ($s['id'] == $serv) { $nav_service = $s['descripcion']; break; } }
+          $fd = DateTime::createFromFormat('Ymd', $desde);
+          $fh = DateTime::createFromFormat('Ymd', $hasta);
+          $nav_period = ($fd && $fh)
+            ? ($desde === $hasta ? $fd->format('d/m/Y') : $fd->format('d/m/Y') . ' – ' . $fh->format('d/m/Y'))
+            : null;
+          // Fechas en Y-m-d para re-enviar el filtro al volver
+          $backDesde = $fd ? $fd->format('Y-m-d') : '';
+          $backHasta = $fh ? $fh->format('Y-m-d') : '';
+          $nav_crumb  = 'Reportes / Ventas por estado / ' . htmlspecialchars($estado, ENT_QUOTES, 'UTF-8');
+          $nav_title  = 'Detalle de ventas por estado';
+          $nav_accent = $estado;
+
+          include(PUBLIC_DIR . 'general/nheader.php');
+          include(PUBLIC_DIR . 'general/nnavbar.php');
+          include(HTML_DIR . 'reportes/ventasxciudad.php');
+          include(PUBLIC_DIR . 'general/nfooter.php');
+          break;
+
+        case 'detalleventas':
+          $id = [Constantes::SERVICIO_BANCARIO, Constantes::SERVICIO_BANCARIO_ALIAS];
+          $servicio = $conn->servicio($id);
+
+          $fechaD = input_date(isset($_POST['fecha_d']) ? $_POST['fecha_d'] : null);
+          $fechaH = input_date(isset($_POST['fecha_h']) ? $_POST['fecha_h'] : null);
+          if ($fechaD !== null && $fechaH !== null) {
+            $desde = date('Ymd', strtotime($fechaD));
+            $hasta = date('Ymd', strtotime($fechaH));
+            $selServicio = input_enum(isset($_POST['servicio']) ? $_POST['servicio'] : null, Constantes::servicios(), '');
+            $formatoVenta = Constantes::esServicioBancario($selServicio) ? 'Ymd' : 'Y-m-d';
+            $ventas = ($selServicio === '') ? [] : $conn->ventaDetallada(
+              date($formatoVenta, strtotime($fechaD)),
+              date($formatoVenta, strtotime($fechaH)),
+              $selServicio
+            );
+
+            $nav_service = null;
+            foreach ($servicio as $s) { if ($s['id'] == $selServicio) { $nav_service = $s['descripcion']; break; } }
+            $nav_period = ($fechaD === $fechaH)
+              ? date('d/m/Y', strtotime($fechaD))
+              : date('d/m/Y', strtotime($fechaD)) . ' – ' . date('d/m/Y', strtotime($fechaH));
+            $backDesde = $fechaD;
+            $backHasta = $fechaH;
+          } else {
+            $desde = date('Ymd');
+            $hasta = $desde;
+            $selServicio = '';
+            $ventas = [];
+            $backDesde = $backHasta = '';
+          }
+
+          $nav_crumb = 'Reportes / Detalle de ventas';
+          $nav_title = 'Resumen de ventas';
+
+          include(PUBLIC_DIR . 'general/nheader.php');
+          include(PUBLIC_DIR . 'general/nnavbar.php');
+          include(HTML_DIR . 'reportes/ventasDetalle.php');
+          include(PUBLIC_DIR . 'general/nfooter.php');
+          break;
+
+        case 'download':
+          header("Content-type: application/vnd.ms-excel");
+          header("Content-Disposition: attachment; filename=gestionDetalladas.xls");
+          $rawDesde = input_string(isset($_GET['from']) ? $_GET['from'] : '', 10);
+          $rawHasta = input_string(isset($_GET['to']) ? $_GET['to'] : '', 10);
+          $fechaDesde = input_date($rawDesde);
+          if ($fechaDesde === null && preg_match('/^\d{8}$/', $rawDesde)) {
+            $fechaDesde = DateTime::createFromFormat('!Ymd', $rawDesde);
+          }
+          $fechaHasta = input_date($rawHasta);
+          if ($fechaHasta === null && preg_match('/^\d{8}$/', $rawHasta)) {
+            $fechaHasta = DateTime::createFromFormat('!Ymd', $rawHasta);
+          }
+          if (!$fechaDesde || !$fechaHasta) {
+            $fechaDesde = $fechaHasta = new DateTime('today');
+          }
+          $servicioDescarga = input_enum(isset($_GET['servicio']) ? $_GET['servicio'] : null, Constantes::servicios(), '1');
+          $formatoDescarga = Constantes::esServicioBancario($servicioDescarga) ? 'Ymd' : 'Y-m-d';
+          $ventas = $conn->ventaDetallada($fechaDesde->format($formatoDescarga), $fechaHasta->format($formatoDescarga), $servicioDescarga);
+            echo '<table class="table table-responsive table-hover table-condensed">';
+            echo '<thead>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>Apellido</th>
+                      <th>Cedula</th>
+                      <th>Fecha de nacimiento</th>
+                      <th>Teléfono 1</th>
+                      <th>Teléfono 2</th>
+                      <th>Correo</th>
+                     <th>Producto</th>
+                      <th>Agente</th>
+                      <th>Fecha</th>
+                    </tr>
+                  </thead>
+                  <tbody>';
+
+            if (!empty($ventas)) {
+              foreach ($ventas as $venta) {
+                echo '<tr>
+                        <td>' . htmlspecialchars((string) $venta['nombre'], ENT_QUOTES, 'UTF-8') . '</td>
+                        <td>' . htmlspecialchars((string) $venta['apellido'], ENT_QUOTES, 'UTF-8') . '</td>
+                        <td>' . htmlspecialchars((string) $venta['cedula'], ENT_QUOTES, 'UTF-8') . '</td>
+                        <td>' . htmlspecialchars((string) $venta['fecha_nacimiento'], ENT_QUOTES, 'UTF-8') . '</td>
+                        <td>' . htmlspecialchars((string) $venta['telf_hab'], ENT_QUOTES, 'UTF-8') . '</td>
+                        <td>' . htmlspecialchars((string) $venta['telf_celular'], ENT_QUOTES, 'UTF-8') . '</td>
+                        <td>' . htmlspecialchars((string) $venta['correo'], ENT_QUOTES, 'UTF-8') . '</td>
+                        <td>' . htmlspecialchars((string) $venta['descripcion'], ENT_QUOTES, 'UTF-8') . '</td>
+                        <td>' . htmlspecialchars((string) $venta['agente'], ENT_QUOTES, 'UTF-8') . '</td>
+                        <td>' . htmlspecialchars((string) $venta['fecha_venta'], ENT_QUOTES, 'UTF-8') . '</td>
+                      </tr>';
+              }
+            }
+
+            echo '</tbody></table>';
+
+          break;
+      
+        case 'gestionCashea':
+          include(PUBLIC_DIR . 'general/header.php');
+          include(PUBLIC_DIR . 'general/navbar.php');
+        
+          //$servicio = $conn->servicio($id);
+          $desde = $hasta = date('Ymd');
+          $ventas = [];
+
+          $fechaD = input_date(isset($_POST['fecha_d']) ? $_POST['fecha_d'] : null);
+          $fechaH = input_date(isset($_POST['fecha_h']) ? $_POST['fecha_h'] : null);
+          if ($fechaD !== null && $fechaH !== null) {
+            $desde = date('Ymd', strtotime($fechaD));
+            $hasta = date('Ymd', strtotime($fechaH));
+            $servicioSel = input_enum(isset($_POST['servicio']) ? $_POST['servicio'] : null, Constantes::servicios(), '');
+            $ventas = ($servicioSel === '') ? [] : $conn->ventaDetallada($fechaD, $fechaH, $servicioSel);
+          }
+
+          include(HTML_DIR . 'reportes/gestionCashea.php');
+          include(PUBLIC_DIR . 'general/footer.php');
+          break;
+      
+        case 'gestionDetalladaCashea':
+          include(PUBLIC_DIR . 'general/header.php');
+          include(PUBLIC_DIR . 'general/navbar.php');
+
+        
+          $desde = $hasta = date('Ymd');
+          $detallados = [];
+          $fechaD = input_date(isset($_POST['fecha_d']) ? $_POST['fecha_d'] : null);
+          $fechaH = input_date(isset($_POST['fecha_h']) ? $_POST['fecha_h'] : null);
+          if ($fechaD !== null && $fechaH !== null) {
+            $desde = date('Ymd', strtotime($fechaD));
+            $hasta = date('Ymd', strtotime($fechaH));
+            $detallados = $conn->gestionDetalladaCashea($fechaD, $fechaH);
+          }
+          include(HTML_DIR . 'reportes/gestionDetalladaCashea.php');
+          include(PUBLIC_DIR . 'general/footer.php');
+          break;
+      
+        case 'downloadCashea':
+          header("Content-type: application/vnd.ms-excel");
+          header("Content-Disposition: attachment; filename=gestionDetalladasCashea.xls");
+          $desdeDescarga = input_date(isset($_GET['from']) ? $_GET['from'] : null, 'Y-m-d');
+          $hastaDescarga = input_date(isset($_GET['to']) ? $_GET['to'] : null, 'Y-m-d');
+          if ($desdeDescarga === null || $hastaDescarga === null) {
+            $desdeDescarga = $hastaDescarga = date('Y-m-d');
+          }
+          $detallados = $conn->gestionDetalladaCashea($desdeDescarga, $hastaDescarga);
+            echo '<table class="table table-responsive table-hover table-condensed">';
+            echo '<thead>
+                    <tr> 
+                      <th>Tipo de contacto</th>
+                      <th>No efectivo</th>
+                      <th>Efectivo</th>
+                      <th>Sub Contacto </th>
+                      <th>Plan de pago</th>
+                      <th>Fecha de pago</th>
+                      <th>ID Cuota</th>
+                      <th>Monto</th>
+                      <th>Nombre del contacto</th>
+                      <th>Parentesco</th>
+                      <th>Observaciones</th>
+                      <th>Cliente</th>
+                      <th>Cédula</th>
+                      <th>Estatus</th>
+                      <th>Operador</th>
+                      <th>Fecha gestión</th>
+                      <th>Hora gestión</th>
+                    </tr>
+                  </thead>
+                  <tbody>';
+            if (!empty($detallados)) { $i=1;
+              array_walk_recursive($detallados, function (&$valor) {
+                if (is_string($valor)) {
+                  $valor = htmlspecialchars($valor, ENT_QUOTES, 'UTF-8');
+                }
+              });
+              foreach ($detallados as $detallado) {
+                echo '<tr>
+                        <td>' . $detallado['tipo_contacto'] . '</td>
+                        <td>' . $detallado['efectivo'] . '</td>
+                        <td>' . $detallado['no_efectivo'] . '</td>
+                        <td>' . $detallado['sub_contacto'] . '</td>
+                        <td>' . $detallado['planDePago'] . '</td>
+                        <td>' . $detallado['fechaPago'] . '</td>
+                        <td>' . $detallado['idCuota'] . '</td>
+                        <td>' . $detallado['monto'] . '</td>
+                        <td>' . $detallado['nombreEncargado'] . '</td>
+                        <td>' . $detallado['parentesco'] . '</td>
+                        <td>' . $detallado['observaciones'] . '</td>
+                        <td>' . $detallado['nombre_usuario'] . '</td>
+                        <td>' . $detallado['cedula'] . '</td>
+                        <td>' . $detallado['status'] . '</td>
+                        <td>' . $detallado['operador'] . '</td>
+                        <td>' . $detallado['fecha_gestion'] . '</td>
+                        <td>' . $detallado['hora_gestion'] . '</td>
+                      </tr>';
+              }
+            }
+            break;
+
+        default:
+          header('location:' . HTML_DIR . 'error.html');
+          break;
+      }
+    } catch (Throwable $e) {
+      app_log('error', 'Error en el controlador reportes: ' . $e->getMessage(), array(
+        'excepcion' => get_class($e),
+        'archivo' => $e->getFile(),
+        'linea' => $e->getLine(),
+        'modo' => isset($_GET['mode']) ? $_GET['mode'] : '',
+      ));
+
+      app_responder_error();
     }
   }
 }
