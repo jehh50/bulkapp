@@ -6,10 +6,10 @@
       </button>
       <div class="collapse navbar-collapse" id="navbar">
         <ul class="navbar-nav ms-auto">
-          <?php if (in_array((int) $_SESSION['usertype_id'], array(Constantes::USUARIO_AGENTE, Constantes::USUARIO_ADMINISTRADOR), true)) { ?>
+          <?php if (in_array((int) $_SESSION['usertype_id'], array(Constantes::USUARIO_AGENTE, Constantes::USUARIO_SUPERVISOR, Constantes::USUARIO_ADMINISTRADOR), true)) { ?>
             <li class="nav-item"><a class="nav-link" href="?view=formulario&mode=index">Formulario</a></li>
           <?php } ?>
-          <?php if ((int) $_SESSION['usertype_id'] === Constantes::USUARIO_ADMINISTRADOR) { ?>
+          <?php if (in_array((int) $_SESSION['usertype_id'], array(Constantes::USUARIO_SUPERVISOR, Constantes::USUARIO_ADMINISTRADOR), true)) { ?>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="menuConfiguracion" role="button" data-bs-toggle="dropdown" aria-expanded="false">Configuración</a>
               <ul class="dropdown-menu" aria-labelledby="menuConfiguracion">
@@ -21,6 +21,10 @@
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="?view=usuarios&mode=index">Bandeja de usuarios</a></li>
                 <li><a class="dropdown-item" href="?view=usuarios&mode=new">Nuevo usuario</a></li>
+                <?php if ((int) $_SESSION['usertype_id'] === Constantes::USUARIO_ADMINISTRADOR) { ?>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="?view=constructor&mode=index">Constructor de formularios</a></li>
+                <?php } ?>
               </ul>
             </li>
             <li class="nav-item dropdown">

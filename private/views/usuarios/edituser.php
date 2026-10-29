@@ -27,6 +27,7 @@
               <select class='selectpicker show-menu-arrow show-tick form-control' name="rol" id="rol">
                    <option value='1' <?=$e?>>OPERADOR</option>
                    <option value='2' <?=$f?>>SUPERVISOR</option>
+                   <option value='3' <?=$g?>>ADMINISTRADOR</option>
               </select>
             </div>
             <div class="mb-3 col-lg-6">

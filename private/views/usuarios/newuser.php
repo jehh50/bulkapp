@@ -91,6 +91,7 @@ body {
                 <option value="" disabled selected>Seleccione...</option>
                 <option value="1">Operador</option>
                 <option value="2">Supervisor</option>
+                <option value="3">Administrador</option>
               </select>
             </div>
 

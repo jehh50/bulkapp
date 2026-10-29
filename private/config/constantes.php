@@ -25,9 +25,14 @@ class Constantes
    * Tipos de usuario (usertype_id)
    * ------------------------------------------------------------------- */
 
+  /** Operador: captura de formularios. */
   const USUARIO_AGENTE = 1;
-  const USUARIO_ADMINISTRADOR = 2;
-  const USUARIO_SUPERVISOR = 3;
+
+  /** Supervisor: toda la configuración operativa. */
+  const USUARIO_SUPERVISOR = 2;
+
+  /** Administrador: todo lo del Supervisor + el Constructor de formularios. */
+  const USUARIO_ADMINISTRADOR = 3;
 
   /* ---------------------------------------------------------------------
    * Estados del cliente y de la gestión (status_id)
@@ -69,7 +74,17 @@ class Constantes
    */
   public static function tiposUsuario()
   {
-    return array(self::USUARIO_AGENTE, self::USUARIO_ADMINISTRADOR, self::USUARIO_SUPERVISOR);
+    return array(self::USUARIO_AGENTE, self::USUARIO_SUPERVISOR, self::USUARIO_ADMINISTRADOR);
+  }
+
+  /**
+   * Tipos de campo admitidos por el Constructor de formularios dinámicos.
+   *
+   * @return array
+   */
+  public static function tiposCampoFormulario()
+  {
+    return array('text', 'textarea', 'number', 'date', 'email', 'select', 'nested');
   }
 
   /**

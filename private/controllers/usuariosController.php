@@ -8,7 +8,7 @@ $conexion = new database();
 if (isset($_GET['mode'])) {
 	$modoUsuarios = $_GET['mode'];
 	if (in_array($modoUsuarios, ['index', 'new', 'registro', 'edituser', 'update', 'password', 'eliminar'], true)) {
-		security_requerir_rol(array(Constantes::USUARIO_ADMINISTRADOR));
+		security_requerir_rol(array(Constantes::USUARIO_SUPERVISOR, Constantes::USUARIO_ADMINISTRADOR));
 	}
 
 	try {

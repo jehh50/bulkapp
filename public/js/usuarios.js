@@ -233,7 +233,7 @@
   }
 
   function rowRefresh(row, vals) {
-    var rolName = vals.rolid === '2' ? 'SUPERVISOR' : 'OPERADOR';
+    var rolName = vals.rolid === '3' ? 'ADMINISTRADOR' : (vals.rolid === '2' ? 'SUPERVISOR' : 'OPERADOR');
     var statusName = vals.statusid === '2' ? 'ACTIVO' : 'INACTIVO';
     var servicioSel = document.getElementById('servicio');
     var servicioName = servicioSel.options[servicioSel.selectedIndex].textContent;

@@ -137,6 +137,7 @@ $servicio = isset($servicio) && is_array($servicio) ? $servicio : [];
           <option value="" selected disabled>Seleccione…</option>
           <option value="1">Operador</option>
           <option value="2">Supervisor</option>
+          <option value="3">Administrador</option>
         </select>
       </label>
       <label class="us-lbl">Servicio
@@ -178,6 +179,7 @@ $servicio = isset($servicio) && is_array($servicio) ? $servicio : [];
         <select class="form-select us-input" name="rol" id="rol" required>
           <option value="1">OPERADOR</option>
           <option value="2">SUPERVISOR</option>
+          <option value="3">ADMINISTRADOR</option>
         </select>
       </label>
       <label class="us-lbl">Estatus

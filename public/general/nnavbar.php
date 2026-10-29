@@ -28,19 +28,19 @@
 
     <div class="collapse navbar-collapse" id="mainNav">
       <ul class="navbar-nav ms-auto">
-        <?php if ($usertype == 2) { ?>
+        <?php if ($usertype == Constantes::USUARIO_SUPERVISOR || $usertype == Constantes::USUARIO_ADMINISTRADOR) { ?>
           <li class="nav-item">
             <a class="nav-link<?php echo nav_active($curKey, ['dashboard:index']); ?>" href="?view=dashboard&mode=index">Dashboard</a>
           </li>
         <?php } ?>
 
-        <?php if ($usertype == 1 || $usertype == 2) { ?>
+        <?php if ($usertype == Constantes::USUARIO_AGENTE || $usertype == Constantes::USUARIO_SUPERVISOR || $usertype == Constantes::USUARIO_ADMINISTRADOR) { ?>
           <li class="nav-item">
             <a class="nav-link<?php echo nav_active($curKey, ['formulario:index']); ?>" href="?view=formulario&mode=index">Formulario</a>
           </li>
         <?php } ?>
 
-        <?php if ($usertype == 2) { ?>
+        <?php if ($usertype == Constantes::USUARIO_SUPERVISOR || $usertype == Constantes::USUARIO_ADMINISTRADOR) { ?>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Configuración</a>
             <ul class="dropdown-menu dropdown-menu-end" data-bs-theme="light">
@@ -51,6 +51,10 @@
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item" href="?view=usuarios&mode=index">Bandeja de usuarios</a></li>
               <li><a class="dropdown-item" href="?view=usuarios&mode=new">Nuevo usuario</a></li>
+              <?php if ($usertype == Constantes::USUARIO_ADMINISTRADOR) { ?>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item<?php echo nav_active($curKey, ['constructor:index']); ?>" href="?view=constructor&mode=index">Constructor de formularios</a></li>
+              <?php } ?>
             </ul>
           </li>
 

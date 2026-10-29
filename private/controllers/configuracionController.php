@@ -1,7 +1,7 @@
 <?php
 ob_start();
 include(PUBLIC_DIR . 'general/session.php');
-security_requerir_rol(array(Constantes::USUARIO_ADMINISTRADOR));
+security_requerir_rol(array(Constantes::USUARIO_SUPERVISOR, Constantes::USUARIO_ADMINISTRADOR));
 if (!security_usuario_autenticado()) {
 	header('location:index.php');
 	exit;

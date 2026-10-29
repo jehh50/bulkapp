@@ -13,6 +13,7 @@ header('X-Request-Id: ' . app_request_id());
 $controladoresPermitidos = [
   'carga_archivo',
   'configuracion',
+  'constructor',
   'csv',
   'dashboard',
   'editar',

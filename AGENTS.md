@@ -10,12 +10,13 @@ Guía rápida para trabajar en este repositorio (MVC en PHP sin framework ni Com
 | [`docs/architecture.md`](docs/architecture.md) | Estructura, flujo de una petición y servicios transversales. |
 | [`docs/conventions.md`](docs/conventions.md) | **Convenciones de código a respetar** (tipado, constantes, logging, assets, tests). |
 | [`docs/technical-debt.md`](docs/technical-debt.md) | Deuda técnica known y prioridades. |
+| [`docs/constructor-plan.md`](docs/constructor-plan.md) | Plan del Constructor de formularios dinámicos (decisiones cerradas; banca no se toca). |
 | [`ANALISIS.md`](ANALISIS.md) | Análisis de seguridad y calidad. |
 
 ## Comandos
 
 ```bash
-php tests/run.php     # pruebas unitarias (40 casos)
+php tests/run.php     # pruebas unitarias (33 casos)
 php tests/lint.php    # sintaxis de todos los archivos PHP
 ```
 
