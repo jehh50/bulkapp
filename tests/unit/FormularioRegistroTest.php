@@ -63,61 +63,6 @@ test('formulario_registro_datos_base rechaza datos incompletos', function () {
   assert_falso(formulario_registro_datos_base($post, sesion_base()));
 });
 
-test('formulario_registro_datos_cashea marca el pago abonado con el plan 3', function () {
-  $base = formulario_registro_datos_base(
-    array_merge(datos_post_base(), array('servicio' => '2', 'subContacto' => '10', 'paymentDate' => '2026-10-21')),
-    sesion_base()
-  );
-
-  $post = array(
-    'paymentPlan' => '3',
-    'amount' => '500',
-    'fullName' => 'Maria Perez',
-    'relationship' => 'Hija',
-    'paymentDate' => '2026-10-21',
-  );
-
-  $datos = formulario_registro_datos_cashea($post, $base);
-
-  assert_igual(Constantes::ESTADO_PAGO_ABONADO, $datos['status']);
-  assert_igual('500', $datos['amount']);
-  assert_igual(3, $datos['payment_plan']);
-  assert_igual('2026-10-21', $datos['payment_date']);
-});
-
-test('formulario_registro_datos_cashea marca compromiso de pago en los demás planes', function () {
-  $base = formulario_registro_datos_base(
-    array_merge(datos_post_base(), array('servicio' => '2', 'subContacto' => '10')),
-    sesion_base()
-  );
-
-  $datos = formulario_registro_datos_cashea(array('paymentPlan' => '1'), $base);
-
-  assert_igual(Constantes::ESTADO_COMPROMISO_PAGO, $datos['status']);
-  assert_igual(null, $datos['amount']);
-});
-
-test('formulario_registro_datos_cashea ignora los subcontactos sin pago', function () {
-  $base = formulario_registro_datos_base(
-    array_merge(datos_post_base(), array('servicio' => '2', 'subContacto' => '5')),
-    sesion_base()
-  );
-
-  $datos = formulario_registro_datos_cashea(array(), $base);
-
-  assert_igual(false, isset($datos['payment_plan']));
-  assert_igual(Constantes::ESTADO_NO_EFECTIVO, $datos['status']);
-});
-
-test('formulario_registro_datos_cashea rechaza un plan de pago inválido', function () {
-  $base = formulario_registro_datos_base(
-    array_merge(datos_post_base(), array('servicio' => '2', 'subContacto' => '10')),
-    sesion_base()
-  );
-
-  assert_falso(formulario_registro_datos_cashea(array('paymentPlan' => '9'), $base));
-});
-
 test('formulario_registro_datos_bancario valida la venta capturada', function () {
   $base = formulario_registro_datos_base(datos_post_base(), sesion_base());
 

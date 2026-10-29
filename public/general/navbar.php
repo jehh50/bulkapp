@@ -18,7 +18,6 @@
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="?view=carga_archivo&mode=index">Carga BBDD</a></li>
                 <li><a class="dropdown-item" href="?view=configuracion&mode=editarResultado">Editar resultados</a></li>
-                <li><a class="dropdown-item" href="?view=carga_archivo&mode=liberarCuotas">Liberar cuotas Cashea</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="?view=usuarios&mode=index">Bandeja de usuarios</a></li>
                 <li><a class="dropdown-item" href="?view=usuarios&mode=new">Nuevo usuario</a></li>
@@ -34,9 +33,6 @@
                 <li><a class="dropdown-item" href="?view=reportes&mode=detalleventas">Detalle de ventas</a></li>
                 <li><a class="dropdown-item" href="?view=reportes&mode=liberar">Liberar clientes Banca</a></li>
                 <li><a class="dropdown-item" href="?view=xml&mode=index">Generar XML</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="?view=reportes&mode=gestionCashea">Gestión Cashea</a></li>
-                <li><a class="dropdown-item" href="?view=reportes&mode=gestionDetalladaCashea">Gestión Detallada Cashea</a></li>
               </ul>
             </li>
           <?php } ?>

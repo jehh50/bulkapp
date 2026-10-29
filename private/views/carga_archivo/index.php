@@ -5,6 +5,8 @@ switch (isset($_GET['mensaje']) ? $_GET['mensaje'] : '') {
   case 'exito':        $mensajeHtml = '¡Éxito! El archivo se ha procesado correctamente.';          $toastClass = 'success'; break;
   case 'errorFormato': $mensajeHtml = 'Error de formato: el delimitador del archivo es incorrecto. Verifique que sea un CSV (punto y coma).'; $toastClass = 'error'; break;
   case 'errorArchivo': $mensajeHtml = 'No se recibió el archivo o hubo un error al subirlo.';      $toastClass = 'error'; break;
+  case 'errorProceso': $mensajeHtml = 'Ocurrió un error al guardar los registros. Intente nuevamente.'; $toastClass = 'error'; break;
+  case 'sinDatos':     $mensajeHtml = 'El archivo no contenía filas válidas para importar.';     $toastClass = 'error'; break;
 }
 ?>
 

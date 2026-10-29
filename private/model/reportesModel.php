@@ -9,10 +9,16 @@ class database
     $this->db = new Conexion();
   }
 
-  public function clientesGestionados(string $desde, string $hasta, int $servicio, int $idEfectivo)
+  public function clientesGestionados(string $desde, string $hasta, int $servicio, int $idEfectivo, int $producto = 0)
   {
-    $sql = "SELECT CONCAT(users.nombre,' ',users.apellido) AS nombre, COUNT(gestion.contacto_id) AS gestion, users.id AS id FROM users INNER JOIN gestion ON users.id = gestion.user_id WHERE gestion.fecha BETWEEN ? AND ? AND gestion.servicio_id = ? GROUP BY gestion.user_id ORDER BY users.nombre";
-    $filas = $this->db->selectQuery($sql, [$desde, $hasta, $servicio], 'sss');
+    // El producto NO acota la gestión/contactabilidad (las gestiones no-efectivas
+    // no tienen producto_id). Solo filtra las ventas, vía ventasEfectivas().
+    $params = [$desde, $hasta, $servicio];
+    $tipos  = 'sss';
+
+    $sql = "SELECT CONCAT(users.nombre,' ',users.apellido) AS nombre, COUNT(gestion.contacto_id) AS gestion, COUNT(gestion.noefectivo_id) as noefectivos, COUNT(gestion.efectivo_id) as efectivos, COUNT(gestion.producto_id) as venta, users.id AS id FROM users INNER JOIN gestion ON users.id = gestion.user_id WHERE gestion.fecha BETWEEN ? AND ? AND gestion.servicio_id = ? GROUP BY gestion.user_id ORDER BY venta DESC";
+
+    $filas = $this->db->selectQuery($sql, $params, $tipos);
     if (empty($filas)) {
       return false;
     }
@@ -22,16 +28,46 @@ class database
       $id_user = $data['id'];
       $nombre = $data['nombre'];
       $gestion = $data['gestion'];
+      $noefectivos = $data['noefectivos'];
+      $efectivos = $data['efectivos'];
 
-      $c = $conexion->clientesEfectivos($id_user, $desde, $hasta, $servicio);
-      $efectivos = $c[0]['efectivos'];
+      //$c = $conexion->clientesEfectivos($id_user, $desde, $hasta, $servicio,$producto);
+      //$efectivos = $c[0]['efectivos'];
 
-      $v = $conexion->ventasEfectivas($id_user, $desde, $hasta, $servicio, $idEfectivo);
+      $v = $conexion->ventasEfectivas($id_user, $desde, $hasta, $servicio, $idEfectivo, $producto);
       $ventas = $v[0]['ventas'];
 
-      $respuesta[] = compact("nombre", "gestion", "efectivos", "ventas");
+      $respuesta[] = compact("nombre", "gestion", "noefectivos","efectivos", "ventas");
     }
     return $respuesta;
+  }
+
+  public function getProduct($id)
+  {
+    $sql = "SELECT id, descripcion FROM productos WHERE servicio_id = ? AND status_id = 2";
+    return $this->db->selectQuery($sql, [(int) $id], 'i');
+
+  }
+
+  public function ventasPorProducto(string $desde, string $hasta, int $servicio, int $idEfectivo, int $producto = 0): array
+  {
+    // Misma definición de "venta" que ventasEfectivas (efectivo_id + servicio),
+    // para que el total de la gráfica coincida con la tabla; agrupado por producto.
+    $where  = '';
+    $params = [$desde, $hasta, $servicio, $idEfectivo];
+    if ($producto > 0) {
+      $where    = " AND g.producto_id = ?";
+      $params[] = $producto;
+    }
+
+    $sql = "SELECT p.id, p.descripcion AS producto, COUNT(g.producto_id) AS vendidos
+            FROM gestion g
+            INNER JOIN productos p ON p.id = g.producto_id
+            WHERE g.fecha BETWEEN ? AND ? AND g.servicio_id = ? AND g.efectivo_id = ?" . $where . "
+            GROUP BY p.id, p.descripcion
+            ORDER BY vendidos DESC";
+
+    return $this->db->selectQuery($sql, $params, str_repeat('s', count($params)));
   }
 
   public function efectivo(array $servicios): array
@@ -53,60 +89,26 @@ class database
       return $this->db->selectQuery($sql, [$desde, $hasta, $servicio], 'sss');
     }
 
-    $sql = "SELECT
-            rc.id AS 'idResultado',
-            rc.gestion_id AS 'idGestion',
-            CASE rc.paymentPlan
-                WHEN '1' THEN 'Monto total'
-                WHEN '2' THEN 'Cuota'
-                WHEN '3' THEN 'Pago personalizado'
-                ELSE rc.paymentPlan
-            END AS 'planDePago',
-            rc.paymentDate AS 'fechaPago',
-            rc.idQuote AS 'idCuota',
-            rc.amount AS 'monto',
-            rc.fullName AS 'nombreEncargado',
-            CASE rc.relationship
-                WHEN 'PADRE' THEN 'Padre'
-                WHEN 'MADRE' THEN 'Madre'
-                WHEN 'HIJO' THEN 'Hijo/Hija'
-                WHEN 'HERMANO' THEN 'Hermano/Hermana'
-                WHEN 'ESPOSA' THEN 'Esposo/Esposa'
-                WHEN 'OTRO' THEN 'Otro'
-                ELSE 'No especificado'
-            END AS 'parentesco',
-            rc.observaciones AS 'observaciones',
-            CONCAT(u.nombre, ' ', u.apellido) AS 'operador',
-            cc.nombre_usuario AS 'nombreCliente',
-            rc.created_at AS 'fechaCreacion',
-            s.name AS 'estadoGestion',
-            cc.cedula AS 'cedula',
-            g.tipoGestion AS 'tipo_gestion'
-        FROM
-            results_cashea AS rc
-        LEFT JOIN
-            gestion AS g ON rc.gestion_id = g.id
-        LEFT JOIN
-            users AS u ON g.user_id = u.id
-        LEFT JOIN
-            cashea_customers AS cc ON rc.cliente_id = cc.id
-        LEFT JOIN
-            status AS s ON rc.status_id = s.id
-        WHERE
-            DATE(rc.created_at) >= ? and DATE(rc.created_at) <= ?";
-    return $this->db->selectQuery($sql, ["$desde 00:00:00", "$hasta 23:59:59"], 'ss');
+    return [];
   }
 
-  public function clientesEfectivos(int $id_user, string $desde, string $hasta, int $servicio): array
+  public function clientesEfectivos(int $id_user, string $desde, string $hasta, int $servicio, int $producto): array
   {
-    $sql = "SELECT COUNT(gestion.contacto_id) AS efectivos FROM gestion WHERE gestion.user_id = ? AND contacto_id = 1 AND fecha BETWEEN ? AND ? AND servicio_id = ?";
-    return $this->db->selectQuery($sql, [$id_user, $desde, $hasta, $servicio], 'ssss');
+    $sql = "SELECT COUNT(gestion.contacto_id) AS efectivos FROM gestion WHERE gestion.user_id = ? AND contacto_id = 1 AND fecha BETWEEN ? AND ? AND servicio_id = ? and producto_id = ?";
+    return $this->db->selectQuery($sql, [$id_user, $desde, $hasta, $servicio, $producto], 'sssss');
   }
 
-  public function ventasEfectivas(int $id_user, string $desde, string $hasta, int $servicio, int $idEfectivo): array
+  public function ventasEfectivas(int $id_user, string $desde, string $hasta, int $servicio, int $idEfectivo, int $producto = 0): array
   {
-    $sql = "SELECT COUNT(gestion.producto_id) AS ventas FROM gestion WHERE gestion.user_id = ? AND efectivo_id = ? AND fecha BETWEEN ? AND ? AND servicio_id = ?";
-    return $this->db->selectQuery($sql, [$id_user, $idEfectivo, $desde, $hasta, $servicio], 'sssss');
+    $sql    = "SELECT COUNT(gestion.producto_id) AS ventas FROM gestion WHERE gestion.user_id = ? AND efectivo_id = ? AND fecha BETWEEN ? AND ? AND servicio_id = ?";
+    $params = [$id_user, $idEfectivo, $desde, $hasta, $servicio];
+    $tipos  = 'sssss';
+    if ($producto > 0) {
+      $sql     .= " AND producto_id = ?";
+      $params[] = $producto;
+      $tipos   .= 's';
+    }
+    return $this->db->selectQuery($sql, $params, $tipos);
   }
 
   public function buscarCliente(string $cedula)
@@ -124,17 +126,17 @@ class database
 
   public function gestionContactonoefectivo(string $desde, string $hasta, int $serv): array
   {
-    $sql = "SELECT n.descripcion, COUNT(g.noefectivo_id) AS total FROM gestion g INNER JOIN noefectivo n ON g.noefectivo_id = n.id WHERE g.fecha BETWEEN ? AND ? AND g.servicio_id = ? GROUP BY n.descripcion";
+    $sql = "SELECT n.descripcion, COUNT(g.noefectivo_id) AS total FROM gestion g INNER JOIN noefectivo n ON g.noefectivo_id = n.id WHERE g.fecha BETWEEN ? AND ? AND g.servicio_id = ? GROUP BY n.descripcion ORDER BY total desc";
     return $this->db->selectQuery($sql, [$desde, $hasta, $serv], 'sss');
   }
 
   public function gestionContactoefectivo(string $desde, string $hasta, int $serv): array
   {
     if (empty($serv)) {
-      $sql = "SELECT e.descripcion, COUNT(g.efectivo_id) AS total FROM gestion g INNER JOIN efectivo e ON g.efectivo_id = e.id WHERE /*g.status_id = 4 AND */fecha BETWEEN ? AND ? GROUP BY e.descripcion";
+      $sql = "SELECT e.descripcion, COUNT(g.efectivo_id) AS total FROM gestion g INNER JOIN efectivo e ON g.efectivo_id = e.id WHERE fecha BETWEEN ? AND ? GROUP BY e.descripcion ORDER BY total desc";
       return $this->db->selectQuery($sql, [$desde, $hasta], 'ss');
     }
-    $sql = "SELECT e.descripcion, COUNT(g.efectivo_id) AS total FROM gestion g INNER JOIN efectivo e ON g.efectivo_id = e.id WHERE /*g.status_id = 4 AND */g.fecha BETWEEN ? AND ? AND g.servicio_id = ? GROUP BY e.descripcion";
+    $sql = "SELECT e.descripcion, COUNT(g.efectivo_id) AS total FROM gestion g INNER JOIN efectivo e ON g.efectivo_id = e.id WHERE g.fecha BETWEEN ? AND ? AND g.servicio_id = ? GROUP BY e.descripcion ORDER BY total desc";
     return $this->db->selectQuery($sql, [$desde, $hasta, $serv], 'sss');
   }
 
@@ -164,61 +166,6 @@ class database
     $in = '(' . implode(',', array_fill(0, count($ids), '?')) . ')';
     $sql = "SELECT id, descripcion FROM servicios WHERE status_id = 2 and id IN $in ORDER BY descripcion";
     return $this->db->selectQuery($sql, $ids, str_repeat('i', count($ids)));
-  }
-
-  public function gestionDetalladaCashea(string $desde, string $hasta): array
-  {
-    $sql = "SELECT
-        IF(g.contacto_id = 0, 'No Efectivo', 'Efectivo') AS tipo_contacto,
-        e.descripcion AS efectivo,
-        ne.descripcion AS no_efectivo,
-        sc.descripcion AS sub_contacto,
-        CASE rc.paymentPlan
-            WHEN '1' THEN 'Monto total'
-            WHEN '2' THEN 'Cuota'
-            WHEN '3' THEN 'Pago personalizado'
-            ELSE rc.paymentPlan
-        END AS planDePago,
-        rc.paymentDate AS fechaPago,
-        rc.idQuote AS idCuota,
-        rc.amount AS monto,
-        rc.fullName AS nombreEncargado,
-        CASE rc.relationship
-            WHEN 'PADRE' THEN 'Padre'
-            WHEN 'MADRE' THEN 'Madre'
-            WHEN 'HIJO' THEN 'Hijo/Hija'
-            WHEN 'HERMANO' THEN 'Hermano/Hermana'
-            WHEN 'ESPOSA' THEN 'Esposo/Esposa'
-            WHEN 'OTRO' THEN 'Otro'
-            ELSE 'No especificado'
-        END AS parentesco,
-        rc.observaciones AS observaciones,
-        cc.nombre_usuario,
-        cc.cedula,
-        st.name AS status,
-        CONCAT(u.nombre, ' ', u.apellido) AS operador,
-        g.fecha AS fecha_gestion,
-        g.hora AS hora_gestion
-    FROM
-        gestion g
-    LEFT JOIN
-        results_cashea rc ON g.id = rc.gestion_id
-    LEFT JOIN
-        efectivo e ON g.efectivo_id = e.id
-    LEFT JOIN
-        noefectivo ne ON g.noefectivo_id = ne.id
-    LEFT JOIN
-        subcontacto sc ON g.subcontacto_id = sc.id
-    INNER JOIN
-        cashea_customers cc ON cc.id = rc.cliente_id
-    INNER JOIN
-        status st ON st.id = cc.status_id
-    INNER JOIN
-        users u ON u.id = g.user_id
-    WHERE
-        g.servicio_id = 2
-        AND g.fecha BETWEEN ? AND ?";
-    return $this->db->selectQuery($sql, [$desde, $hasta], 'ss');
   }
 
   // ---------- Dashboard: acumulado del mes por servicio ----------

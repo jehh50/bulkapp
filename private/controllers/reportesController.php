@@ -22,6 +22,8 @@ if (!security_usuario_autenticado()) {
         case 'acumulado':
           $desde = input_date(isset($_POST['fecha_d']) ? $_POST['fecha_d'] : null);
           $hasta = input_date(isset($_POST['fecha_h']) ? $_POST['fecha_h'] : null);
+          $productoId = (int) input_int(isset($_POST['producto']) ? $_POST['producto'] : null, 1, null, 0);
+          
           if ($desde === null || $hasta === null) {
             $desde = date('Y-m-d');
             $hasta = $desde;
@@ -33,7 +35,8 @@ if (!security_usuario_autenticado()) {
           $idEfectivo = $conn->efectivo($serv);
           $idEfectivoId = !empty($idEfectivo[0]['id']) ? $idEfectivo[0]['id'] : 0;
 
-          $gestion = $conn->clientesGestionados($desde, $hasta, $servicioSel, $idEfectivoId);
+          $gestion = $conn->clientesGestionados($desde, $hasta, $servicioSel, $idEfectivoId, $productoId);
+          $ventasProducto = $conn->ventasPorProducto($desde, $hasta, $servicioSel, $idEfectivoId, $productoId);
 
           // Motivos de contacto (para el modal "Ver motivos de contacto")
           $motivosNC = $conn->gestionContactonoefectivo($desde, $hasta, $servicioSel);
@@ -54,7 +57,13 @@ if (!security_usuario_autenticado()) {
           include(PUBLIC_DIR . 'general/nfooter.php');
           break;
 
-        case 'contactabilidad':
+          case 'producto':
+            header('Content-Type: application/json');
+            $servicioProd = (int) input_enum(isset($_POST['id']) ? $_POST['id'] : null, Constantes::servicios(), 0);
+            echo json_encode($servicioProd > 0 ? $conn->getProduct($servicioProd) : []);
+            break;
+
+          case 'contactabilidad':
           include(PUBLIC_DIR . 'general/header.php');
           include(PUBLIC_DIR . 'general/navbar.php');
           $desde = input_date(isset($_POST['fecha_d']) ? $_POST['fecha_d'] : null);
@@ -287,107 +296,6 @@ if (!security_usuario_autenticado()) {
 
           break;
       
-        case 'gestionCashea':
-          include(PUBLIC_DIR . 'general/header.php');
-          include(PUBLIC_DIR . 'general/navbar.php');
-        
-          //$servicio = $conn->servicio($id);
-          $desde = $hasta = date('Ymd');
-          $ventas = [];
-
-          $fechaD = input_date(isset($_POST['fecha_d']) ? $_POST['fecha_d'] : null);
-          $fechaH = input_date(isset($_POST['fecha_h']) ? $_POST['fecha_h'] : null);
-          if ($fechaD !== null && $fechaH !== null) {
-            $desde = date('Ymd', strtotime($fechaD));
-            $hasta = date('Ymd', strtotime($fechaH));
-            $servicioSel = input_enum(isset($_POST['servicio']) ? $_POST['servicio'] : null, Constantes::servicios(), '');
-            $ventas = ($servicioSel === '') ? [] : $conn->ventaDetallada($fechaD, $fechaH, $servicioSel);
-          }
-
-          include(HTML_DIR . 'reportes/gestionCashea.php');
-          include(PUBLIC_DIR . 'general/footer.php');
-          break;
-      
-        case 'gestionDetalladaCashea':
-          include(PUBLIC_DIR . 'general/header.php');
-          include(PUBLIC_DIR . 'general/navbar.php');
-
-        
-          $desde = $hasta = date('Ymd');
-          $detallados = [];
-          $fechaD = input_date(isset($_POST['fecha_d']) ? $_POST['fecha_d'] : null);
-          $fechaH = input_date(isset($_POST['fecha_h']) ? $_POST['fecha_h'] : null);
-          if ($fechaD !== null && $fechaH !== null) {
-            $desde = date('Ymd', strtotime($fechaD));
-            $hasta = date('Ymd', strtotime($fechaH));
-            $detallados = $conn->gestionDetalladaCashea($fechaD, $fechaH);
-          }
-          include(HTML_DIR . 'reportes/gestionDetalladaCashea.php');
-          include(PUBLIC_DIR . 'general/footer.php');
-          break;
-      
-        case 'downloadCashea':
-          header("Content-type: application/vnd.ms-excel");
-          header("Content-Disposition: attachment; filename=gestionDetalladasCashea.xls");
-          $desdeDescarga = input_date(isset($_GET['from']) ? $_GET['from'] : null, 'Y-m-d');
-          $hastaDescarga = input_date(isset($_GET['to']) ? $_GET['to'] : null, 'Y-m-d');
-          if ($desdeDescarga === null || $hastaDescarga === null) {
-            $desdeDescarga = $hastaDescarga = date('Y-m-d');
-          }
-          $detallados = $conn->gestionDetalladaCashea($desdeDescarga, $hastaDescarga);
-            echo '<table class="table table-responsive table-hover table-condensed">';
-            echo '<thead>
-                    <tr> 
-                      <th>Tipo de contacto</th>
-                      <th>No efectivo</th>
-                      <th>Efectivo</th>
-                      <th>Sub Contacto </th>
-                      <th>Plan de pago</th>
-                      <th>Fecha de pago</th>
-                      <th>ID Cuota</th>
-                      <th>Monto</th>
-                      <th>Nombre del contacto</th>
-                      <th>Parentesco</th>
-                      <th>Observaciones</th>
-                      <th>Cliente</th>
-                      <th>Cédula</th>
-                      <th>Estatus</th>
-                      <th>Operador</th>
-                      <th>Fecha gestión</th>
-                      <th>Hora gestión</th>
-                    </tr>
-                  </thead>
-                  <tbody>';
-            if (!empty($detallados)) { $i=1;
-              array_walk_recursive($detallados, function (&$valor) {
-                if (is_string($valor)) {
-                  $valor = htmlspecialchars($valor, ENT_QUOTES, 'UTF-8');
-                }
-              });
-              foreach ($detallados as $detallado) {
-                echo '<tr>
-                        <td>' . $detallado['tipo_contacto'] . '</td>
-                        <td>' . $detallado['efectivo'] . '</td>
-                        <td>' . $detallado['no_efectivo'] . '</td>
-                        <td>' . $detallado['sub_contacto'] . '</td>
-                        <td>' . $detallado['planDePago'] . '</td>
-                        <td>' . $detallado['fechaPago'] . '</td>
-                        <td>' . $detallado['idCuota'] . '</td>
-                        <td>' . $detallado['monto'] . '</td>
-                        <td>' . $detallado['nombreEncargado'] . '</td>
-                        <td>' . $detallado['parentesco'] . '</td>
-                        <td>' . $detallado['observaciones'] . '</td>
-                        <td>' . $detallado['nombre_usuario'] . '</td>
-                        <td>' . $detallado['cedula'] . '</td>
-                        <td>' . $detallado['status'] . '</td>
-                        <td>' . $detallado['operador'] . '</td>
-                        <td>' . $detallado['fecha_gestion'] . '</td>
-                        <td>' . $detallado['hora_gestion'] . '</td>
-                      </tr>';
-              }
-            }
-            break;
-
         default:
           header('location:' . HTML_DIR . 'error.html');
           break;

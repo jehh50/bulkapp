@@ -85,7 +85,7 @@
           </div>
 
           <div class="alert alert-danger d-none" id="loginError" role="alert"></div>
-          <div class="alert alert-info d-none" id="loginInfo" role="alert"></div>
+          <div class="alert alert-info<?php echo isset($_GET['expirado']) ? '' : ' d-none'; ?>" id="loginInfo" role="alert"><?php echo isset($_GET['expirado']) ? 'Tu sesión expiró. Vuelve a iniciar sesión.' : ''; ?></div>
 
           <button type="submit" class="btn btn-primary btn-lg w-100" id="btnLogin">Iniciar sesión</button>
 

@@ -42,12 +42,6 @@ class Constantes
   /** Cliente atendido / sin deuda. */
   const ESTADO_ATENDIDO = 7;
 
-  /** Compromiso de pago (Cashea). */
-  const ESTADO_COMPROMISO_PAGO = 9;
-
-  /** Pago abonado (Cashea). */
-  const ESTADO_PAGO_ABONADO = 12;
-
   /* ---------------------------------------------------------------------
    * Otros valores de negocio
    * ------------------------------------------------------------------- */
@@ -57,12 +51,6 @@ class Constantes
 
   /** Registro dado de baja. */
   const REGISTRO_INACTIVO = 1;
-
-  /** Subcontactos de Cashea que admiten compromiso o abono de pago. */
-  const SUBCONTACTO_CON_PAGO = array(1, 10, 20, 21);
-
-  /** Plan de pago "pago personalizado" en Cashea. */
-  const PLAN_PAGO_PERSONALIZADO = 3;
 
   /**
    * Lista de servicios válidos.
@@ -110,29 +98,4 @@ class Constantes
     return $servicioId === self::SERVICIO_BANCARIO || $servicioId === self::SERVICIO_BANCARIO_ALIAS;
   }
 
-  /**
-   * Indica si el servicio es Cashea.
-   *
-   * @param mixed $servicioId
-   * @return bool
-   */
-  public static function esServicioCashea($servicioId)
-  {
-    return (int) $servicioId === self::SERVICIO_CASHEA;
-  }
-
-  /**
-   * Indica si un subcontacto de Cashea admite compromiso o abono de pago.
-   *
-   * @param mixed $subContacto
-   * @return bool
-   */
-  public static function admitePago($subContacto)
-  {
-    if ($subContacto === null || $subContacto === '') {
-      return false;
-    }
-
-    return in_array((int) $subContacto, self::SUBCONTACTO_CON_PAGO, true);
-  }
 }

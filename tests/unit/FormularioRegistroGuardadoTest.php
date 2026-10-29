@@ -22,12 +22,6 @@ class ModeloSimulado
     $this->llamadas[] = array('metodo' => 'registroGestion', 'args' => func_get_args());
     return 42;
   }
-
-  public function registroResultadosCashea()
-  {
-    $this->llamadas[] = array('metodo' => 'registroResultadosCashea', 'args' => func_get_args());
-    return true;
-  }
 }
 
 test('formulario_registro_guardar usa registroResultados en la venta bancaria', function () {
@@ -84,34 +78,4 @@ test('formulario_registro_guardar usa registroGestion cuando no hay venta', func
 
   assert_igual(1, count($modelo->llamadas));
   assert_igual('registroGestion', $modelo->llamadas[0]['metodo']);
-});
-
-test('formulario_registro_guardar registra gestión y resultado en Cashea', function () {
-  $modelo = new ModeloSimulado();
-
-  $datos = formulario_registro_datos(
-    array(
-      'servicio' => '2',
-      'id_cliente' => '123',
-      'contacto' => '1',
-      'efectivo' => '1',
-      'noefectivo' => '2',
-      'subContacto' => '10',
-      'venta' => '7',
-      'paymentPlan' => '3',
-      'amount' => '500',
-      'fullName' => 'Maria Perez',
-      'relationship' => 'Hija',
-      'paymentDate' => '2026-10-21',
-      'idQuote' => array('10|500'),
-    ),
-    array('id' => '9')
-  );
-
-  formulario_registro_guardar($modelo, $datos);
-
-  assert_igual(2, count($modelo->llamadas));
-  assert_igual('registroGestion', $modelo->llamadas[0]['metodo']);
-  assert_igual('registroResultadosCashea', $modelo->llamadas[1]['metodo']);
-  assert_igual(42, $modelo->llamadas[1]['args'][9]);
 });

@@ -17,7 +17,7 @@ class database
 	 * @param int $servicio El identificador del servicio (1 para clientes, otro valor para cashea).
 	 * @return int|false El número de filas insertadas con éxito, o false si hubo un error.
 	 */
-	public function guardarRegistrosBatch(array $batch, string $paramTypes, int $servicio)
+	public function guardarRegistrosBatch(array $batch, int $servicio)
 	{
 		if (empty($batch)) {
 			return 0;
@@ -85,100 +85,8 @@ class database
 		}
 	}
 
-
-	public function registroCashea(string $cedula, string $id_cuota, string $nombre_grupo, string $fecha_pagar, string $monto_cuota, string $numero_cuota, string $fee, string $plata_por_cobrar, string $capital_asignado, string $id_orden, string $identificacion_orden, string $fecha_creacion_orden, string $email, string $telefono, string $nombre_usuario, string $local_origen, string $estado_deuda, string $tramo_inicial, string $tramo_actual, string $segmento): bool {
-		$cedula = iconv(mb_detect_encoding($cedula, mb_detect_order(), true), "UTF-8", $cedula);
-		$nombre_grupo = iconv(mb_detect_encoding($nombre_grupo, mb_detect_order(), true), "UTF-8", $nombre_grupo);
-		$email = iconv(mb_detect_encoding($email, mb_detect_order(), true), "UTF-8", $email);
-		$telefono = iconv(mb_detect_encoding($telefono, mb_detect_order(), true), "UTF-8", $telefono);
-		$nombre_usuario = iconv(mb_detect_encoding($nombre_usuario, mb_detect_order(), true), "UTF-8", $nombre_usuario);
-		$local_origen = iconv(mb_detect_encoding($local_origen, mb_detect_order(), true), "UTF-8", $local_origen);
-		$estado_deuda = iconv(mb_detect_encoding($estado_deuda, mb_detect_order(), true), "UTF-8", $estado_deuda);
-		$tramo_inicial = iconv(mb_detect_encoding($tramo_inicial, mb_detect_order(), true), "UTF-8", $tramo_inicial);
-		$tramo_actual = iconv(mb_detect_encoding($tramo_actual, mb_detect_order(), true), "UTF-8", $tramo_actual);
-		$segmento = iconv(mb_detect_encoding($segmento, mb_detect_order(), true), "UTF-8", $segmento);
-
-		$query = "INSERT INTO cashea_customers (
-        cedula, id_cuota, nombre_grupo, fecha_pagar, monto_cuota, numero_cuota, fee, plata_por_cobrar,
-        capital_asignado, id_orden, identificacion_orden, fecha_creacion_orden, email, telefono,
-        nombre_usuario, local_origen, estado_deuda, tramo_inicial, tramo_actual, segmento
-    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-
-		$params = [
-			$cedula,
-			$id_cuota,
-			$nombre_grupo,
-			$fecha_pagar,
-			$monto_cuota,
-			$numero_cuota,
-			$fee,
-			$plata_por_cobrar,
-			$capital_asignado,
-			$id_orden,
-			$identificacion_orden,
-			$fecha_creacion_orden,
-			$email,
-			$telefono,
-			$nombre_usuario,
-			$local_origen,
-			$estado_deuda,
-			$tramo_inicial,
-			$tramo_actual,
-			$segmento
-		];
-
-		$paramTypes = 'ssssssssssssssssssss';
-
-		try {
-			$stmt = $this->db->preparedQuery($query, $params, $paramTypes);
-			$stmt->close();
-			return true;
-		} catch (Exception $e) {
-			app_log('error', 'Error al guardar en cashea_customers: ' . $e->getMessage());
-			return false;
-		}
-	}
-
 	public function servicio(): array
 	{
 		return $this->db->selectQuery("SELECT id,descripcion FROM servicios WHERE status_id = 2 ORDER BY id ASC");
-	}
-
-	public function updateQuotes(array $paramsBatch, string $paramTypes): bool
-	{
-		try {
-			foreach ($paramsBatch as $param) {
-				$tipo = isset($param[1]) ? trim((string) $param[1]) : '';
-				$idCuota = isset($param[0]) ? trim((string) $param[0]) : '';
-				$monto = isset($param[2]) ? str_replace(',', '.', trim((string) $param[2])) : '';
-
-				if ($idCuota === '') {
-					continue;
-				}
-
-				if ($tipo === 'Pago' || $tipo === 'Pago parcial') {
-					if (!is_numeric($monto)) {
-						continue;
-					}
-					$status = ($tipo === 'Pago') ? 7 : 13;
-					$query = "UPDATE cashea_customers cc SET cc.status_id = ?, cc.plata_por_cobrar = REPLACE(CAST(REPLACE(cc.plata_por_cobrar,',','.') AS DECIMAL (10,2)) - ?, '.', ',') WHERE cc.id_cuota = ?";
-					$params = [$status, $monto, $idCuota];
-					$types = 'iss';
-				} else {
-					$status = 10;
-					$query = "UPDATE cashea_customers cc SET cc.status_id = ? WHERE cc.id_cuota = ?";
-					$params = [$status, $idCuota];
-					$types = 'is';
-				}
-
-				$stmt = $this->db->preparedQuery($query, $params, $types);
-				if ($stmt) $stmt->close();
-
-			}
-			return true;
-		} catch (Exception $e) {
-			app_log('error', 'Error en updateQuotes: ' . $e->getMessage());
-			return false;
-		}
 	}
 }

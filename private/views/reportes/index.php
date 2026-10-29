@@ -68,6 +68,12 @@ if (!function_exists('rep_motivos_panel')) {
     <?php
   }
 }
+if(!isset($_POST['fecha_d'])){
+  $fecha_d = $fecha_h = date('d/m/Y');
+}else{
+  $fecha_d = $_POST['fecha_d'];
+  $fecha_h = $_POST['fecha_h'];
+}
 ?>
 
 <!-- FILTROS -->
@@ -79,11 +85,11 @@ if (!function_exists('rep_motivos_panel')) {
     <div class="row g-3 align-items-end">
       <div class="col-12 col-sm-6 col-lg-3">
         <label class="form-label filter-label" for="fecha_d">Desde</label>
-        <input type="date" class="form-control" name="fecha_d" id="fecha_d">
+        <input type="date" class="form-control" name="fecha_d" id="fecha_d" value="<?=$fecha_d;?>">
       </div>
       <div class="col-12 col-sm-6 col-lg-3">
         <label class="form-label filter-label" for="fecha_h">Hasta</label>
-        <input type="date" class="form-control" name="fecha_h" id="fecha_h">
+        <input type="date" class="form-control" name="fecha_h" id="fecha_h" value="<?=$fecha_h;?>">
       </div>
       <div class="col-12 col-sm-6 col-lg-3">
         <label class="form-label filter-label" for="servicio">Servicio</label>
@@ -93,6 +99,10 @@ if (!function_exists('rep_motivos_panel')) {
             <option value="<?php echo $s['id']; ?>"><?php echo $s['descripcion']; ?></option>
           <?php } ?>
         </select>
+      </div>
+      <div class="col-12 col-sm-6 col-lg-3">
+        <label class="form-label filter-label" for="producto">Producto</label>
+        <select class="form-select" name="producto" id="producto"></select>
       </div>
       <div class="col-12 col-sm-6 col-lg-3">
         <button type="submit" class="btn btn-primary w-100 search-btn">Buscar</button>
@@ -110,14 +120,14 @@ if (!function_exists('rep_motivos_panel')) {
 <?php
 } else {
   // ---------- Cálculo de filas y totales ----------
-  $avatarBg = ['#dbe5fa', '#fde7b0', '#d3f0e6', '#f7d9e0', '#e4dcf7', '#d9eef7'];
-  $salesPal = ['#2f5fc4', '#12306b', '#f5b83d', '#e8743b', '#0f9d75', '#8a3fb0'];
+  $avatarBg = ['#dbe5fa', '#fde7b0', '#d3f0e6', '#f7d9e0', '#cca677e9', '#d9eef7'];
+  $salesPal = ['#0f9d75', '#8a3fb0', '#f5b83d', '#e8743b', '#0f9d75', '#8a3fb0'];
 
   $rows = [];
-  $tg = $tc = $tnc = $tv = 0;
+  $tg = $tc = $tnc = $tv = $nc = 0;
   foreach ($gestion as $g) {
     $gg = (int) $g['gestion']; $cc = (int) $g['efectivos']; $vv = (int) $g['ventas'];
-    $nc = $gg - $cc;
+    $nc = $g['noefectivos'];
     $rows[] = ['nombre' => $g['nombre'], 'g' => $gg, 'c' => $cc, 'nc' => $nc, 'v' => $vv,
                'pc' => rep_pct($cc, $gg), 'pnc' => rep_pct($nc, $gg), 'pv' => rep_pct($vv, $cc)];
     $tg += $gg; $tc += $cc; $tv += $vv;
@@ -145,9 +155,13 @@ if (!function_exists('rep_motivos_panel')) {
                   ['label' => 'No contactados', 'n' => $tnc, 'color' => '#d5dcec']];
   $chart1Total = $tc + $tnc;
   $chart2Items = [];
-  foreach ($rows as $i => $r) {
-    $chart2Items[] = ['label' => $r['nombre'], 'n' => $r['v'], 'color' => $salesPal[$i % count($salesPal)]];
+  $ventasProd = isset($ventasProducto) && is_array($ventasProducto) ? $ventasProducto : [];
+  $i = 0;
+  foreach ($ventasProd as $vp) {
+    $chart2Items[] = ['label' => $vp['producto'], 'n' => (int) $vp['vendidos'], 'color' => $salesPal[$i % count($salesPal)]];
+    $i++;
   }
+  $chart2Total = 0; foreach ($chart2Items as $it) { $chart2Total += $it['n']; }
   $servLabel = isset($nav_service) && $nav_service !== null ? $nav_service : '';
 ?>
 
@@ -177,7 +191,7 @@ if (!function_exists('rep_motivos_panel')) {
     $charts = [
       ['title' => 'Contactados vs no contactados', 'center' => 'Gestión', 'total' => $chart1Total,
        'items' => $chart1Items, 'cta' => true],
-      ['title' => 'Ventas por operador', 'center' => 'Ventas', 'total' => $t['v'],
+      ['title' => 'Ventas por producto', 'center' => 'Ventas', 'total' => $chart2Total,
        'items' => $chart2Items, 'cta' => false],
     ];
     foreach ($charts as $ch) {
@@ -223,7 +237,8 @@ if (!function_exists('rep_motivos_panel')) {
             <th>Contactados</th>
             <th>No contact.</th>
             <th>Ventas</th>
-            <th class="ta-left">Contacto</th>
+            <th class="ta-left">% Contacto</th>
+            <th class="ta-right">% No Contacto</th>
             <th>% Ventas</th>
           </tr>
         </thead>
@@ -241,7 +256,7 @@ if (!function_exists('rep_motivos_panel')) {
               <td><?php echo $r['c']; ?></td>
               <td><?php echo $r['nc']; ?></td>
               <td><span class="pill" style="background:<?php echo $r['vbg']; ?>;color:<?php echo $r['vfg']; ?>"><?php echo $r['v']; ?></span></td>
-              <td class="ta-left" style="min-width:220px">
+              <td class="ta-left" colspan="2" style="min-width:220px">
                 <div class="bar"><div class="bar__fill" style="width:<?php echo $r['pc']; ?>%"></div></div>
                 <div class="bar-meta"><span><?php echo $r['pc']; ?>%</span><span><?php echo $r['pnc']; ?>%</span></div>
               </td>
@@ -402,5 +417,37 @@ function validateService() {
 
   paginate({ rowSelector: '.op-row',  pagerId: 'opPager',      wrapId: 'opPagerWrap',      infoId: 'opPageInfo' });
   paginate({ rowSelector: '.op-card', pagerId: 'opCardsPager', wrapId: 'opCardsPagerWrap' });
+})();
+
+// Producto (depende del servicio seleccionado)
+(function () {
+  var servicio = document.getElementById('servicio');
+  var producto = document.getElementById('producto');
+  if (!servicio || !producto) { return; }
+
+  servicio.addEventListener('change', function () {
+    producto.innerHTML = '<option value="" disabled selected>Seleccione...</option>';
+    if (!servicio.value) { return; }
+
+    var cuerpo = new URLSearchParams();
+    cuerpo.set('id', servicio.value);
+
+    fetch('?view=reportes&mode=producto', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: cuerpo.toString()
+    })
+      .then(function (resp) { return resp.json(); })
+      .then(function (datos) {
+        if (!Array.isArray(datos)) { return; }
+        datos.forEach(function (item) {
+          var opt = document.createElement('option');
+          opt.value = item.id;
+          opt.textContent = item.descripcion;
+          producto.appendChild(opt);
+        });
+      })
+      .catch(function () { /* el combo queda en "Seleccione..." si falla la carga */ });
+  });
 })();
 </script>

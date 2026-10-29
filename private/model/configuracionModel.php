@@ -50,69 +50,6 @@ class database
     }
   }
 
-  public function guardarRegistrosTemporalBatch(array $batch, string $types, int $servicio): bool
-  {
-    // CORRECCIÓN 1: Verificar la variable correcta ($batch)
-    if (empty($batch)) {
-      return false;
-    }
-
-    if ($servicio == 1) {
-      $query = "INSERT INTO clientes (identificacion, nombre_legal, telf_hab, telf_ofi, telf_cel, correo, direccion, cuenta, oferta) VALUES ";
-    } else {
-      $query = "INSERT INTO cashea (cedula, id_cuota, nombre_grupo, fecha_pagar, monto_cuota, numero_cuota, fee, plata_por_cobrar, capital_asignado, id_orden, identificacion_orden, fecha_creacion_orden, email, telefono, nombre_usuario, local_origen, estado_deuda, tramo_inicial, tramo_actual, segmento) VALUES ";
-    }
-
-    $placeHolders = [];
-    $flatennedParams = [];
-
-    foreach ($batch as $row) {
-      // CORRECCIÓN 2: Usar count($row) para obtener el número de columnas
-      $placeHolders[] = '(' . implode(',', array_fill(0, count($row), '?')) . ')';
-      $flatennedParams = array_merge($flatennedParams, $row);
-    }
-
-    try {
-      $query .= implode(',', $placeHolders);
-      $stmt = $this->db->preparedQuery($query, $flatennedParams, str_repeat($types, count($batch)));
-
-      if ($stmt) {
-        $stmt->close();
-      }
-
-      return true;
-    } catch (Exception $e) {
-      app_log('error', 'Error en guardarRegistrosTemporalBatch: ' . $e->getMessage());
-      return false;
-    }
-  }
-
-  public function listarTemporal(int $servicio, int $paginaActual, int $registrosPorPagina): array
-  {
-    // Nombre de tabla desde lista blanca (no parametrizable como valor)
-    if ($servicio == 1) {
-      $tabla = "clientes";
-    } else {
-      $tabla = "cashea_customers";
-    }
-
-    $offset = ($paginaActual - 1) * $registrosPorPagina;
-
-    $filaTotal = $this->db->selectQuery("SELECT COUNT(*) as total FROM $tabla");
-    $totalRegistros = !empty($filaTotal) ? $filaTotal[0]['total'] : 0;
-
-    $registros = $this->db->selectQuery("SELECT * FROM $tabla LIMIT ? OFFSET ?", [$registrosPorPagina, $offset], 'ii');
-
-    $totalPaginas = ceil($totalRegistros / $registrosPorPagina);
-    return [
-      'registros' => $registros,
-      'totalRegistros' => $totalRegistros,
-      'totalPaginas' => $totalPaginas,
-      'paginaActual' => $paginaActual,
-      'porPagina' => $registrosPorPagina
-    ];
-  }
-
   public function busquedaResultados(string $cedula): array
   {
     return $this->db->selectQuery("SELECT a.id as resultado_id, a.gestion_id, a.nombre, a.apellido, a.genero, a.fecha_nacimiento, a.cedula, a.telf_hab, a.telf_ofi, a.telf_celular, a.correo, a.cuenta, b.descripcion, b.id as servicio_id, a.producto_id, p.descripcion as name_product, a.fecha_venta FROM resultados a INNER JOIN servicios b  ON a.servicio_id = b.id INNER JOIN productos p ON a.producto_id = p.id WHERE a.cedula = ?", [$cedula], 's');

@@ -60,6 +60,13 @@ $(document).ready(function () {
     reset();
   });
 
+  // Enter dentro del formulario de búsqueda: evita el submit nativo
+  // (que navegaría perdiendo index.php y terminaría en login) y dispara la búsqueda.
+  $('#formBuscar').on('submit', function (e) {
+    e.preventDefault();
+    $('#btn-buscar').trigger('click');
+  });
+
   // Buscar cliente por teléfono
   $('#btn-buscar').on('click', function (e) {
     var telefono = $.trim($('#b_telf').val());

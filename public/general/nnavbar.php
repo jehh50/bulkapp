@@ -46,9 +46,8 @@
             <ul class="dropdown-menu dropdown-menu-end" data-bs-theme="light">
               <li><a class="dropdown-item" href="?view=configuracion&mode=index">Listar Productos</a></li>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item<?php echo nav_active($curKey, ['carga_archivo:index', 'carga_archivo:registro', 'carga_archivo:liberarCuotas', 'carga_archivo:freeQuotes']); ?>" href="?view=carga_archivo&mode=index">Carga BBDD</a></li>
+              <li><a class="dropdown-item<?php echo nav_active($curKey, ['carga_archivo:index', 'carga_archivo:registro']); ?>" href="?view=carga_archivo&mode=index">Carga BBDD</a></li>
               <li><a class="dropdown-item" href="?view=configuracion&mode=editarResultado">Editar resultados</a></li>
-              <li><a class="dropdown-item" href="?view=carga_archivo&mode=liberarCuotas">Liberar cuotas Cashea</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item" href="?view=usuarios&mode=index">Bandeja de usuarios</a></li>
               <li><a class="dropdown-item" href="?view=usuarios&mode=new">Nuevo usuario</a></li>

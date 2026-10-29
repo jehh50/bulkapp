@@ -118,7 +118,7 @@ if (isset($_GET['mode'])) {
 					break;
 				}
 
-				$update 	= $conexion->updateUser($id,$nombre,$apellido,$rol,$status,$servicio);
+				$update = $conexion->updateUser($id,$nombre,$apellido,$rol,$status,$servicio);
 			
 			if ($update){
 				$json['response'] = 'true';

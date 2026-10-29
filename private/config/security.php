@@ -162,9 +162,67 @@ function security_requerir_rol(array $tipos)
     ));
   }
 
-  http_response_code(403);
-  header('Content-Type: text/plain; charset=UTF-8');
-  echo 'No autorizado.';
+  security_responder_sin_permiso();
+}
+
+/**
+ * Respuesta cuando el usuario autenticado no tiene permiso para la sección.
+ *
+ * Navegación normal: página con un modal de "acceso restringido" que redirige
+ * al formulario. Peticiones AJAX: JSON controlado con el destino sugerido.
+ *
+ * @return void
+ */
+function security_responder_sin_permiso()
+{
+  $destino = 'index.php?view=formulario&mode=index';
+
+  $esAjax = (function_exists('app_es_ajax') && app_es_ajax())
+    || isset($_SERVER['HTTP_X_CSRF_TOKEN'])
+    || (isset($_SERVER['HTTP_ACCEPT']) && strpos((string) $_SERVER['HTTP_ACCEPT'], 'application/json') !== false);
+
+  if (!headers_sent()) {
+    http_response_code(403);
+    header('Content-Type: ' . ($esAjax ? 'application/json' : 'text/html') . '; charset=UTF-8');
+  }
+
+  if ($esAjax) {
+    echo json_encode(array(
+      'response' => 'false',
+      'denied'   => true,
+      'message'  => 'No tienes acceso a esta sección.',
+      'redirect' => $destino,
+    ));
+    exit;
+  }
+
+  $destinoAttr = htmlspecialchars($destino, ENT_QUOTES, 'UTF-8');
+  $destinoJs   = json_encode($destino);
+
+  echo '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">'
+    . '<meta name="viewport" content="width=device-width, initial-scale=1">'
+    . '<title>Acceso restringido</title><style>'
+    . ':root{--blue-900:#12306b;--blue-700:#1a4391;--gold:#f5b83d;--ink:#252525}'
+    . '*{box-sizing:border-box}body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;'
+    . 'background:rgba(18,48,107,.55);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}'
+    . '.sp-card{background:#fff;border-radius:16px;box-shadow:0 18px 50px rgba(18,48,107,.35);max-width:420px;width:100%;'
+    . 'padding:28px;text-align:center;border-top:5px solid var(--gold)}'
+    . '.sp-ico{width:62px;height:62px;border-radius:50%;background:#fdecec;color:#b42318;display:flex;align-items:center;'
+    . 'justify-content:center;font-size:30px;margin:0 auto 16px}'
+    . '.sp-title{margin:0 0 8px;font-size:20px;font-weight:600;color:var(--ink)}'
+    . '.sp-text{margin:0 0 20px;font-size:14.5px;color:#5b6475;line-height:1.5}'
+    . '.sp-btn{display:inline-block;height:44px;line-height:44px;padding:0 24px;border-radius:10px;background:var(--blue-700);'
+    . 'color:#fff;font-size:14px;font-weight:600;text-decoration:none}.sp-btn:hover{background:var(--blue-900)}'
+    . '</style></head><body>'
+    . '<div class="sp-card" role="alertdialog" aria-labelledby="spTitle" aria-describedby="spText">'
+    . '<div class="sp-ico">&#9888;</div>'
+    . '<h1 class="sp-title" id="spTitle">Acceso restringido</h1>'
+    . '<p class="sp-text" id="spText">No tienes permiso para acceder a esta sección. '
+    . 'Te redirigiremos al formulario en unos segundos.</p>'
+    . '<a class="sp-btn" href="' . $destinoAttr . '">Ir al formulario</a>'
+    . '</div>'
+    . '<script>setTimeout(function(){window.location=' . $destinoJs . ';},3000);</script>'
+    . '</body></html>';
   exit;
 }
 
@@ -219,11 +277,44 @@ function security_require_csrf()
         'user_agent' => function_exists('app_user_agent') ? app_user_agent() : '',
       ));
     }
-    http_response_code(403);
-    header('Content-Type: text/plain; charset=UTF-8');
-    echo 'Solicitud rechazada: token CSRF inválido o ausente.';
+
+    security_responder_csrf_invalido();
+  }
+}
+
+/**
+ * Respuesta controlada cuando el token CSRF es inválido o la sesión expiró.
+ *
+ * Evita el 500/respuesta cruda que rompía las llamadas AJAX: para una petición
+ * AJAX devuelve un JSON que el front puede interpretar (response=false +
+ * expired), y para una navegación normal redirige al login con un aviso.
+ *
+ * @return void
+ */
+function security_responder_csrf_invalido()
+{
+  $mensaje = 'Su sesión expiró. Vuelva a iniciar sesión e intente nuevamente.';
+
+  $esAjax = (function_exists('app_es_ajax') && app_es_ajax())
+    || isset($_SERVER['HTTP_X_CSRF_TOKEN'])
+    || (isset($_SERVER['HTTP_ACCEPT']) && strpos((string) $_SERVER['HTTP_ACCEPT'], 'application/json') !== false);
+
+  if ($esAjax) {
+    if (!headers_sent()) {
+      header('Content-Type: application/json; charset=UTF-8');
+    }
+    echo json_encode(array(
+      'response' => 'false',
+      'expired'  => true,
+      'message'  => $mensaje,
+    ));
     exit;
   }
+
+  if (!headers_sent()) {
+    header('Location: index.php?expirado=1');
+  }
+  exit;
 }
 
 /* -------------------------------------------------------------------------

@@ -16,21 +16,6 @@ test('Constantes::esServicioBancario reconoce 1 y 5', function () {
   assert_falso(Constantes::esServicioBancario(2));
 });
 
-test('Constantes::esServicioCashea reconoce el servicio 2', function () {
-  assert_verdadero(Constantes::esServicioCashea(2));
-  assert_falso(Constantes::esServicioCashea(1));
-});
-
-test('Constantes::admitePago solo acepta los subcontactos con compromiso', function () {
-  assert_verdadero(Constantes::admitePago(1));
-  assert_verdadero(Constantes::admitePago(10));
-  assert_verdadero(Constantes::admitePago(20));
-  assert_verdadero(Constantes::admitePago(21));
-  assert_falso(Constantes::admitePago(5));
-  assert_falso(Constantes::admitePago(null));
-  assert_falso(Constantes::admitePago(''));
-});
-
 test('Constantes::servicios y tiposUsuario devuelven las listas permitidas', function () {
   assert_igual(array(1, 2, 5), Constantes::servicios());
   assert_igual(array(1, 2, 3), Constantes::tiposUsuario());

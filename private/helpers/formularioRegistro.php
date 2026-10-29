@@ -146,47 +146,6 @@ function formulario_registro_venta_valida(array $datos)
 }
 
 /**
- * Datos del servicio Cashea (servicio 2).
- *
- * @param array $post
- * @param array $base
- * @return array|false
- */
-function formulario_registro_datos_cashea($post, array $base)
-{
-  $datos = $base;
-
-  if (!Constantes::admitePago($base['sub_contacto'])) {
-    return $datos;
-  }
-
-  $paymentPlan = input_enum(isset($post['paymentPlan']) ? $post['paymentPlan'] : null, array(1, 2, 3));
-  if ($paymentPlan === null) {
-    return false;
-  }
-
-  $datos['payment_plan'] = (int) $paymentPlan;
-
-  if ($datos['payment_plan'] === Constantes::PLAN_PAGO_PERSONALIZADO) {
-    $amount = input_amount(isset($post['amount']) ? $post['amount'] : null);
-    if ($amount === null) {
-      return false;
-    }
-    $datos['status'] = Constantes::ESTADO_PAGO_ABONADO;
-    $datos['amount'] = $amount;
-  } else {
-    $datos['status'] = Constantes::ESTADO_COMPROMISO_PAGO;
-    $datos['amount'] = null;
-  }
-
-  $datos['full_name'] = input_letters(isset($post['fullName']) ? $post['fullName'] : '', 100);
-  $datos['relationship'] = input_string(isset($post['relationship']) ? $post['relationship'] : '', 30);
-  $datos['observaciones'] = input_string(isset($post['observaciones']) ? $post['observaciones'] : '', 1000);
-
-  return $datos;
-}
-
-/**
  * Datos completos del registro según el servicio.
  *
  * @param array $post
@@ -204,10 +163,6 @@ function formulario_registro_datos($post, $session)
     return formulario_registro_datos_bancario($post, $base);
   }
 
-  if (Constantes::esServicioCashea($base['servicio'])) {
-    return formulario_registro_datos_cashea($post, $base);
-  }
-
   return false;
 }
 
@@ -222,10 +177,6 @@ function formulario_registro_guardar($conn, array $datos)
 {
   if (Constantes::esServicioBancario($datos['servicio'])) {
     return formulario_registro_guardar_bancario($conn, $datos);
-  }
-
-  if (Constantes::esServicioCashea($datos['servicio'])) {
-    return formulario_registro_guardar_cashea($conn, $datos);
   }
 
   return false;
@@ -271,33 +222,6 @@ function formulario_registro_guardar_bancario($conn, array $datos)
   }
 
   return formulario_registro_guardar_gestion($conn, $datos);
-}
-
-/**
- * @param object $conn
- * @param array $datos
- * @return mixed
- */
-function formulario_registro_guardar_cashea($conn, array $datos)
-{
-  if (!Constantes::admitePago($datos['sub_contacto'])) {
-    return formulario_registro_guardar_gestion($conn, $datos);
-  }
-
-  $gestionId = formulario_registro_guardar_gestion($conn, $datos);
-
-  return $conn->registroResultadosCashea(
-    $datos['payment_plan'],
-    $datos['payment_date'],
-    $datos['id_quote'],
-    $datos['amount'],
-    $datos['full_name'],
-    $datos['relationship'],
-    $datos['observaciones'],
-    $datos['id_cliente'],
-    $datos['status'],
-    $gestionId
-  );
 }
 
 /**

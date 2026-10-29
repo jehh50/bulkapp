@@ -31,47 +31,8 @@ if (!security_usuario_autenticado()) {
               $cuentas = $conn->cuentasBancarias();
               include(HTML_DIR . 'formulario/index.php');
               break;
-            case Constantes::SERVICIO_CASHEA:
-              // cashea
-              $cliente = null;
-              include(HTML_DIR . 'formulario/cashea.php');
-              break;
           }
           include(PUBLIC_DIR . 'general/nfooter.php');
-          break;
-
-        case 'buscarCliente':
-          $dni = input_string(isset($_POST['dni']) ? $_POST['dni'] : '', 30);
-          $servicioId = input_enum(isset($_POST['servicioId']) ? $_POST['servicioId'] : null, Constantes::servicios());
-          if ($dni === '' || $servicioId === null) {
-            $cliente = false;
-          } else {
-            $cliente = $conn->buscaCliente($dni, $servicioId);
-          }
-          $id = Constantes::servicioBase(isset($_SESSION['servicio_id']) ? $_SESSION['servicio_id'] : 1);
-          if (!$cliente || $cliente[0]['is_active'] == 0) {
-            $msg = 'No existe o el cliente no está activo';
-          } else {
-            $st = '';
-            $id_cliente = [];
-            for ($i = 0; $i < count($cliente); $i++) {
-              $st .= $cliente[$i]['status_id'];
-              $id_cliente[] = $cliente[$i]['id'];
-            }
-            $customerHistory = $conn->customerHistory($id_cliente);
-            $pay = str_repeat(Constantes::ESTADO_ATENDIDO, count($cliente));
-            if ($st == $pay) {
-              $msg = 'Cliente sin deuda ✅';
-            } else {
-              $msg = '';
-            }
-          }
-          include(PUBLIC_DIR . 'general/header.php');
-          include(PUBLIC_DIR . 'general/navbar.php');
-          $noefectivo = $conn->contactoNoEfectivo($id);
-          $efectivo = $conn->contactoEfectivo($id);
-          include(HTML_DIR . 'formulario/cashea.php');
-          include(PUBLIC_DIR . 'general/footer.php');
           break;
 
         case 'cliente':

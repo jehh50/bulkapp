@@ -33,13 +33,6 @@ class database
       $sql = "SELECT * FROM clientes WHERE (identificacion = ? OR telf_hab LIKE ? or telf_ofi LIKE ? OR telf_cel LIKE ?) and servicio_id = ?";
       return $this->db->selectQuery($sql, [$telefono, '%' . $telefono, '%' . $telefono, '%' . $telefono, $servicio], 'sssss');
     }
-    if ($servicio == 2) {
-      $sql = "SELECT cc.is_active, cc.fecha_creacion_orden as mora, (CASE WHEN s.id = '3' THEN 'Pendiente por cobrar' WHEN s.id = 4 THEN 'Pendiente por cobrar' WHEN s.id = 8 THEN 'Pendiente por cobrar' WHEN s.id = 9 THEN 'Compromiso de pago' ELSE s.name END) AS status, cc.status_id, cc.id, cc.id_cuota, cc.local_origen, cc.plata_por_cobrar, cc.fecha_pagar, cc.numero_cuota, cc.tramo_inicial, cc.segmento, cc.nombre_usuario, cc.email, cc.telefono, cc.cedula, (SELECT SUM(CAST(REPLACE(REPLACE(plata_por_cobrar, '.', ''), ',', '.') AS DECIMAL(20, 10))) AS total_plata_por_cobrar FROM cashea_customers WHERE (cedula = ? OR telefono = ?) AND status_id IN (3,4,8,9,10,12,13) and is_active = 1) AS deuda_total FROM cashea_customers cc  INNER JOIN status s ON cc.status_id = s.id WHERE (cc.cedula = ? OR cc.telefono = ?) AND cc.status_id IN (3,4,7,8,9,10,12,13) AND cc.is_active = 1 ORDER BY cc.id_cuota ASC";
-
-      //$sql = $this->db->query("SELECT * FROM vista_cashea_clientes vcc WHERE vcc.cedula = '$telefono' OR vcc.telefono = '$telefono' ORDER BY vcc.id_cuota ASC");
-
-      return $this->db->selectQuery($sql, [$telefono, $telefono, $telefono, $telefono], 'ssss');
-    }
   }
 
   public function estado(int $servicio_id): array
@@ -96,35 +89,9 @@ class database
 
   public function registroGestion(?int $contacto, ?int $efectivo, ?int $producto, ?int $noefectivo, ?int $subcontacto, int $id_usuario, string $date, int $id_cliente, ?int $status, string $hora, int $servicio, ?string $dni, ?array $idQuote, ?string $gestion): int
   {
-    $whereParams = [];
-    if (Constantes::esServicioBancario($servicio)) {
-      $table = 'clientes';
-      $where = 'id = ?';
-      $whereParams[] = $id_cliente;
-    } else {
-      $table = 'cashea_customers cc';
-      if (!$idQuote) {
-        $where = 'cc.cedula = ? AND cc.status_id = 3';
-        $whereParams[] = $dni;
-      } else {
-        $where = 'cc.cedula = ? AND cc.status_id NOT IN (7,11) AND cc.id_cuota in ';
-        $whereParams[] = $dni;
-        if (count($idQuote) == 1) {
-          $idQuote = explode("|", $idQuote[0]);
-          $where .= "(?)";
-          $whereParams[] = $idQuote[0];
-        } else {
-          $placeholders = [];
-          for ($i = 0; $i < count($idQuote); $i++) {
-            $idQuote[$i] = explode("|", $idQuote[$i]);
-            $idQuote[$i] = $idQuote[$i][0];
-            $placeholders[] = '?';
-            $whereParams[] = $idQuote[$i];
-          }
-          $where .= '(' . implode(',', $placeholders) . ')';
-        }
-      }
-    }
+    $table = 'clientes';
+    $where = 'id = ?';
+    $whereParams = [$id_cliente];
 
     $efectivo = ($efectivo === null) ? null : $efectivo;
     $noefectivo = ($noefectivo === null) ? null : $noefectivo;
@@ -149,64 +116,13 @@ class database
     return $id_gestion;
   }
 
-  public function registroResultadosCashea(?int $paymentPlan, ?string $paymentDate, ?array $idQuote, ?string $amount, ?string $fullName, ?string $relationship, ?string $observaciones, int $id_cliente, ?int $status, ?int $gestionId)
-  {
-    if (!is_array($idQuote) || empty($idQuote)) {
-      return false;
-    }
-    for ($i = 0; $i < count($idQuote); $i++) {
-      if (count($idQuote) == 1) {
-        $value = explode('|', $idQuote[$i]);
-        if (empty($amount)) {
-          $amount = $value[1];
-        }
-
-        $this->db->preparedQuery(
-          "INSERT INTO results_cashea (gestion_id,paymentPlan, paymentDate, idQuote, amount, fullName, relationship, observaciones, cliente_id, status_id) VALUES (?,?,?,?,?,?,?,?,?,?)",
-          [$gestionId, $paymentPlan, $paymentDate, $value[0], $amount, $fullName, $relationship, $observaciones, $id_cliente, $status],
-          'ssssssssss'
-        );
-      } else {
-        $value = explode('|', $idQuote[$i]);
-        $this->db->preparedQuery(
-          "INSERT INTO results_cashea (gestion_id,paymentPlan, paymentDate, idQuote, amount, fullName, relationship, observaciones, cliente_id, status_id) VALUES (?,?,?,?,?,?,?,?,?,?)",
-          [$gestionId, $paymentPlan, $paymentDate, $value[0], $value[1], $fullName, $relationship, $observaciones, $id_cliente, $status],
-          'ssssssssss'
-        );
-      }
-    }
-  }
-
   public function codigosProductos(int $servicio): array
   {
     return $this->db->selectQuery("SELECT id FROM productos WHERE servicio_id = ?", [$servicio], 's');
   }
 
-  public function referidos(int $cod_servicio, string $fecha, int $id_user, int $tipo): array
-  {
-    if ($tipo == 2) {
-      $sql = "SELECT DISTINCT(clientes.nombre_legal), clientes.identificacion, clientes.telf_hab, clientes.telf_ofi, clientes.telf_cel, clientes.identificacion, CONCAT(gestion.fecha,' ',gestion.hora) AS fecha FROM clientes inner join gestion on clientes.id = gestion.cliente_id WHERE gestion.efectivo_id = 2 AND gestion.servicio_id = ? AND gestion.fecha = ? AND gestion.user_id = ? ORDER BY fecha desc";
-      return $this->db->selectQuery($sql, [$cod_servicio, $fecha, $id_user], 'sss');
-    } else {
-      $sql = "SELECT DISTINCT(clientes.nombre_legal), clientes.identificacion, clientes.telf_hab, clientes.telf_ofi, clientes.telf_cel, clientes.identificacion, CONCAT(gestion.fecha,' ',gestion.hora) AS fecha, CONCAT(users.nombre,' ',users.apellido) AS operador FROM clientes INNER JOIN gestion on clientes.id = gestion.cliente_id INNER JOIN users ON gestion.user_id = users.id WHERE gestion.efectivo_id = 2 AND gestion.servicio_id = ? AND gestion.fecha = ? ORDER BY fecha desc";
-      return $this->db->selectQuery($sql, [$cod_servicio, $fecha], 'ss');
-    }
-  }
-
   public function cuentasBancarias(): array
   {
     return $this->db->selectQuery("SELECT * FROM tipo_cuentas where status_id = '2'");
-  }
-
-  public function customerHistory(array $idCliente): array
-  {
-    $placeholders = [];
-    for ($i = 0; $i < count($idCliente); $i++) {
-      $placeholders[] = '?';
-    }
-    $in = '(' . implode(',', $placeholders) . ')';
-
-    $sql = "SELECT IF(g.contacto_id = 0, 'No efectivo','Efectivo') AS contacto, e.descripcion AS efectivo, ne.descripcion AS noefectivo, s.descripcion AS subcontacto, g.fecha, st.name as status, CONCAT(u.nombre,' ',u.apellido) as asesor FROM gestion g LEFT JOIN efectivo e ON g.efectivo_id = e.id LEFT JOIN noefectivo ne ON g.noefectivo_id = ne.id LEFT JOIN subcontacto s ON g.subContacto_id = s.id LEFT JOIN status st ON g.status_id = st.id LEFT JOIN users u ON g.user_id = u.id WHERE g.cliente_id IN $in ORDER BY g.id DESC";
-    return $this->db->selectQuery($sql, $idCliente, str_repeat('s', count($idCliente)));
   }
 }
