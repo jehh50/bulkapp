@@ -26,6 +26,7 @@
     var recibido = false;   // guard para sortable receive/update
     var aEliminar = null;
     var previewCampos = {}; // k -> campo, para validar la vista previa
+    var analisis = null;    // resultado de cargaAnalizar { headers, muestra, filas_total }
 
     // ---------- Modales / toast ----------
     var eliminarModal = new bootstrap.Modal(document.getElementById('cnsModalEliminar'));
@@ -113,7 +114,7 @@
 
     // ---------- Editor ----------
     function nuevoForm() {
-      form = { id: null, nombre: '', status_id: INACTIVO, btn_texto: 'Guardar', servicios: [], campos: [] };
+      form = { id: null, nombre: '', status_id: INACTIVO, btn_texto: 'Guardar', servicios: [], campos: [], bd: null };
       selected = -1;
       abrirEditor(null);
     }
@@ -131,7 +132,8 @@
           campos: ((f.definicion && f.definicion.campos) ? f.definicion.campos : []).map(function (c) {
             c._uid = uidSeq++;
             return c;
-          })
+          }),
+          bd: res.bd || null
         };
         selected = -1;
         abrirEditor(f);
@@ -150,6 +152,7 @@
       renderLienzo();
       renderProps();
       renderHistorial();
+      renderBd();
       $('#cnsListView').hide();
       $('#cnsEditorView').show();
       window.scrollTo(0, 0);
@@ -404,6 +407,154 @@
       });
     }
 
+    // ---------- Base de datos (Fase 2) ----------
+    function renderBd() {
+      if (!form.id) {
+        $('#cnsBdAviso').show();
+        $('#cnsBdPanel').hide();
+        return;
+      }
+      $('#cnsBdAviso').hide();
+      $('#cnsBdPanel').show();
+      $('#cnsMapeo').hide();
+      $('#cnsArchivo').val('');
+      analisis = null;
+      cargarBd();
+    }
+
+    function cargarBd() {
+      getJSON('cargas', { id: form.id }).then(function (res) {
+        var vig = res.vigente;
+        form.bd = vig || null;
+        var colBusqueda = vig ? columnaBusqueda(vig) : null;
+        $('#cnsBdVigente').html(vig
+          ? ('<span class="cns-estado cns-estado--activo">BD vigente</span> ' + esc(vig.archivo) + ' · ' + vig.filas + ' filas · ' + esc(fmtFecha(vig.fecha)) +
+             (colBusqueda ? ' · búsqueda por <strong>' + esc(colBusqueda.label) + '</strong>' : ''))
+          : '<span class="text-muted">Sin BD vigente: el formulario se muestra centrado, sin card de búsqueda.</span>');
+
+        var cargas = res.cargas || [];
+        var $c = $('#cnsCargas').empty();
+        if (!cargas.length) { $c.html('<p class="text-muted mb-0">Sin cargas.</p>'); return; }
+        var $ul = $('<ul class="list-group">');
+        cargas.forEach(function (cg) {
+          var vigente = parseInt(cg.vigente, 10);
+          var $li = $('<li class="list-group-item d-flex justify-content-between align-items-center">');
+          $li.append($('<span>').html(esc(cg.archivo) + ' · ' + cg.filas + ' filas · ' + esc(fmtFecha(cg.fecha)) + (vigente ? ' · <strong>vigente</strong>' : '')));
+          if (!vigente) {
+            $li.append($('<button class="btn btn-sm btn-outline-primary">Hacer vigente</button>').on('click', function () { setVigenteCarga(cg.id); }));
+          }
+          $ul.append($li);
+        });
+        $c.empty().append($ul);
+      });
+    }
+
+    function analizarArchivo() {
+      var input = document.getElementById('cnsArchivo');
+      var file = (input && input.files) ? input.files[0] : null;
+      if (!file) { toast('Selecciona un archivo.', true); return; }
+      var fd = new FormData();
+      fd.append('archivo', file);
+      fetch('index.php?view=constructor&mode=cargaAnalizar', { method: 'POST', body: fd })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+          if (res.response !== 'true') { toast(res.message || 'No se pudo analizar.', true); return; }
+          analisis = { headers: res.headers, muestra: res.muestra || [], filas_total: res.filas_total };
+          renderMapeo();
+        });
+    }
+
+    function columnaBusqueda(bd) {
+      var cols = bd.columnas || [];
+      for (var i = 0; i < cols.length; i++) { if (cols[i].k === bd.busqueda) { return cols[i]; } }
+      return null;
+    }
+
+    function sugerirBusqueda(headers) {
+      for (var i = 0; i < headers.length; i++) {
+        if (/c[eé]dula|documento|doc|rif|^ci$|identificaci/i.test(String(headers[i]))) { return headers[i]; }
+      }
+      return headers[0];
+    }
+
+    function renderMapeo() {
+      var $m = $('#cnsMapeoCampos').empty();
+      var sugerida = sugerirBusqueda(analisis.headers);
+      analisis.headers.forEach(function (h, i) {
+        var $tr = $('<tr>').attr('data-col', h);
+        $tr.append($('<td>').append($('<input class="form-check-input cns-col-mostrar" type="checkbox" checked>')));
+        $tr.append($('<td>').append($('<code>').text(h)));
+        $tr.append($('<td>').append($('<input class="form-control form-control-sm cns-col-label" type="text" maxlength="80">').val(h)));
+        $tr.append($('<td class="text-center">').append(
+          $('<input class="form-check-input cns-col-busqueda" type="radio" name="cnsBusqueda">').attr('id', 'cnsBus' + i).prop('checked', h === sugerida)
+        ));
+        $m.append($tr);
+      });
+
+      var $h = $('#cnsMuestraHead').empty();
+      var $b = $('#cnsMuestraBody').empty();
+      var $tr = $('<tr>');
+      analisis.headers.forEach(function (h) { $tr.append($('<th>').text(h)); });
+      $h.append($tr);
+      analisis.muestra.forEach(function (fila) {
+        var $r = $('<tr>');
+        fila.forEach(function (v) { $r.append($('<td>').text(v)); });
+        $b.append($r);
+      });
+
+      $('#cnsMapeoInfo').text(analisis.filas_total + ' filas en el archivo.');
+      $('#cnsMapeo').show();
+    }
+
+    // La columna de búsqueda siempre se muestra.
+    $('#cnsMapeoCampos').on('change', '.cns-col-busqueda', function () {
+      $(this).closest('tr').find('.cns-col-mostrar').prop('checked', true);
+    });
+    $('#cnsMapeoCampos').on('change', '.cns-col-mostrar', function () {
+      if (!this.checked) { $(this).closest('tr').find('.cns-col-busqueda').prop('checked', false); }
+    });
+
+    function confirmarCarga() {
+      var input = document.getElementById('cnsArchivo');
+      var file = (input && input.files) ? input.files[0] : null;
+      if (!file) { toast('Vuelve a seleccionar el archivo.', true); return; }
+      var def = { busqueda: '', columnas: [] };
+      $('#cnsMapeoCampos tr').each(function () {
+        var $tr = $(this);
+        if (!$tr.find('.cns-col-mostrar').is(':checked')) { return; }
+        var col = $tr.attr('data-col');
+        def.columnas.push({ col: col, label: $.trim($tr.find('.cns-col-label').val()) });
+        if ($tr.find('.cns-col-busqueda').is(':checked')) { def.busqueda = col; }
+      });
+      if (!def.columnas.length) { toast('Elige al menos una columna para mostrar.', true); return; }
+      if (!def.busqueda) { toast('Marca la columna de búsqueda.', true); return; }
+
+      var fd = new FormData();
+      fd.append('archivo', file);
+      fd.append('form_id', form.id);
+      fd.append('columnas', JSON.stringify(def));
+      fetch('index.php?view=constructor&mode=cargaConfirmar', { method: 'POST', body: fd })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+          if (res.response === 'true') {
+            toast('Carga guardada (' + res.filas + ' filas' + (res.omitidas ? ', ' + res.omitidas + ' omitidas sin clave de búsqueda' : '') + ').');
+            $('#cnsMapeo').hide();
+            $('#cnsArchivo').val('');
+            analisis = null;
+            cargarBd();
+          } else {
+            toast(res.message || 'No se pudo cargar.', true);
+          }
+        });
+    }
+
+    function setVigenteCarga(cargaId) {
+      postJSON('cargaSetVigente', { form_id: form.id, carga_id: cargaId }).then(function (res) {
+        if (res.response === 'true') { toast('BD vigente actualizada.'); cargarBd(); }
+        else { toast(res.message || 'No se pudo.', true); }
+      });
+    }
+
     // ---------- Validación (espejo cliente) ----------
     function validarDefinicionCliente(campos) {
       var err = [], vistas = {};
@@ -491,11 +642,11 @@
     function previewServidor(id) {
       getJSON('preview', { id: id }).then(function (res) {
         if (res.response !== 'true') { toast(res.message || 'No disponible.', true); return; }
-        renderPreview(res.formulario.nombre, res.formulario.definicion.campos || [], res.formulario.btn_texto);
+        renderPreview(res.formulario.nombre, res.formulario.definicion.campos || [], res.bd || null);
       });
     }
     function previewEditor() {
-      renderPreview($('#cnsNombre').val() || '(sin nombre)', form ? form.campos : [], $('#cnsBtnTexto').val() || 'Guardar');
+      renderPreview($('#cnsNombre').val() || '(sin nombre)', form ? form.campos : [], form ? form.bd : null);
     }
 
     function construirControl(c) {
@@ -523,9 +674,40 @@
       return $('<input class="form-control">').attr('type', tipo).attr('name', c.k).attr('placeholder', c.placeholder || '');
     }
 
-    function renderPreview(nombre, campos, btnTexto) {
+    // Card izquierda «Datos de la búsqueda» (solo lectura) con una fila de muestra.
+    // Sin BD vigente la card no se muestra y el formulario queda centrado.
+    function renderPreviewBd(bd) {
+      var $col = $('#cnsPreviewBdCol');
+      var $form = $('#cnsPreviewFormCol');
+      if (!bd || !(bd.columnas || []).length) {
+        $col.hide();
+        $form.removeClass('col-lg-7').addClass('col-lg-8 mx-auto');
+        return;
+      }
+      var fila = bd.muestra || {};
+      var clave = columnaBusqueda(bd);
+      var $c = $('#cnsPreviewBd').empty();
+      if (clave) {
+        $c.append($('<label class="form-label">').text(clave.label));
+        $c.append($('<div class="input-group mb-3">')
+          .append($('<input class="form-control" type="text" readonly>').val(fila[clave.k] || ''))
+          .append('<button class="btn btn-outline-primary" type="button" disabled><i class="fi fi-rr-search"></i></button>'));
+      }
+      var $dl = $('<dl class="row mb-0" style="font-size:14px">');
+      bd.columnas.forEach(function (c) {
+        if (clave && c.k === clave.k) { return; }
+        $dl.append($('<dt class="col-sm-5 text-muted fw-normal">').text(c.label));
+        $dl.append($('<dd class="col-sm-7">').text(fila[c.k] || '—'));
+      });
+      $c.append($dl);
+      $col.show();
+      $form.removeClass('col-lg-8 mx-auto').addClass('col-lg-7');
+    }
+
+    function renderPreview(nombre, campos, bd) {
       previewCampos = {};
       $('#cnsPreviewTitulo').text('Vista previa — ' + nombre);
+      renderPreviewBd(bd);
       var $b = $('#cnsPreviewBody').empty().off('change input');
       campos.forEach(function (c) {
         previewCampos[c.k] = c;
@@ -592,6 +774,8 @@
     $('#cnsGuardar').on('click', function () { guardar(false); });
     $('#cnsPreview').on('click', previewEditor);
     $('#cnsPreviewValidar').on('click', validarValores);
+    $('#cnsAnalizar').on('click', analizarArchivo);
+    $('#cnsConfirmarCarga').on('click', confirmarCarga);
     $('#cnsReasignar').on('click', function () { conflictoModal.hide(); guardar(true); });
     $('#cnsConfirmarEliminar').on('click', function () {
       if (!aEliminar) { return; }

@@ -1,6 +1,7 @@
 # Constructor de formularios dinámicos — Plan de trabajo
 
-> Estado: **Fase 0 completa (migración aplicada y verificada en BD)**. Fecha: 2026-10-29.
+> Estado: **Fase 1 completa (validada en navegador). Fase 2 completa (backend + frontend;
+> pendiente aplicar migración + QA)**. Fecha: 2026-10-29.
 > Diseño origen: proyecto Claude Design *"Bulksales Resumen de gestión rediseño"* → `Constructor.dc.html` (+ `support.js`).
 
 Guía para implementar el **Constructor de formularios dinámicos** dentro de BulkApp
@@ -34,7 +35,7 @@ Nombre + estado (toggle Activo/Inactivo) + 4 pestañas:
 |---------|-----------|
 | **Campos** | Paleta (izq) → lienzo (centro, *drag-drop* + ↑↓ + borrar) → propiedades (der). El botón "Guardar" va siempre al final y es inamovible. |
 | **Servicios** | Checkboxes de servicios. Regla: **un solo formulario activo por servicio** (modal de conflicto → "reasignar y guardar"). |
-| **Base de datos** | BD vigente + cargar nueva (.xlsx/.csv) con **mapeo columna→campo** + historial de cargas ("hacer vigente"). |
+| **Base de datos** | BD vigente + cargar nueva (.xlsx/.csv) eligiendo **columnas de la card «Datos de la búsqueda»** (etiqueta + 1 columna clave) + historial de cargas ("hacer vigente"). La BD es **independiente** de los campos del formulario. |
 | **Historial** | Versiones del formulario (se crea una en cada guardado). |
 
 Modales: eliminar (lógico — conserva datos para reportería), guardado, conflicto de
@@ -182,7 +183,7 @@ CREATE TABLE formulario_cargas (
   formulario_id INT UNSIGNED NOT NULL,
   archivo       VARCHAR(255) NOT NULL,            -- nombre original
   filas         INT          NOT NULL DEFAULT 0,
-  mapping       JSON         NOT NULL,            -- columna CSV -> clave k (ver §4.1)
+  mapping       JSON         NOT NULL,            -- definición de la card: búsqueda + columnas (ver §4.1)
   vigente       TINYINT(1)   NOT NULL DEFAULT 0,  -- 1 = BD vigente del formulario
   user_id       INT          NULL,
   fecha         DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -228,7 +229,7 @@ CREATE TABLE formulario_envios (
 ### 4.1 Forma del JSON
 
 `definicion` (en `formulario_versiones`) — refleja el modelo de campo del diseño; cada campo
-tiene una clave **`k`** estable que referencian `mapping` y `valores`:
+tiene una clave **`k`** estable que referencia `valores`:
 
 ```json
 {
@@ -249,11 +250,19 @@ tiene una clave **`k`** estable que referencian `mapping` y `valores`:
 - Props por campo: `k, type, label, placeholder, req, min, max, regex, help, cond{k,v}, opts,
   tree[{p,c}], lv1, lv2`. El **orden del array `campos`** = orden de render (lo reordena el drag&drop).
 
-`mapping` (en `formulario_cargas`) — columna del CSV → clave `k`:
+`mapping` (en `formulario_cargas`) — definición de la card «Datos de la búsqueda». **No se
+relaciona con los campos del formulario**: como en banca, la BD es la card de la izquierda
+(solo lectura) y el formulario construido es lo de la derecha. Sin BD vigente no hay card y el
+formulario se centra. Las `k` de columna se derivan del encabezado (`constructor_slug_columna`):
 
 ```json
-{ "CEDULA": "cedula", "PLAN CONTRATADO": "plan", "CIUDAD": "ubicacion" }
+{ "busqueda": "nro_doc",
+  "columnas": [ { "k": "nro_doc", "col": "NRO_DOC", "label": "Cédula" },
+                { "k": "nombre",  "col": "NOMBRE",  "label": "Cliente" } ] }
 ```
+
+Cada fila en `formulario_carga_filas.fila` usa esas `k`: `{ "nro_doc": "V-1", "nombre": "Ana" }`.
+Las filas sin valor en la columna de búsqueda se omiten al cargar.
 
 `valores` (en `formulario_envios`) — clave `k` → valor capturado:
 
@@ -328,15 +337,38 @@ tiene una clave **`k`** estable que referencian `mapping` y `valores`:
   entrada "Constructor" en `nnavbar.php` (`if ($usertype == 3)`).
 
 ### Fase 1 — Builder (CRUD + preview)
-- Controlador (`index`, `list`, `save`, `delete`, `preview`) + modelo (CRUD, versionado,
-  conflicto de servicio, reasignación).
-- Vista shell (BS5) + `constructor.js` (estado del editor, drag&drop con jQuery UI, validación
-  en vivo, modales BS5) + `constructor.css` (solo lo que BS5 no cubre).
-- Validación de la definición en servidor (tipos, `cond`→campo previo, etc.).
+- ✅ **Backend (2026-10-29):** controlador (`index`, `list`, `detalle`/`preview`, `save`,
+  `delete`, `historial`, `versionVigente`) + `constructorModel.php` (CRUD, versionado,
+  conflicto de servicio, reasignación, rollback de versión) + `constructorDefinicion.php`
+  (validación/normalización de la definición, espejo del editor). Tests del validador (10) y
+  prueba de integración contra BD (12 checks) OK.
+- ✅ **Frontend (2026-10-29):** `private/views/constructor/index.php` (Listado + Editor de 4
+  pestañas + modales BS5), `public/js/constructor.js` (estado del editor, drag&drop con jQuery UI
+  —sortable + draggable-connectToSortable—, propiedades por tipo, servicios, historial, validación
+  viva espejo del servidor, vista previa con validación de valores), `public/css/constructor.css`.
+  `public/js/jquery-ui.min.js` vendado (local, v1.13.3). PHP lint 77/0, tests 43/43, JS sintaxis OK,
+  render de la vista OK. **Pendiente:** QA manual en navegador (drag&drop, modales, AJAX real).
 
-### Fase 2 — Base de datos por formulario
-- `upload` (ingesta CSV + mapeo columna→campo, reutilizando la lógica de `carga_archivo`),
-  `setVigente`, historial de cargas. `.xlsx` opcional después (`ZipArchive`+`SimpleXML`).
+### Fase 2 — Base de datos por formulario ✅ (migración aplicada; pendiente QA en navegador)
+- **Concepto (2026-10-30):** la BD es **independiente** de los campos del formulario. Es la card
+  izquierda «Datos de la búsqueda» (solo lectura, como en banca); el formulario es lo de la
+  derecha. Sin BD vigente, no hay card y el formulario va centrado. Se eligen las columnas a
+  mostrar, su etiqueta y **una** columna clave de búsqueda. Sin precarga de campos.
+- **Migración:** `20261030_constructor_carga_filas.sql` crea `formulario_carga_filas`
+  (`fila JSON`, FK cascade a `formulario_cargas`). Aplicada.
+- **Backend:** `private/helpers/constructorCarga.php` (validación de subida CSV/XLSX, parser CSV
+  con autodetección de delimitador/encoding, parser XLSX nativo `ZipArchive`+`SimpleXML`,
+  `constructor_slug_columna`, `constructor_normalizar_columnas`, `constructor_aplicar_columnas`).
+  Modelo: `guardarCarga` (1 vigente por formulario + inserción por lotes de 500),
+  `cargasDeFormulario`, `cargaVigente` (con `busqueda`, `columnas` y fila `muestra`),
+  `hacerVigenteCarga`, `filasDeCarga`. Endpoints: `cargaAnalizar`, `cargaConfirmar`, `cargas`,
+  `cargaFilas`, `cargaSetVigente`; `detalle`/`preview` devuelven `bd` (carga vigente).
+- **Flujo sin archivos temporales:** *Analizar* devuelve encabezados + muestra; *Confirmar*
+  reenvía el mismo archivo + `columnas` `{busqueda, columnas:[{col,label}]}`.
+- **Frontend:** pestaña *Base de datos* (BD vigente, tabla Mostrar/Columna/Etiqueta/Búsqueda,
+  muestra, historial con «hacer vigente»). Vista previa en dos columnas con la card a la
+  izquierda si hay BD vigente; centrada si no.
+- **Verificado:** lint 79/0, tests 53/53, JS OK, integración contra BD real OK.
 
 ### Fase 3 — Runtime (FUERA DE ALCANCE por ahora)
 > **No se implementa en este tramo.** Y cuando se retome, **no toca banca**: el flujo bancario

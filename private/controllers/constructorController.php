@@ -4,7 +4,8 @@
  * Constructor de formularios dinámicos — acceso exclusivo del rol Administrador.
  *
  * Fase 1 (Builder): CRUD + versionado + regla de conflicto de servicio + preview.
- * La carga de BD por formulario (upload / BD vigente) llega en la Fase 2.
+ * Fase 2 (BD por formulario): carga CSV/XLSX con columnas propias (card «Datos de la
+ * búsqueda», independiente de los campos del formulario), vigente e historial.
  * Respuestas AJAX en JSON; el CSRF lo adjunta public/js/csrf.js.
  */
 
@@ -17,6 +18,7 @@ if (!security_usuario_autenticado()) {
 } else {
   include_once(MODEL_DIR . 'constructorModel.php');
   require_once dirname(__DIR__) . '/helpers/constructorDefinicion.php';
+  require_once dirname(__DIR__) . '/helpers/constructorCarga.php';
 
   $conexion = new database();
   $mode = isset($_GET['mode']) ? $_GET['mode'] : 'index';
@@ -53,7 +55,7 @@ if (!security_usuario_autenticado()) {
           echo json_encode(array('response' => 'false', 'message' => 'Formulario no encontrado.'));
           break;
         }
-        echo json_encode(array('response' => 'true', 'formulario' => $form));
+        echo json_encode(array('response' => 'true', 'formulario' => $form, 'bd' => $conexion->cargaVigente($id)));
         break;
 
       case 'historial':
@@ -134,6 +136,96 @@ if (!security_usuario_autenticado()) {
           break;
         }
         $ok = $conexion->hacerVigenteVersion($id, $versionId);
+        echo json_encode(array('response' => $ok ? 'true' : 'false'));
+        break;
+
+      case 'cargaAnalizar':
+        header('Content-Type: application/json; charset=UTF-8');
+        $val = constructor_validar_subida(isset($_FILES['archivo']) ? $_FILES['archivo'] : null);
+        if (!$val[0]) {
+          echo json_encode(array('response' => 'false', 'message' => $val[1]));
+          break;
+        }
+        $parseado = constructor_parsear_archivo($_FILES['archivo']['tmp_name'], $val[1]);
+        if ($parseado === null) {
+          echo json_encode(array('response' => 'false', 'message' => 'No se pudo leer el archivo.'));
+          break;
+        }
+        if (empty($parseado['headers'])) {
+          echo json_encode(array('response' => 'false', 'message' => 'El archivo no tiene encabezados.'));
+          break;
+        }
+        echo json_encode(array(
+          'response' => 'true',
+          'headers' => $parseado['headers'],
+          'filas_total' => count($parseado['filas']),
+          'muestra' => array_slice($parseado['filas'], 0, 5),
+        ));
+        break;
+
+      case 'cargaConfirmar':
+        header('Content-Type: application/json; charset=UTF-8');
+        $formId = input_int(isset($_POST['form_id']) ? $_POST['form_id'] : null, 1);
+        if ($formId === null || $conexion->obtenerFormulario($formId) === null) {
+          echo json_encode(array('response' => 'false', 'message' => 'Formulario inválido.'));
+          break;
+        }
+        $val = constructor_validar_subida(isset($_FILES['archivo']) ? $_FILES['archivo'] : null);
+        if (!$val[0]) {
+          echo json_encode(array('response' => 'false', 'message' => $val[1]));
+          break;
+        }
+        $parseado = constructor_parsear_archivo($_FILES['archivo']['tmp_name'], $val[1]);
+        if ($parseado === null) {
+          echo json_encode(array('response' => 'false', 'message' => 'No se pudo leer el archivo.'));
+          break;
+        }
+        $defRaw = (isset($_POST['columnas']) && is_string($_POST['columnas'])) ? json_decode($_POST['columnas'], true) : null;
+        $norm = constructor_normalizar_columnas($defRaw, $parseado['headers']);
+        if (!$norm['ok']) {
+          echo json_encode(array('response' => 'false', 'message' => implode(' ', $norm['errores'])));
+          break;
+        }
+        $filas = constructor_aplicar_columnas($parseado['headers'], $parseado['filas'], $norm['columnas']);
+        if (empty($filas)) {
+          echo json_encode(array('response' => 'false', 'message' => 'Ninguna fila tiene valor en la columna de búsqueda.'));
+          break;
+        }
+        $nombreArchivo = input_string(isset($_FILES['archivo']['name']) ? $_FILES['archivo']['name'] : 'carga', 255);
+        $res = $conexion->guardarCarga($formId, $nombreArchivo, $norm['columnas'], $filas, $userId);
+        echo json_encode(array(
+          'response' => 'true',
+          'carga_id' => $res['carga_id'],
+          'filas' => $res['filas'],
+          'omitidas' => count($parseado['filas']) - $res['filas'],
+        ));
+        break;
+
+      case 'cargas':
+        $id = input_int(isset($_GET['id']) ? $_GET['id'] : null, 1);
+        header('Content-Type: application/json; charset=UTF-8');
+        echo json_encode(array(
+          'response' => 'true',
+          'cargas' => ($id !== null) ? $conexion->cargasDeFormulario($id) : array(),
+          'vigente' => ($id !== null) ? $conexion->cargaVigente($id) : null,
+        ));
+        break;
+
+      case 'cargaFilas':
+        $cargaId = input_int(isset($_GET['carga_id']) ? $_GET['carga_id'] : null, 1);
+        header('Content-Type: application/json; charset=UTF-8');
+        echo json_encode(array('response' => 'true', 'filas' => ($cargaId !== null) ? $conexion->filasDeCarga($cargaId, 10) : array()));
+        break;
+
+      case 'cargaSetVigente':
+        $formId = input_int(isset($_POST['form_id']) ? $_POST['form_id'] : null, 1);
+        $cargaId = input_int(isset($_POST['carga_id']) ? $_POST['carga_id'] : null, 1);
+        header('Content-Type: application/json; charset=UTF-8');
+        if ($formId === null || $cargaId === null) {
+          echo json_encode(array('response' => 'false', 'message' => 'Datos inválidos.'));
+          break;
+        }
+        $ok = $conexion->hacerVigenteCarga($formId, $cargaId);
         echo json_encode(array('response' => $ok ? 'true' : 'false'));
         break;
 

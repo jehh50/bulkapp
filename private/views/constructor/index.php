@@ -1,6 +1,6 @@
 <?php
 /**
- * Constructor de formularios — vista del Builder (Fase 1).
+ * Constructor de formularios — vista del Builder (Fases 1–2).
  *
  * El listado y el editor se renderizan/operan desde public/js/constructor.js
  * sobre los datos boot embebidos abajo. Bootstrap 5 para todo; constructor.css
@@ -118,11 +118,49 @@
       </div>
     </div>
 
-    <!-- Base de datos (Fase 2) -->
+    <!-- Base de datos -->
     <div class="tab-pane fade" id="tabBd">
       <div class="cns-col">
         <div class="cns-col__title">Base de datos del formulario</div>
-        <p class="text-muted mb-0">Carga de BD (.csv) y mapeo columna→campo: disponible en la Fase 2.</p>
+        <div id="cnsBdAviso" class="text-muted" style="display:none">Guarda el formulario primero para poder cargar su base de datos.</div>
+        <div id="cnsBdPanel">
+          <div id="cnsBdVigente" class="mb-3"></div>
+          <div class="row g-2 align-items-end mb-3">
+            <div class="col-md-8">
+              <label class="filter-label" for="cnsArchivo">Cargar nueva BD (.csv / .xlsx)</label>
+              <input type="file" class="form-control" id="cnsArchivo" accept=".csv,.txt,.xlsx">
+            </div>
+            <div class="col-md-4">
+              <button type="button" class="btn btn-outline-primary" id="cnsAnalizar">Analizar archivo</button>
+            </div>
+          </div>
+
+          <div id="cnsMapeo" style="display:none">
+            <h6 class="mb-1">Columnas de la card «Datos de la búsqueda»</h6>
+            <p class="text-muted mb-2" style="font-size:13px">Independientes de los campos del formulario. Elige qué columnas mostrar, su etiqueta y la columna clave para buscar el registro.</p>
+            <div class="table-responsive mb-3">
+              <table class="table table-sm align-middle mb-0">
+                <thead><tr><th style="width:70px">Mostrar</th><th>Columna del archivo</th><th>Etiqueta</th><th style="width:90px">Búsqueda</th></tr></thead>
+                <tbody id="cnsMapeoCampos"></tbody>
+              </table>
+            </div>
+            <div class="text-muted mb-1" style="font-size:12px">Muestra del archivo</div>
+            <div class="table-responsive mb-2">
+              <table class="table table-sm table-bordered" style="font-size:12px">
+                <thead id="cnsMuestraHead"></thead>
+                <tbody id="cnsMuestraBody"></tbody>
+              </table>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <button type="button" class="btn btn-primary" id="cnsConfirmarCarga">Confirmar carga</button>
+              <span class="text-muted" id="cnsMapeoInfo"></span>
+            </div>
+          </div>
+
+          <hr>
+          <h6 class="mb-2">Historial de cargas</h6>
+          <div id="cnsCargas"><p class="text-muted mb-0">—</p></div>
+        </div>
       </div>
     </div>
 
@@ -178,10 +216,22 @@
 </div>
 
 <div class="modal fade" id="cnsModalPreview" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
     <div class="modal-content">
       <div class="modal-header"><h5 class="modal-title" id="cnsPreviewTitulo">Vista previa</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-      <div class="modal-body"><form class="cns-preview" id="cnsPreviewBody" novalidate></form></div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-lg-5" id="cnsPreviewBdCol" style="display:none">
+            <div class="card">
+              <div class="card-header fw-semibold">Datos de la búsqueda</div>
+              <div class="card-body" id="cnsPreviewBd"></div>
+            </div>
+          </div>
+          <div class="col-lg-8 mx-auto" id="cnsPreviewFormCol">
+            <form class="cns-preview" id="cnsPreviewBody" novalidate></form>
+          </div>
+        </div>
+      </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
         <button type="button" class="btn btn-primary" id="cnsPreviewValidar">Validar</button>

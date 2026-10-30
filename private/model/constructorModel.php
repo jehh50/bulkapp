@@ -337,4 +337,164 @@ class database
       'i'
     );
   }
+
+  /* ---------------------------------------------------------------------
+   * Fase 2 — Base de datos por formulario (cargas)
+   * ------------------------------------------------------------------- */
+
+  /**
+   * Persiste una carga de BD: registro de carga (vigente) + filas (JSON).
+   *
+   * @param int $formId
+   * @param string $archivo Nombre original del archivo.
+   * @param array $columnas { busqueda: k, columnas: [ {k, col, label} ] } (se guarda en `mapping`).
+   * @param array[] $filas  Filas como { k => valor }.
+   * @param int|null $userId
+   * @return array ['carga_id'=>int, 'filas'=>int]
+   */
+  public function guardarCarga($formId, $archivo, array $columnas, array $filas, $userId = null)
+  {
+    $formId = (int) $formId;
+
+    $this->db->begin_transaction();
+    try {
+      $this->db->preparedQuery(
+        "UPDATE formulario_cargas SET vigente = 0 WHERE formulario_id = ?",
+        array($formId),
+        'i'
+      );
+      $this->db->preparedQuery(
+        "INSERT INTO formulario_cargas (formulario_id, archivo, filas, mapping, vigente, user_id)
+         VALUES (?,?,?,?,1,?)",
+        array($formId, (string) $archivo, count($filas), json_encode($columnas, JSON_UNESCAPED_UNICODE), $userId !== null ? (int) $userId : null),
+        'isisi'
+      );
+      $cargaId = (int) $this->db->insert_id;
+
+      $chunk = 500;
+      $total = count($filas);
+      for ($i = 0; $i < $total; $i += $chunk) {
+        $slice = array_slice($filas, $i, $chunk);
+        $marcadores = array();
+        $params = array();
+        $types = '';
+        foreach ($slice as $f) {
+          $marcadores[] = '(?,?)';
+          $params[] = $cargaId;
+          $params[] = json_encode($f, JSON_UNESCAPED_UNICODE);
+          $types .= 'is';
+        }
+        $this->db->preparedQuery(
+          "INSERT INTO formulario_carga_filas (carga_id, fila) VALUES " . implode(',', $marcadores),
+          $params,
+          $types
+        );
+      }
+
+      $this->db->commit();
+    } catch (Throwable $e) {
+      $this->db->rollback();
+      throw $e;
+    }
+
+    return array('carga_id' => $cargaId, 'filas' => $total);
+  }
+
+  /**
+   * Historial de cargas de un formulario.
+   *
+   * @param int $formId
+   * @return array
+   */
+  public function cargasDeFormulario($formId)
+  {
+    return $this->db->selectQuery(
+      "SELECT id, archivo, filas, vigente, fecha, user_id
+       FROM formulario_cargas WHERE formulario_id = ? ORDER BY fecha DESC, id DESC",
+      array((int) $formId),
+      'i'
+    );
+  }
+
+  /**
+   * Carga vigente de un formulario (o null), con la definición de la card
+   * (busqueda + columnas) y una fila de muestra.
+   *
+   * @param int $formId
+   * @return array|null
+   */
+  public function cargaVigente($formId)
+  {
+    $r = $this->db->selectQuery(
+      "SELECT id, archivo, filas, fecha, mapping FROM formulario_cargas
+       WHERE formulario_id = ? AND vigente = 1 LIMIT 1",
+      array((int) $formId),
+      'i'
+    );
+    if (empty($r)) {
+      return null;
+    }
+    $carga = $r[0];
+    $def = json_decode($carga['mapping'], true);
+    unset($carga['mapping']);
+    $carga['busqueda'] = (is_array($def) && isset($def['busqueda'])) ? $def['busqueda'] : null;
+    $carga['columnas'] = (is_array($def) && isset($def['columnas'])) ? $def['columnas'] : array();
+    $muestra = $this->filasDeCarga($carga['id'], 1);
+    $carga['muestra'] = empty($muestra) ? null : $muestra[0];
+    return $carga;
+  }
+
+  /**
+   * Marca una carga como vigente (desactiva las demás del formulario).
+   *
+   * @param int $formId
+   * @param int $cargaId
+   * @return bool
+   */
+  public function hacerVigenteCarga($formId, $cargaId)
+  {
+    $formId = (int) $formId;
+    $cargaId = (int) $cargaId;
+
+    $existe = $this->db->selectQuery(
+      "SELECT id FROM formulario_cargas WHERE id = ? AND formulario_id = ?",
+      array($cargaId, $formId),
+      'ii'
+    );
+    if (empty($existe)) {
+      return false;
+    }
+
+    $this->db->begin_transaction();
+    try {
+      $this->db->preparedQuery("UPDATE formulario_cargas SET vigente = 0 WHERE formulario_id = ?", array($formId), 'i');
+      $this->db->preparedQuery("UPDATE formulario_cargas SET vigente = 1 WHERE id = ?", array($cargaId), 'i');
+      $this->db->commit();
+    } catch (Throwable $e) {
+      $this->db->rollback();
+      throw $e;
+    }
+
+    return true;
+  }
+
+  /**
+   * Muestra de filas de una carga (decodificadas).
+   *
+   * @param int $cargaId
+   * @param int $limite
+   * @return array[]  Lista de { clave_k => valor }.
+   */
+  public function filasDeCarga($cargaId, $limite = 10)
+  {
+    $rows = $this->db->selectQuery(
+      "SELECT fila FROM formulario_carga_filas WHERE carga_id = ? ORDER BY id LIMIT ?",
+      array((int) $cargaId, (int) $limite),
+      'ii'
+    );
+    return array_map(function ($r) {
+      $d = json_decode($r['fila'], true);
+      return is_array($d) ? $d : array();
+    }, $rows);
+  }
 }

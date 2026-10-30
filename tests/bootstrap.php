@@ -20,6 +20,7 @@ require_once $raizProyecto . '/private/lib/errors.php';
 require_once $raizProyecto . '/private/lib/assets.php';
 require_once $raizProyecto . '/private/helpers/formularioRegistro.php';
 require_once $raizProyecto . '/private/helpers/constructorDefinicion.php';
+require_once $raizProyecto . '/private/helpers/constructorCarga.php';
 
 if (!defined('APP_VERSION')) {
   define('APP_VERSION', '1.0.0');
