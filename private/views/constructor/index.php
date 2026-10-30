@@ -1,15 +1,210 @@
 <?php
 /**
- * Constructor de formularios — shell (Fase 0).
+ * Constructor de formularios — vista del Builder (Fase 1).
  *
- * Marcador de posición. El Listado y el Editor (campos, servicios, base de
- * datos, historial) se construyen en la Fase 1 sobre este mismo contenedor.
+ * El listado y el editor se renderizan/operan desde public/js/constructor.js
+ * sobre los datos boot embebidos abajo. Bootstrap 5 para todo; constructor.css
+ * solo para lo que BS5 no cubre (paleta, lienzo, estados de arrastre).
  */
 ?>
-<div class="filter-card">
-  <h2 class="chart-card__title">Constructor de formularios</h2>
-  <p class="text-muted mb-0">
-    Módulo en construcción. Aquí vivirán el listado de formularios y el editor
-    (campos, servicios, base de datos e historial).
-  </p>
+<link rel="stylesheet" href="<?php echo asset('public/css/constructor.css'); ?>">
+
+<!-- ===================== LISTADO ===================== -->
+<section id="cnsListView">
+  <div class="filter-card">
+    <div class="row g-3 align-items-end">
+      <div class="col-lg-5">
+        <label class="filter-label" for="cnsSearch">Buscar</label>
+        <input type="text" class="form-control" id="cnsSearch" placeholder="Nombre del formulario…">
+      </div>
+      <div class="col-lg-3">
+        <label class="filter-label" for="cnsFiltroEstado">Estado</label>
+        <select class="form-select" id="cnsFiltroEstado">
+          <option value="">Todos</option>
+          <option value="<?php echo Constantes::REGISTRO_ACTIVO; ?>">Activo</option>
+          <option value="<?php echo Constantes::REGISTRO_INACTIVO; ?>">Inactivo</option>
+        </select>
+      </div>
+      <div class="col-lg-4 text-lg-end">
+        <button type="button" class="btn btn-primary search-btn" id="cnsNuevo">
+          <i class="fi fi-rr-plus"></i> Nuevo formulario
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="data-card">
+    <div class="table-responsive">
+      <table class="data-table table align-middle">
+        <thead>
+          <tr>
+            <th class="ta-left">Formulario</th>
+            <th>Servicios</th>
+            <th>Campos</th>
+            <th>Versión</th>
+            <th>Estado</th>
+            <th>Actualizado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="cnsRows"></tbody>
+      </table>
+    </div>
+    <div id="cnsEmpty" class="data-empty" style="display:none">No hay formularios para mostrar.</div>
+  </div>
+</section>
+
+<!-- ===================== EDITOR ===================== -->
+<section id="cnsEditorView" style="display:none">
+  <input type="hidden" id="cnsId">
+
+  <div class="filter-card">
+    <div class="row g-3 align-items-end">
+      <div class="col-lg-5">
+        <label class="filter-label" for="cnsNombre">Nombre del formulario</label>
+        <input type="text" class="form-control" id="cnsNombre" maxlength="150" placeholder="Ej: Captación Bancaribe">
+      </div>
+      <div class="col-lg-3">
+        <label class="filter-label" for="cnsBtnTexto">Texto del botón</label>
+        <input type="text" class="form-control" id="cnsBtnTexto" maxlength="80" value="Guardar">
+      </div>
+      <div class="col-lg-2">
+        <label class="filter-label d-block">Estado</label>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" role="switch" id="cnsEstado">
+          <label class="form-check-label" for="cnsEstado" id="cnsEstadoLbl">Inactivo</label>
+        </div>
+      </div>
+      <div class="col-lg-2 text-lg-end">
+        <span class="text-muted" id="cnsVersion"></span>
+      </div>
+    </div>
+  </div>
+
+  <ul class="nav nav-tabs mb-3" id="cnsTabs" role="tablist">
+    <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabCampos" type="button">Campos</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabServicios" type="button">Servicios</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabBd" type="button">Base de datos</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabHist" type="button">Historial</button></li>
+  </ul>
+
+  <div class="tab-content">
+    <!-- Campos -->
+    <div class="tab-pane fade show active" id="tabCampos">
+      <div class="cns-editor__grid">
+        <div class="cns-col">
+          <div class="cns-col__title">Paleta</div>
+          <div id="cnsPaleta"></div>
+          <p class="text-muted" style="font-size:12px;margin:8px 0 0">Arrastra al lienzo o haz clic para agregar.</p>
+        </div>
+        <div class="cns-col">
+          <div class="cns-col__title">Lienzo</div>
+          <ul id="cnsLienzo" class="cns-canvas" style="padding:0;margin:0"></ul>
+          <div id="cnsLienzoEmpty" class="cns-canvas__empty">Sin campos todavía. Agrega desde la paleta.</div>
+        </div>
+        <div class="cns-col">
+          <div class="cns-col__title">Propiedades</div>
+          <div id="cnsProps" class="cns-prop"><div class="cns-prop__empty">Selecciona un campo del lienzo.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Servicios -->
+    <div class="tab-pane fade" id="tabServicios">
+      <div class="cns-col">
+        <div class="cns-col__title">Servicios asignados</div>
+        <p class="text-muted" style="font-size:13px">Regla: un solo formulario <strong>activo</strong> por servicio.</p>
+        <div id="cnsServicios" class="row g-2"></div>
+      </div>
+    </div>
+
+    <!-- Base de datos (Fase 2) -->
+    <div class="tab-pane fade" id="tabBd">
+      <div class="cns-col">
+        <div class="cns-col__title">Base de datos del formulario</div>
+        <p class="text-muted mb-0">Carga de BD (.csv) y mapeo columna→campo: disponible en la Fase 2.</p>
+      </div>
+    </div>
+
+    <!-- Historial -->
+    <div class="tab-pane fade" id="tabHist">
+      <div class="cns-col">
+        <div class="cns-col__title">Historial de versiones</div>
+        <div id="cnsHistorial"><p class="text-muted mb-0">Guarda el formulario para ver su historial.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <ul id="cnsErrores" class="cns-errors mt-3" style="display:none"></ul>
+
+  <div class="d-flex justify-content-between mt-3 mb-5">
+    <button type="button" class="btn btn-outline-secondary" id="cnsVolver">Volver al listado</button>
+    <div class="d-flex gap-2">
+      <button type="button" class="btn btn-outline-primary" id="cnsPreview">Vista previa</button>
+      <button type="button" class="btn btn-primary" id="cnsGuardar">Guardar formulario</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MODALES ===================== -->
+<div class="modal fade" id="cnsModalEliminar" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Eliminar formulario</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">¿Eliminar <strong id="cnsEliminarNombre"></strong>? Es un borrado lógico: se conservan datos e historial para reportería.</div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="cnsConfirmarEliminar">Eliminar</button>
+      </div>
+    </div>
+  </div>
 </div>
+
+<div class="modal fade" id="cnsModalConflicto" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Conflicto de servicios</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <p>Estos servicios ya tienen un formulario activo:</p>
+        <ul id="cnsConflictoLista"></ul>
+        <p class="mb-0">¿Reasignarlos a este formulario y guardar?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="cnsReasignar">Reasignar y guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="cnsModalPreview" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title" id="cnsPreviewTitulo">Vista previa</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body"><form class="cns-preview" id="cnsPreviewBody" novalidate></form></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary" id="cnsPreviewValidar">Validar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:1090">
+  <div id="cnsToast" class="toast align-items-center text-bg-success border-0" role="alert">
+    <div class="d-flex"><div class="toast-body" id="cnsToastMsg">Guardado.</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>
+  </div>
+</div>
+
+<script>
+window.CONSTRUCTOR_BOOT = {
+  servicios: <?php echo json_encode($servicios, JSON_UNESCAPED_UNICODE); ?>,
+  formularios: <?php echo json_encode($formularios, JSON_UNESCAPED_UNICODE); ?>,
+  tipos: <?php echo json_encode(Constantes::tiposCampoFormulario()); ?>,
+  estados: { activo: <?php echo Constantes::REGISTRO_ACTIVO; ?>, inactivo: <?php echo Constantes::REGISTRO_INACTIVO; ?> }
+};
+</script>
+<script src="<?php echo asset('public/js/jquery-3.7.1.min.js'); ?>"></script>
+<script src="<?php echo asset('public/js/jquery-ui.min.js'); ?>"></script>
+<script src="<?php echo asset('public/js/constructor.js'); ?>"></script>
