@@ -36,7 +36,7 @@
 
         <?php if ($usertype == Constantes::USUARIO_AGENTE || $usertype == Constantes::USUARIO_SUPERVISOR || $usertype == Constantes::USUARIO_ADMINISTRADOR) { ?>
           <li class="nav-item">
-            <a class="nav-link<?php echo nav_active($curKey, ['formulario:index']); ?>" href="?view=formulario&mode=index">Formulario</a>
+            <a class="nav-link<?php echo nav_active($curKey, ['formulario:index', 'captura:index']); ?>" href="?view=formulario&mode=index">Formulario</a>
           </li>
         <?php } ?>
 
@@ -59,7 +59,7 @@
           </li>
 
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle<?php echo in_array(explode(':', $curKey)[0], ['reportes', 'xml']) ? ' active' : ''; ?>" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Reportes</a>
+            <a class="nav-link dropdown-toggle<?php echo (in_array(explode(':', $curKey)[0], ['reportes', 'xml']) || $curKey === 'captura:reporte') ? ' active' : ''; ?>" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Reportes</a>
             <ul class="dropdown-menu dropdown-menu-end" data-bs-theme="light">
               <li><a class="dropdown-item<?php echo nav_active($curKey, ['reportes:index', 'reportes:acumulado']); ?>" href="?view=reportes&mode=index">Acumulado de gestión</a></li>
               <li><hr class="dropdown-divider"></li>
@@ -67,6 +67,8 @@
               <li><a class="dropdown-item<?php echo nav_active($curKey, ['reportes:detalleventas']); ?>" href="?view=reportes&mode=detalleventas">Detalle de ventas</a></li>
               <li><a class="dropdown-item<?php echo nav_active($curKey, ['reportes:liberar']); ?>" href="?view=reportes&mode=liberar">Liberar clientes Banca</a></li>
               <li><a class="dropdown-item<?php echo nav_active($curKey, ['xml:index']); ?>" href="?view=xml&mode=index">Generar XML</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item<?php echo nav_active($curKey, ['captura:reporte']); ?>" href="?view=captura&mode=reporte">Formularios dinámicos</a></li>
               <li><hr class="dropdown-divider"></li>
             </ul>
           </li>

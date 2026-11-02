@@ -1,7 +1,7 @@
 # Constructor de formularios dinámicos — Plan de trabajo
 
-> Estado: **Fase 1 completa (validada en navegador). Fase 2 completa (backend + frontend;
-> pendiente aplicar migración + QA)**. Fecha: 2026-10-29.
+> Estado: **Fases 0–2 completas y validadas. Fase 3 (runtime + reportería) implementada;
+> pendiente aplicar migración + QA**. Fecha: 2026-10-30.
 > Diseño origen: proyecto Claude Design *"Bulksales Resumen de gestión rediseño"* → `Constructor.dc.html` (+ `support.js`).
 
 Guía para implementar el **Constructor de formularios dinámicos** dentro de BulkApp
@@ -11,9 +11,9 @@ y [`conventions.md`](conventions.md).
 > **Restricción dura (no negociable):** los **formularios de banca quedan intactos** —
 > ni su **forma** ni su **modelo** se tocan. El flujo bancario (`formulario`,
 > `registroGestion`/`registroResultados`, `gestion`/`resultados`, reportería) sigue tal cual.
-> El Constructor sirve para **formularios dinámicos nuevos**; su eventual runtime (Fase 3,
-> fuera de alcance ahora) sería una ruta de captura **separada**, nunca una modificación del
-> esquema bancario fijo.
+> El Constructor sirve para **formularios dinámicos nuevos** de servicios **no bancarios**; su
+> runtime (Fase 3) es una ruta de captura **separada** (`?view=captura`), nunca una
+> modificación del esquema bancario fijo.
 
 ---
 
@@ -77,7 +77,7 @@ no se porta:
 
 | # | Decisión | **Resuelto** | Nota |
 |---|----------|--------------|------|
-| 1 | **Alcance ahora** | **Builder (Fases 0–2)** | Runtime (Fase 3) queda fuera de alcance. Banca **no se toca** (restricción dura, ver encabezado). |
+| 1 | **Alcance** | **Builder (Fases 0–2)** y luego **runtime (Fase 3, 2026-10-30)** | Banca **no se toca** (restricción dura, ver encabezado); los dinámicos son solo para servicios no bancarios. |
 | 2 | **Persistencia de la definición** | **`definicion JSON` por versión** | MariaDB 10.11 (el motor real) soporta el tipo `JSON` y funciones `JSON_*`. Sin `LONGTEXT` manual. |
 | 3 | **Valores capturados (runtime)** | **JSON por envío** (modelo cerrado) | Tabla `formulario_envios` con `valores JSON` + `servicio_id` denormalizado (ver §4). Esquema definido ahora; se **construye** en Fase 3. Nunca sobre el esquema bancario. |
 | 4 | **.xlsx** | **CSV primero** | Parser xlsx (`ZipArchive`+`SimpleXML`, nativos) opcional más adelante. |
@@ -127,8 +127,8 @@ Convenciones del repo: tablas en español, PK `id`, FKs `<entidad>_id`, estado v
 `status_id` reusando `REGISTRO_ACTIVO=2`/`REGISTRO_INACTIVO=1`, columna `fecha`, `utf8mb4`.
 
 > El esquema completo queda **definido ahora**. Las tablas 1–4 se construyen en las Fases 0–2
-> (Builder). La tabla 5 (`formulario_envios`, captura) es Fase 3 y se deja especificada pero
-> **no se construye** en este tramo. Nada de esto toca el esquema bancario fijo.
+> (Builder). La tabla 5 (`formulario_envios`, captura) se construye en la Fase 3
+> (`20261030_constructor_envios.sql`). Nada de esto toca el esquema bancario fijo.
 
 ### Tablas del Builder (Fases 0–2)
 
@@ -194,7 +194,11 @@ CREATE TABLE formulario_cargas (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
-### Tabla de captura (Fase 3 — especificada, NO se construye ahora)
+### Tabla de captura (Fase 3)
+
+> La versión construida (`20261030_constructor_envios.sql`) agrega a este esquema `fila_id`
+> (UNIQUE: un envío por registro) y `registro JSON` (foto de la card), con FK `ON DELETE SET
+> NULL` a la carga y a la fila.
 
 ```sql
 -- 5) Envío: un formulario dinámico completado por un operador
@@ -370,15 +374,36 @@ Las filas sin valor en la columna de búsqueda se omiten al cargar.
   izquierda si hay BD vigente; centrada si no.
 - **Verificado:** lint 79/0, tests 53/53, JS OK, integración contra BD real OK.
 
-### Fase 3 — Runtime (FUERA DE ALCANCE por ahora)
-> **No se implementa en este tramo.** Y cuando se retome, **no toca banca**: el flujo bancario
-> (`formulario`, `registroGestion`/`registroResultados`, `gestion`/`resultados`, reportería)
-> queda fijo. El runtime dinámico sería una **ruta de captura separada** para formularios
-> nuevos, no una modificación del esquema bancario. Esbozo para memoria futura:
-> - Render del form activo del servicio desde su definición (en la ruta nueva, no en banca).
-> - Guardado de valores en `formulario_envios` (`valores JSON`), separado de `gestion`/`resultados`.
-> - Reportería propia de campos dinámicos (filtro por `servicio_id`, `JSON_VALUE`/`JSON_TABLE`).
-> - Validación servidor espejo de la del preview.
+### Fase 3 — Runtime de captura + reportería (2026-10-30; pendiente aplicar migración + QA)
+**Banca no se toca** (ni forma ni modelo). Única intervención en `formularioController`: en
+`index`, si el servicio del operador **no** es bancario, redirige a `?view=captura`; la rama de
+banca queda igual.
+
+Decisiones (2026-10-30):
+- **Solo servicios no bancarios.** El Constructor ya no ofrece servicios de banca
+  (`serviciosDisponibles` los excluye, `save` los descarta); el menú «Formulario» lleva a la
+  captura dinámica cuando el servicio del operador no es bancario.
+- **Un envío por registro:** al guardar, el registro de la BD queda *atendido* (`fila_id`
+  UNIQUE en `formulario_envios`; cubre dos operadores guardando a la vez).
+- **Sin registro solo si no hay BD:** sin BD vigente el formulario va centrado y se captura
+  directo; con BD vigente, solo sobre un registro encontrado.
+- **Reportería:** filtro por formulario/servicio/fechas (vista previa de 100) + exportación CSV
+  (`;`, UTF-8 con BOM), para Supervisor/Administrador (menú Reportes → Formularios dinámicos).
+
+Implementación:
+- **Migración** `20261030_constructor_envios.sql`: `formulario_carga_filas.clave` (valor de la
+  columna de búsqueda, índice `(carga_id, clave)`, relleno para cargas existentes) y
+  `formulario_envios` (+ `fila_id` UNIQUE y `registro JSON` = foto de la card al capturar).
+- `capturaController` (+ `capturaModel`, `helpers/captura.php`): `index`, `buscar`, `guardar`,
+  `reporte`, `exportar`. El servidor resuelve el formulario activo y la BD vigente desde la
+  sesión (nunca confía en ids del cliente) y valida los valores (`captura_validar_valores`,
+  espejo del navegador; campos ocultos por condición no se validan ni se guardan).
+- `public/js/formDinamico.js`: render/condiciones/validación/lectura compartidos por la vista
+  previa del Constructor y la captura (`captura.js`). `captura.css` replica el lenguaje
+  visual del formulario de banca.
+- CSV: columnas fijas (ID, fecha, servicio, operador, usuario, versión) + columnas de la BD +
+  campos; une todas las versiones del formulario y todas sus cargas (etiquetas de lo más
+  reciente).
 
 ### Cierre de cada fase
 `php tests/lint.php` + `php tests/run.php`. Agregar tests para: validación de la definición,

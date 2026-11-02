@@ -325,17 +325,21 @@ class database
   }
 
   /**
-   * Servicios activos disponibles para asignar.
+   * Servicios no bancarios (cualquier estado) que pueden recibir un formulario dinámico.
    *
    * @return array
    */
   public function serviciosDisponibles()
   {
-    return $this->db->selectQuery(
-      "SELECT id, descripcion FROM servicios WHERE status_id = ? ORDER BY descripcion",
-      array(Constantes::REGISTRO_ACTIVO),
-      'i'
+    $servicios = $this->db->selectQuery(
+      "SELECT id, descripcion, status_id FROM servicios ORDER BY descripcion",
+      array(),
+      ''
     );
+    // Los servicios de banca usan su formulario fijo: no admiten formularios dinámicos.
+    return array_values(array_filter($servicios, function ($s) {
+      return !Constantes::esServicioBancario($s['id']);
+    }));
   }
 
   /* ---------------------------------------------------------------------
@@ -371,6 +375,7 @@ class database
       );
       $cargaId = (int) $this->db->insert_id;
 
+      $kBusqueda = isset($columnas['busqueda']) ? $columnas['busqueda'] : null;
       $chunk = 500;
       $total = count($filas);
       for ($i = 0; $i < $total; $i += $chunk) {
@@ -379,13 +384,14 @@ class database
         $params = array();
         $types = '';
         foreach ($slice as $f) {
-          $marcadores[] = '(?,?)';
+          $marcadores[] = '(?,?,?)';
           $params[] = $cargaId;
+          $params[] = ($kBusqueda !== null && isset($f[$kBusqueda])) ? mb_substr((string) $f[$kBusqueda], 0, 191, 'UTF-8') : null;
           $params[] = json_encode($f, JSON_UNESCAPED_UNICODE);
-          $types .= 'is';
+          $types .= 'iss';
         }
         $this->db->preparedQuery(
-          "INSERT INTO formulario_carga_filas (carga_id, fila) VALUES " . implode(',', $marcadores),
+          "INSERT INTO formulario_carga_filas (carga_id, clave, fila) VALUES " . implode(',', $marcadores),
           $params,
           $types
         );

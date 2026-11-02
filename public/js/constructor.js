@@ -365,10 +365,15 @@
     // ---------- Servicios ----------
     function renderServicios() {
       var $c = $('#cnsServicios').empty();
+      if (!BOOT.servicios.length) {
+        $c.html('<div class="col-12 text-muted">No hay servicios no bancarios para asignar.</div>');
+        return;
+      }
       BOOT.servicios.forEach(function (s) {
         var id = parseInt(s.id, 10);
         var $col = $('<div class="col-md-4">');
         var $chk = $('<div class="form-check"><input class="form-check-input" type="checkbox" id="srv' + id + '"><label class="form-check-label" for="srv' + id + '">' + esc(s.descripcion) + '</label></div>');
+        if (parseInt(s.status_id, 10) !== ACTIVO) { $chk.find('label').append(' <span class="text-muted">(inactivo)</span>'); }
         $chk.find('input').prop('checked', form.servicios.indexOf(id) >= 0).on('change', function () {
           if (this.checked) { if (form.servicios.indexOf(id) < 0) { form.servicios.push(id); } }
           else { form.servicios = form.servicios.filter(function (x) { return x !== id; }); }
@@ -649,31 +654,6 @@
       renderPreview($('#cnsNombre').val() || '(sin nombre)', form ? form.campos : [], form ? form.bd : null);
     }
 
-    function construirControl(c) {
-      if (c.type === 'textarea') { return $('<textarea class="form-control">').attr('name', c.k).attr('placeholder', c.placeholder || ''); }
-      if (c.type === 'select') {
-        var $s = $('<select class="form-select"><option value="">—</option></select>').attr('name', c.k);
-        (c.opts || []).forEach(function (o) { $s.append($('<option>').val(o).text(o)); });
-        return $s;
-      }
-      if (c.type === 'nested') {
-        var $w = $('<div>');
-        var $p = $('<select class="form-select mb-2" data-nivel="1">').append($('<option value="">').text(c.lv1 || 'Nivel 1'));
-        var $h = $('<select class="form-select" data-nivel="2">').append($('<option value="">').text(c.lv2 || 'Nivel 2'));
-        (c.tree || []).forEach(function (n) { $p.append($('<option>').val(n.p).text(n.p)); });
-        $p.on('change', function () {
-          $h.empty().append($('<option value="">').text(c.lv2 || 'Nivel 2'));
-          var nodo = (c.tree || []).filter(function (n) { return n.p === $p.val(); })[0];
-          if (nodo) {
-            nodo.c.split(',').map(function (s) { return s.trim(); }).filter(Boolean).forEach(function (ch) { $h.append($('<option>').val(ch).text(ch)); });
-          }
-        });
-        return $w.append($p).append($h);
-      }
-      var tipo = c.type === 'number' ? 'number' : (c.type === 'date' ? 'date' : (c.type === 'email' ? 'email' : 'text'));
-      return $('<input class="form-control">').attr('type', tipo).attr('name', c.k).attr('placeholder', c.placeholder || '');
-    }
-
     // Card izquierda «Datos de la búsqueda» (solo lectura) con una fila de muestra.
     // Sin BD vigente la card no se muestra y el formulario queda centrado.
     function renderPreviewBd(bd) {
@@ -705,66 +685,14 @@
     }
 
     function renderPreview(nombre, campos, bd) {
-      previewCampos = {};
       $('#cnsPreviewTitulo').text('Vista previa — ' + nombre);
       renderPreviewBd(bd);
-      var $b = $('#cnsPreviewBody').empty().off('change input');
-      campos.forEach(function (c) {
-        previewCampos[c.k] = c;
-        var $grp = $('<div class="mb-3">').attr('data-k', c.k);
-        $grp.append($('<label class="form-label">').html(esc(c.label || c.k) + (c.req ? ' <span class="req-mark">*</span>' : '')));
-        $grp.append(construirControl(c));
-        if (c.help) { $grp.append($('<div class="form-text">').text(c.help)); }
-        $grp.append('<div class="field-error" style="display:none"></div>');
-        if (c.cond) { $grp.attr('data-cond-k', c.cond.k).attr('data-cond-v', c.cond.v); }
-        $b.append($grp);
-      });
-      $b.on('change input', function () { aplicarCondicionales($b); });
-      aplicarCondicionales($b);
+      previewCampos = FormDinamico.render($('#cnsPreviewBody'), campos);
       previewModal.show();
     }
 
-    function aplicarCondicionales($b) {
-      $b.find('[data-cond-k]').each(function () {
-        var $g = $(this);
-        var $ref = $b.find('[data-k="' + $g.attr('data-cond-k') + '"]').find('input,select,textarea').first();
-        var cur = $ref.length ? ($ref.val() || '') : '';
-        $g.toggle(String(cur) === String($g.attr('data-cond-v')));
-      });
-    }
-
     function validarValores() {
-      var $b = $('#cnsPreviewBody');
-      var ok = true;
-      $b.find('[data-k]').each(function () {
-        var $g = $(this);
-        if (!$g.is(':visible')) { return; }
-        var c = previewCampos[$g.attr('data-k')];
-        var $e = $g.find('.field-error').hide().text('');
-        var err = '';
-        if (c.type === 'nested') {
-          var p = $g.find('[data-nivel="1"]').val(), h = $g.find('[data-nivel="2"]').val();
-          if (c.req && (!p || !h)) { err = 'Selecciona ambos niveles.'; }
-        } else {
-          var val = ($g.find('input,select,textarea').val() || '').trim();
-          if (c.req && !val) { err = 'Campo obligatorio.'; }
-          else if (val) {
-            if (c.type === 'email' && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(val)) { err = 'Correo inválido.'; }
-            if (!err && c.regex) { try { if (!(new RegExp(c.regex)).test(val)) { err = 'Formato inválido.'; } } catch (e) { /* noop */ } }
-            if (!err && (c.type === 'text' || c.type === 'textarea')) {
-              if (c.min != null && val.length < c.min) { err = 'Mínimo ' + c.min + ' caracteres.'; }
-              else if (c.max != null && val.length > c.max) { err = 'Máximo ' + c.max + ' caracteres.'; }
-            }
-            if (!err && c.type === 'number') {
-              var n = parseFloat(val);
-              if (isNaN(n)) { err = 'Número inválido.'; }
-              else if (c.min != null && n < c.min) { err = 'Mínimo ' + c.min + '.'; }
-              else if (c.max != null && n > c.max) { err = 'Máximo ' + c.max + '.'; }
-            }
-          }
-        }
-        if (err) { ok = false; $e.text(err).show(); }
-      });
+      var ok = FormDinamico.validar($('#cnsPreviewBody'), previewCampos);
       toast(ok ? 'Validación OK.' : 'Hay errores en el formulario.', !ok);
     }
 

@@ -13,6 +13,11 @@ if (!security_usuario_autenticado()) {
     try {
       switch ($_GET['mode']) {
         case 'index':
+          // Los servicios no bancarios usan formularios dinámicos (Constructor): ruta propia.
+          if (!Constantes::esServicioBancario(isset($_SESSION['servicio_id']) ? $_SESSION['servicio_id'] : Constantes::SERVICIO_BANCARIO)) {
+            header('location:?view=captura&mode=index');
+            exit;
+          }
           $id = Constantes::servicioBase(isset($_SESSION['servicio_id']) ? $_SESSION['servicio_id'] : 1);
           // Valores del hero (nnavbar)
           $nav_crumb = 'Inicio / Formulario';

@@ -11,6 +11,7 @@ header('X-Request-Id: ' . app_request_id());
 
 // Lista blanca de módulos. Solo estos controladores pueden incluirse.
 $controladoresPermitidos = [
+  'captura',
   'carga_archivo',
   'configuracion',
   'constructor',

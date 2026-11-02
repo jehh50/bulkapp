@@ -74,6 +74,10 @@ if (!security_usuario_autenticado()) {
         );
         $btnTexto  = input_string(isset($_POST['btn_texto']) ? $_POST['btn_texto'] : 'Guardar', 80);
         $servicios = input_int_array(isset($_POST['servicios']) ? $_POST['servicios'] : array());
+        // Banca conserva su formulario fijo: se descartan servicios bancarios.
+        $servicios = array_values(array_filter($servicios, function ($s) {
+          return !Constantes::esServicioBancario($s);
+        }));
         $nota      = input_string(isset($_POST['nota']) ? $_POST['nota'] : '', 255);
         $reasignar = !empty($_POST['reasignar']);
         $defJson   = (isset($_POST['definicion']) && is_string($_POST['definicion'])) ? $_POST['definicion'] : '';

@@ -113,7 +113,7 @@
     <div class="tab-pane fade" id="tabServicios">
       <div class="cns-col">
         <div class="cns-col__title">Servicios asignados</div>
-        <p class="text-muted" style="font-size:13px">Regla: un solo formulario <strong>activo</strong> por servicio.</p>
+        <p class="text-muted" style="font-size:13px">Regla: un solo formulario <strong>activo</strong> por servicio. Solo servicios no bancarios: los de banca conservan su formulario fijo.</p>
         <div id="cnsServicios" class="row g-2"></div>
       </div>
     </div>
@@ -257,4 +257,5 @@ window.CONSTRUCTOR_BOOT = {
 </script>
 <script src="<?php echo asset('public/js/jquery-3.7.1.min.js'); ?>"></script>
 <script src="<?php echo asset('public/js/jquery-ui.min.js'); ?>"></script>
+<script src="<?php echo asset('public/js/formDinamico.js'); ?>"></script>
 <script src="<?php echo asset('public/js/constructor.js'); ?>"></script>

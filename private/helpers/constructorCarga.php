@@ -108,9 +108,26 @@ function constructor_parsear_csv($ruta)
   if (empty($filas)) {
     return array('headers' => array(), 'filas' => array());
   }
-  $headers = array_map('strval', $filas[0]);
 
-  return array('headers' => $headers, 'filas' => array_slice($filas, 1));
+  return array('headers' => constructor_limpiar_headers($filas[0]), 'filas' => array_slice($filas, 1));
+}
+
+/**
+ * Normaliza encabezados: quita el BOM UTF-8 (Excel lo antepone al exportar CSV)
+ * y los espacios de los extremos.
+ *
+ * @param array $headers
+ * @return string[]
+ */
+function constructor_limpiar_headers(array $headers)
+{
+  return array_map(function ($h) {
+    $h = (string) $h;
+    if (strncmp($h, "\xEF\xBB\xBF", 3) === 0) {
+      $h = substr($h, 3);
+    }
+    return trim($h);
+  }, $headers);
 }
 
 /**
@@ -188,9 +205,8 @@ function constructor_parsear_xlsx($ruta)
   if (empty($filas)) {
     return array('headers' => array(), 'filas' => array());
   }
-  $headers = array_map('strval', $filas[0]);
 
-  return array('headers' => $headers, 'filas' => array_slice($filas, 1));
+  return array('headers' => constructor_limpiar_headers($filas[0]), 'filas' => array_slice($filas, 1));
 }
 
 /**

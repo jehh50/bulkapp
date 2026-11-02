@@ -35,6 +35,14 @@ test('parsea CSV con delimitador ; y encabezados', function () {
   assert_igual('Full', $r['filas'][0][1]);
 });
 
+test('parsea CSV con BOM UTF-8: el primer encabezado queda limpio', function () {
+  $ruta = tmp_archivo("\xEF\xBB\xBFnombre_legal;telf_cel\nAna;0414\n", 'csv');
+  $r = constructor_parsear_csv($ruta);
+  unlink($ruta);
+
+  assert_igual(array('nombre_legal', 'telf_cel'), $r['headers']);
+});
+
 test('parsea CSV con delimitador , (autodetección)', function () {
   $ruta = tmp_archivo("a,b,c\n1,2,3\n", 'csv');
   $r = constructor_parsear_csv($ruta);
