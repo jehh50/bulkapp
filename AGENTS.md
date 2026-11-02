@@ -27,6 +27,6 @@ php tests/lint.php    # sintaxis de todos los archivos PHP
 - **No** dejar `print_r()`, `var_dump()` ni `console.log()`: usar `app_log($nivel, $msg, $ctx)`.
 - **No** escribir literales de negocio: usar la clase `Constantes` (`private/config/constantes.php`).
 - **No** referenciar CSS/JS sin el helper `asset()` (cache-busting).
-- Los controladores manejan errores con `try/catch` + `app_log()` + `app_responder_error()`.
+- Los controladores manejan errores con `try/catch` + `app_log()` + `app_responder_error()`; las URLs inválidas (vista/modo inexistente) con `app_responder_no_encontrado()` (404).
 - Los datos que llegan de `$_GET`/`$_POST` se validan con los helpers `input_*`.
 - Bootstrap 5.3.8 y jQuery 3.7.1, **locales** en `public/` (no CDN, no jQuery/Bootstrap nuevos).

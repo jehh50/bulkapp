@@ -226,7 +226,7 @@ if (!security_usuario_autenticado()) {
   				break;
 
   			default:
-  				header('location:' . HTML_DIR . 'error.html');
+  				app_responder_no_encontrado();
   				break;
   		}
 		} catch (Throwable $e) {

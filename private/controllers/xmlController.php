@@ -352,7 +352,7 @@ if (!security_usuario_autenticado()) {
 
 
         default:
-          header('location:' . HTML_DIR . 'error.html');
+          app_responder_no_encontrado();
           break;
       }
     } catch (Throwable $e) {

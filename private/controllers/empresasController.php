@@ -164,8 +164,7 @@ if (!security_usuario_autenticado()) {
         break;
 
       default:
-        header('location:' . HTML_DIR . 'error.html');
-        exit;
+        app_responder_no_encontrado();
     }
   } catch (Throwable $e) {
     app_log('error', 'Error en el controlador de empresas: ' . $e->getMessage(), array(

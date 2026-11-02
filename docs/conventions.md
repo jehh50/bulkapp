@@ -26,6 +26,7 @@ estilo del archivo que estés tocando para mantener consistencia.
         case 'index': /* render de vista */ break;
         case 'registro': /* POST */ break;
         // AJAX: echo json_encode($json);
+        default: app_responder_no_encontrado();
       }
     } catch (Throwable $e) {
       app_log('error', 'Error en el controlador: ' . $e->getMessage(), array(/* ... */));
@@ -36,6 +37,10 @@ estilo del archivo que estés tocando para mantener consistencia.
 
 - **Todo controlador** envuelve su lógica en `try/catch (Throwable)` y delega el manejo
   del error a `app_log()` + `app_responder_error()`.
+- **URL inválida** (vista o modo inexistente, parámetro obligatorio inválido): llamar a
+  `app_responder_no_encontrado()` (404 + `private/views/error.html`, o JSON si es AJAX). Todo
+  `switch ($_GET['mode'])` lleva `default` con esa llamada. Nunca redirigir con
+  `header('location:' . HTML_DIR . 'error.html')`: expone la ruta interna.
 - **Páginas**: incluir `header.php` + `navbar.php`, luego la vista, luego `footer.php`,
   usando las constantes `PUBLIC_DIR` / `HTML_DIR`.
 - **Respuestas AJAX**: construir `$json` y terminar con `echo json_encode($json);` (sin HTML).

@@ -158,8 +158,7 @@ if (isset($_GET['mode'])) {
         break;
       #_________________________________________________________________________________
       default:
-        header('location:' . HTML_DIR . 'error.html');
-        exit;
+        app_responder_no_encontrado();
     }
   } catch (Throwable $e) {
     app_log('error', 'Error en el controlador session: ' . $e->getMessage(), array(

@@ -217,6 +217,9 @@ $conexion = new database();
   				}
   				echo json_encode($json);
   			break;
+  #----------------------------------------------------------------------------------------------------------------------
+  			default:
+  				app_responder_no_encontrado();
   		}
 		} catch (Throwable $e) {
 		  app_log('error', 'Error en el controlador editar: ' . $e->getMessage(), array(
@@ -228,6 +231,8 @@ $conexion = new database();
 
 		  app_responder_error();
 		}
+	} else {
+		app_responder_no_encontrado();
 	}
 }
 ?>

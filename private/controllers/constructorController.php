@@ -234,8 +234,7 @@ if (!security_usuario_autenticado()) {
         break;
 
       default:
-        http_response_code(404);
-        include(HTML_DIR . 'error.html');
+        app_responder_no_encontrado();
         break;
     }
   } catch (Throwable $e) {

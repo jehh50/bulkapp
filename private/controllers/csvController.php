@@ -12,8 +12,7 @@ if (!security_usuario_autenticado()) { header('location:index.php'); exit; } els
   				$fechaD = input_date(isset($_POST['fecha_d']) ? $_POST['fecha_d'] : null);
   				$fechaH = input_date(isset($_POST['fecha_h']) ? $_POST['fecha_h'] : null);
   				if ($fechaD === null || $fechaH === null) {
-  					header('location:' . HTML_DIR . 'error.html');
-  					exit;
+  					app_responder_no_encontrado();
   				}
   				$desde = str_replace('-', '', $fechaD);
   				$hasta = str_replace('-', '', $fechaH);
@@ -139,8 +138,7 @@ if (!security_usuario_autenticado()) { header('location:index.php'); exit; } els
   				$fechaD = input_date(isset($_POST['fecha_d']) ? $_POST['fecha_d'] : null);
   				$fechaH = input_date(isset($_POST['fecha_h']) ? $_POST['fecha_h'] : null);
   				if ($fechaD === null || $fechaH === null) {
-  					header('location:' . HTML_DIR . 'error.html');
-  					exit;
+  					app_responder_no_encontrado();
   				}
   				$desde = date('d/m/Y', strtotime($fechaD));
   				$hasta = date('d/m/Y', strtotime($fechaH));
@@ -187,7 +185,7 @@ if (!security_usuario_autenticado()) { header('location:index.php'); exit; } els
   			break;
   #-------------------------------------------------------------------------------------------
   			default:
-  				header('location:'.HTML_DIR.'error.html');
+  				app_responder_no_encontrado();
   			break;	
   		}
 		} catch (Throwable $e) {

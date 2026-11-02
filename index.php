@@ -35,17 +35,13 @@ if ($vista === '') {
 }
 
 if (!preg_match('/^[a-z0-9_]+$/', $vista) || !in_array($vista, $controladoresPermitidos, true)) {
-  http_response_code(404);
-  include __DIR__ . '/private/views/error.html';
-  exit;
+  app_responder_no_encontrado();
 }
 
 $controlador = __DIR__ . '/private/controllers/' . $vista . 'Controller.php';
 
 if (!is_file($controlador)) {
-  http_response_code(404);
-  include __DIR__ . '/private/views/error.html';
-  exit;
+  app_responder_no_encontrado();
 }
 
 security_require_csrf();

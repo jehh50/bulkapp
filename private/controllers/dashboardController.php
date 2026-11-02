@@ -5,6 +5,10 @@ if (!security_usuario_autenticado()) {
   header('location:index.php');
   exit;
 } else {
+  // Única pantalla: cualquier otro modo es una URL inválida.
+  if (isset($_GET['mode']) && $_GET['mode'] !== 'index') {
+    app_responder_no_encontrado();
+  }
   include_once(MODEL_DIR . 'reportesModel.php');
   $conn = new database();
 

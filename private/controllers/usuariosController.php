@@ -71,8 +71,7 @@ if (isset($_GET['mode'])) {
 		case 'edituser':
 			$id_user = input_int(isset($_GET['id']) ? $_GET['id'] : null, 1);
 			if ($id_user === null) {
-				header('location:'.HTML_DIR.'error.html');
-				exit;
+				app_responder_no_encontrado();
 			}
 			$registro = $conexion->editUser($id_user);
 			foreach ($registro as $u) {
@@ -191,7 +190,7 @@ if (isset($_GET['mode'])) {
 			break;
 		#-------------------------------------------------------------------------------------------------------------------------------
 			default:
-				header('location:'.HTML_DIR.'error.html');
+				app_responder_no_encontrado();
 			break;
 			}
 	} catch (Throwable $e) {

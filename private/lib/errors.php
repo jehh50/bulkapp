@@ -106,6 +106,48 @@ function app_responder_error()
 }
 
 /**
+ * Responde 404 con la página de error (o JSON si la petición es AJAX) y termina.
+ * Úsese para vistas/modos inexistentes y parámetros de URL inválidos; nunca redirigir
+ * a private/views/error.html (expone una ruta interna).
+ *
+ * @return void
+ */
+function app_responder_no_encontrado()
+{
+  $texto = function ($clave) {
+    return (isset($_GET[$clave]) && is_scalar($_GET[$clave])) ? mb_substr((string) $_GET[$clave], 0, 60) : '';
+  };
+  app_log('info', 'Recurso no encontrado', array(
+    'event' => 'http.not_found',
+    'view' => $texto('view'),
+    'mode' => $texto('mode'),
+    'user_id' => isset($_SESSION['id']) ? (int) $_SESSION['id'] : null,
+  ));
+
+  // Descarta lo que el controlador hubiera alcanzado a generar.
+  while (ob_get_level() > 0) {
+    ob_end_clean();
+  }
+  if (!headers_sent()) {
+    http_response_code(404);
+  }
+
+  if (app_es_ajax()) {
+    if (!headers_sent()) {
+      header('Content-Type: application/json; charset=UTF-8');
+    }
+    echo json_encode(array('response' => 'false', 'message' => 'Recurso no encontrado.'));
+    exit;
+  }
+
+  if (!headers_sent()) {
+    header('Content-Type: text/html; charset=UTF-8');
+  }
+  include dirname(__DIR__) . '/views/error.html';
+  exit;
+}
+
+/**
  * Mensaje genérico que se muestra al usuario. El detalle técnico queda en el log.
  *
  * @return string
