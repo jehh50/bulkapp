@@ -49,7 +49,7 @@ $stops = empty($segs) ? '#e5e9f2 0% 100%' : implode(',', $segs);
           <select class="form-select" name="servicio" id="servicio" required>
             <option value="" disabled selected>Seleccione...</option>
             <?php if (!empty($servicio)) { foreach ($servicio as $s) { ?>
-              <option value="<?= $s['id']; ?>"><?= htmlspecialchars($s['descripcion']); ?></option>
+              <option value="<?= $s['id']; ?>"><?= htmlspecialchars(isset($s['etiqueta']) ? $s['etiqueta'] : $s['descripcion']); ?></option>
             <?php } } ?>
           </select>
         </div>

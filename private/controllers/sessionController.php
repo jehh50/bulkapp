@@ -87,6 +87,8 @@ if (isset($_GET['mode'])) {
         $_SESSION['servicio_id'] = $user['servicio_id'];
         $_SESSION['status_id'] = $user['status_id'];
         $_SESSION['last_activity'] = time();
+        // Campañas asignadas (N:M): alimentan el selector de campaña de la navbar.
+        campanas_sesion_refrescar((int) $user['id']);
 
         app_log('info', 'Inicio de sesión exitoso', array(
           'event' => 'auth.login_success',
@@ -98,6 +100,42 @@ if (isset($_GET['mode'])) {
           'user_agent' => $agenteCliente,
         ));
 
+        header('location:?view=formulario&mode=index');
+        exit;
+        break;
+
+      #_________________________________________________________________________________
+      case 'campana':
+        // Cambia la campaña activa de la sesión entre las asignadas al usuario.
+        include (PUBLIC_DIR . 'general/session.php');
+        if (!security_usuario_autenticado() || ($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
+          header('location:index.php');
+          exit;
+        }
+        $userIdSesion = (int) $_SESSION['id'];
+        $destino = input_int(isset($_POST['servicio_id']) ? $_POST['servicio_id'] : null, 1);
+        $permitidas = array_map('intval', array_column(campanas_sesion_refrescar($userIdSesion), 'id'));
+
+        if ($destino === null || !in_array((int) $destino, $permitidas, true)) {
+          app_log('warning', 'Cambio de campaña rechazado', array(
+            'event' => 'auth.campana_rechazada',
+            'user_id' => $userIdSesion,
+            'servicio_id' => $destino,
+            'ip' => $ipCliente,
+          ));
+          header('location:?view=formulario&mode=index');
+          exit;
+        }
+
+        $anterior = isset($_SESSION['servicio_id']) ? (int) $_SESSION['servicio_id'] : null;
+        $_SESSION['servicio_id'] = (int) $destino;
+        app_log('info', 'Cambio de campaña', array(
+          'event' => 'auth.campana_cambiada',
+          'user_id' => $userIdSesion,
+          'desde' => $anterior,
+          'hacia' => (int) $destino,
+          'ip' => $ipCliente,
+        ));
         header('location:?view=formulario&mode=index');
         exit;
         break;

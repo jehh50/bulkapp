@@ -23,6 +23,7 @@
                 <li><a class="dropdown-item" href="?view=usuarios&mode=new">Nuevo usuario</a></li>
                 <?php if ((int) $_SESSION['usertype_id'] === Constantes::USUARIO_ADMINISTRADOR) { ?>
                   <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="?view=empresas&mode=index">Clientes y campañas</a></li>
                   <li><a class="dropdown-item" href="?view=constructor&mode=index">Constructor de formularios</a></li>
                 <?php } ?>
               </ul>

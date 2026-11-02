@@ -38,7 +38,7 @@ $showOk = isset($_GET['ok']);
               <select class="form-select form-select-lg" name="servicio" id="servicio" style="font-size:15px">
                 <option value="" selected>Seleccione un servicio…</option>
                 <?php foreach ($servicio as $s) { ?>
-                  <option value="<?= $s['id']; ?>"><?= htmlspecialchars($s['descripcion']); ?></option>
+                  <option value="<?= $s['id']; ?>"><?= htmlspecialchars(isset($s['etiqueta']) ? $s['etiqueta'] : $s['descripcion']); ?></option>
                 <?php } ?>
               </select>
             </div>
@@ -75,7 +75,7 @@ $showOk = isset($_GET['ok']);
               <select class="form-select form-select-lg" id="dSvc" style="font-size:15px">
                 <option value="" selected>Seleccione un servicio…</option>
                 <?php foreach ($servicio as $s) { ?>
-                  <option value="<?= $s['id']; ?>"><?= htmlspecialchars($s['descripcion']); ?></option>
+                  <option value="<?= $s['id']; ?>"><?= htmlspecialchars(isset($s['etiqueta']) ? $s['etiqueta'] : $s['descripcion']); ?></option>
                 <?php } ?>
               </select>
             </div>

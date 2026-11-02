@@ -69,7 +69,7 @@ switch (isset($_GET['mensaje']) ? $_GET['mensaje'] : '') {
           <select class="form-select" name="servicio" required>
             <option value="" selected disabled>Seleccione…</option>
             <?php foreach ($servicio as $s) { ?>
-              <option value="<?php echo (int)$s['id']; ?>"><?php echo htmlspecialchars($s['descripcion']); ?></option>
+              <option value="<?php echo (int)$s['id']; ?>"><?php echo htmlspecialchars(isset($s['etiqueta']) ? $s['etiqueta'] : $s['descripcion']); ?></option>
             <?php } ?>
           </select>
         </label>

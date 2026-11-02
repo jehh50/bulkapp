@@ -164,7 +164,8 @@ class database
       return [];
     }
     $in = '(' . implode(',', array_fill(0, count($ids), '?')) . ')';
-    $sql = "SELECT id, descripcion FROM servicios WHERE status_id = 2 and id IN $in ORDER BY descripcion";
+    // etiqueta = «Empresa › Campaña» (solo para mostrar en el selector).
+    $sql = "SELECT s.id, s.descripcion, " . campanas_sql_etiqueta() . " AS etiqueta FROM servicios s LEFT JOIN empresas e ON e.id = s.empresa_id WHERE s.status_id = 2 and s.id IN $in ORDER BY etiqueta";
     return $this->db->selectQuery($sql, $ids, str_repeat('i', count($ids)));
   }
 

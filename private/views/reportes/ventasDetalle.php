@@ -26,7 +26,7 @@ $descargaUrl = '?view=reportes&mode=download&from=' . $desde . '&to=' . $hasta .
             <option value="" disabled <?= $selServicio === '' ? 'selected' : ''; ?>>Seleccione...</option>
             <?php foreach ($servicio as $s) { ?>
               <option value="<?= $s['id']; ?>" <?= ($s['id'] == $selServicio) ? 'selected' : ''; ?>>
-                <?= htmlspecialchars($s['descripcion']); ?>
+                <?= htmlspecialchars(isset($s['etiqueta']) ? $s['etiqueta'] : $s['descripcion']); ?>
               </option>
             <?php } ?>
           </select>

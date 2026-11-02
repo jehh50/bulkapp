@@ -22,17 +22,23 @@ para gestión de contactos y ventas por campaña. La usan agentes telefónicos p
 > Los valores están centralizados en la clase `Constantes`
 > (`private/config/constantes.php`): `USUARIO_AGENTE`, `USUARIO_ADMINISTRADOR`, etc.
 
-## Servicios / campañas (`servicio_id`)
+## Clientes y campañas (`servicio_id`)
 
-El comportamiento del formulario y de los reportes cambia según el servicio:
+Una **empresa** (cliente corporativo, tabla `empresas`) tiene N **campañas**. La campaña es la
+tabla `servicios`: su id es el `servicio_id` de todo el sistema. Cada campaña declara su flujo en
+`servicios.tipo_flujo` y tiene N usuarios asignados (`usuario_servicios`; `users.servicio_id` es
+la campaña principal). Se gestionan en Configuración → «Clientes y campañas» (Administrador).
+Detalle en [clientes-campanas-plan.md](clientes-campanas-plan.md).
 
-| `servicio_id` | Campaña | Notas |
-|---------------|---------|-------|
-| `1` | Bancamiga / Bancaribe / Banco Activo | Formulario bancario estándar (`formulario/index.php`). |
-| `2` | Cashea | Flujo de cobranza con compromiso/abono de pago (`formulario/cashea.php`). |
-| `5` | Alias de `1` | En varios puntos se normaliza con `Constantes::servicioBase()`. |
+| `servicio_id` | Empresa / campaña | Flujo |
+|---------------|-------------------|-------|
+| `1` | Banco Activo | `bancario` — formulario fijo (`formulario/index.php`); dueña de los catálogos de banca. |
+| `2` | Cashea (inactiva) | `dinamico` — captura del Constructor. |
+| `5` | Bancaribe | `bancario` — comparte catálogos con la 1 (`Constantes::servicioBase()`). |
 
-> Los XML generados se depositan en `public/archivos/{banco}/` (bancamiga, bancaribe, bancoactivo).
+> `Constantes::esServicioBancario()`, `servicios()`, `serviciosBancarios()` y `servicioBase()`
+> leen `tipo_flujo` de la BD (con respaldo al mapa histórico si no está disponible).
+> Los XML generados se depositan en `public/archivos/{nombre de la campaña sin espacios}/`.
 
 ## Glosario rápido
 

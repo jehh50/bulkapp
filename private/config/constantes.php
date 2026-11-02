@@ -12,14 +12,27 @@ class Constantes
    * Servicios (servicio_id)
    * ------------------------------------------------------------------- */
 
-  /** Campañas bancarias: Bancamiga, Bancaribe y Banco Activo. */
+  /** Campaña bancaria base (Banco Activo): dueña de los catálogos de banca. */
   const SERVICIO_BANCARIO = 1;
 
-  /** Flujo de cobranza Cashea. */
+  /** Cashea (hoy inactiva; flujo dinámico). */
   const SERVICIO_CASHEA = 2;
 
-  /** Alias histórico del servicio bancario. */
+  /** Bancaribe: campaña bancaria que comparte catálogos con la 1. */
   const SERVICIO_BANCARIO_ALIAS = 5;
+
+  /* ---------------------------------------------------------------------
+   * Tipos de flujo de una campaña (servicios.tipo_flujo)
+   * ------------------------------------------------------------------- */
+
+  /** Formulario fijo de banca (formularioController). */
+  const FLUJO_BANCARIO = 'bancario';
+
+  /** Formulario dinámico del Constructor (capturaController). */
+  const FLUJO_DINAMICO = 'dinamico';
+
+  /** @var array|null Mapa id → tipo_flujo (cacheado por petición). */
+  private static $flujosCampana = null;
 
   /* ---------------------------------------------------------------------
    * Tipos de usuario (usertype_id)
@@ -58,13 +71,85 @@ class Constantes
   const REGISTRO_INACTIVO = 1;
 
   /**
-   * Lista de servicios válidos.
+   * Tipos de flujo admitidos para una campaña.
+   *
+   * @return array
+   */
+  public static function flujos()
+  {
+    return array(self::FLUJO_BANCARIO, self::FLUJO_DINAMICO);
+  }
+
+  /**
+   * Mapa histórico id → flujo: se usa si la BD no está disponible o la migración
+   * de empresas/campañas (20261102) aún no se aplicó.
+   *
+   * @return array
+   */
+  public static function flujosPorDefecto()
+  {
+    return array(
+      self::SERVICIO_BANCARIO => self::FLUJO_BANCARIO,
+      self::SERVICIO_CASHEA => self::FLUJO_DINAMICO,
+      self::SERVICIO_BANCARIO_ALIAS => self::FLUJO_BANCARIO,
+    );
+  }
+
+  /**
+   * Fija el mapa id → flujo (tests) o, con null, fuerza a releerlo de la BD.
+   *
+   * @param array|null $mapa
+   * @return void
+   */
+  public static function definirFlujosCampana($mapa)
+  {
+    self::$flujosCampana = ($mapa === null) ? null : array_map('strval', $mapa);
+  }
+
+  /**
+   * Mapa id → flujo de todas las campañas (servicios.tipo_flujo).
+   *
+   * @return array
+   */
+  public static function flujosCampana()
+  {
+    if (self::$flujosCampana === null) {
+      $mapa = function_exists('campanas_flujos_desde_bd') ? campanas_flujos_desde_bd() : null;
+      self::$flujosCampana = is_array($mapa) ? $mapa : self::flujosPorDefecto();
+    }
+
+    return self::$flujosCampana;
+  }
+
+  /**
+   * Lista de servicios (campañas) válidos, de cualquier estado.
    *
    * @return array
    */
   public static function servicios()
   {
-    return array(self::SERVICIO_BANCARIO, self::SERVICIO_CASHEA, self::SERVICIO_BANCARIO_ALIAS);
+    $ids = array_map('intval', array_keys(self::flujosCampana()));
+    sort($ids);
+
+    return $ids;
+  }
+
+  /**
+   * Ids de las campañas de flujo bancario.
+   *
+   * @return array
+   */
+  public static function serviciosBancarios()
+  {
+    $ids = array();
+    foreach (self::flujosCampana() as $id => $flujo) {
+      if ($flujo === self::FLUJO_BANCARIO) {
+        $ids[] = (int) $id;
+      }
+    }
+    sort($ids);
+
+    return $ids;
   }
 
   /**
@@ -75,6 +160,22 @@ class Constantes
   public static function tiposUsuario()
   {
     return array(self::USUARIO_AGENTE, self::USUARIO_SUPERVISOR, self::USUARIO_ADMINISTRADOR);
+  }
+
+  /** Filas por página por defecto del reporte de formularios dinámicos. */
+  const REPORTE_FILAS_POR_DEFECTO = 25;
+
+  /** Envíos que se leen de la BD por tanda al exportar el reporte a Excel. */
+  const REPORTE_TANDA_EXPORTACION = 1000;
+
+  /**
+   * Opciones de «Filas por página» del reporte de formularios dinámicos.
+   *
+   * @return int[]
+   */
+  public static function filasPorPaginaReporte()
+  {
+    return array(10, 25, 50, 100);
   }
 
   /**
@@ -88,7 +189,8 @@ class Constantes
   }
 
   /**
-   * Normaliza el id de servicio: el alias 5 se trabaja como el servicio 1.
+   * Normaliza el id de servicio para los catálogos: toda campaña bancaria usa los de la 1
+   * (contacto efectivo/no efectivo, estados, ciudades). Las demás se quedan con su id.
    *
    * @param mixed $servicioId
    * @return int
@@ -97,20 +199,21 @@ class Constantes
   {
     $servicioId = (int) $servicioId;
 
-    return ($servicioId === self::SERVICIO_BANCARIO_ALIAS) ? self::SERVICIO_BANCARIO : $servicioId;
+    return self::esServicioBancario($servicioId) ? self::SERVICIO_BANCARIO : $servicioId;
   }
 
   /**
-   * Indica si el servicio corresponde a una campaña bancaria (1 o su alias 5).
+   * Indica si la campaña usa el flujo bancario (servicios.tipo_flujo = 'bancario').
    *
    * @param mixed $servicioId
    * @return bool
    */
   public static function esServicioBancario($servicioId)
   {
+    $mapa = self::flujosCampana();
     $servicioId = (int) $servicioId;
 
-    return $servicioId === self::SERVICIO_BANCARIO || $servicioId === self::SERVICIO_BANCARIO_ALIAS;
+    return isset($mapa[$servicioId]) && $mapa[$servicioId] === self::FLUJO_BANCARIO;
   }
 
 }

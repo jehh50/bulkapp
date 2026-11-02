@@ -40,6 +40,7 @@ class database
 
   public function servicio(): array
   {
-    return $this->db->selectQuery("SELECT id,descripcion FROM servicios WHERE status_id = 2");
+    // descripcion sigue dando nombre a la carpeta del XML; etiqueta = «Empresa › Campaña» (solo para mostrar).
+    return $this->db->selectQuery("SELECT s.id, s.descripcion, " . campanas_sql_etiqueta() . " AS etiqueta FROM servicios s LEFT JOIN empresas e ON e.id = s.empresa_id WHERE s.status_id = 2");
   }
 }

@@ -58,7 +58,7 @@ $servicio = isset($servicio) && is_array($servicio) ? $servicio : [];
 <!-- ========== LISTA DE USUARIOS ========== -->
 <section id="listView" class="us-card">
   <div class="d-flex flex-wrap gap-3 align-items-center justify-content-between">
-    <input type="text" id="usSearch" class="form-control us-search" placeholder="Buscar usuario, nombre, rol, servicio…">
+    <input type="text" id="usSearch" class="form-control us-search" placeholder="Buscar usuario, nombre, rol, campaña…">
     <button type="button" class="btn btn-gold us-btn" id="btnAdd">+ Agregar usuario</button>
   </div>
 
@@ -71,7 +71,7 @@ $servicio = isset($servicio) && is_array($servicio) ? $servicio : [];
           <th class="us-th">Nombre</th>
           <th class="us-th">Apellido</th>
           <th class="us-th">Rol</th>
-          <th class="us-th">Servicio</th>
+          <th class="us-th">Campaña principal</th>
           <th class="us-th">Estatus</th>
           <th class="us-th us-th--center">Editar</th>
           <th class="us-th us-th--center">Eliminar</th>
@@ -94,7 +94,7 @@ $servicio = isset($servicio) && is_array($servicio) ? $servicio : [];
           <td class="us-td"><?php echo htmlspecialchars($u['nombre']); ?></td>
           <td class="us-td"><?php echo htmlspecialchars($u['apellido']); ?></td>
           <td class="us-td"><?php echo htmlspecialchars($u['name']); ?></td>
-          <td class="us-td"><span class="us-svc"><?php echo htmlspecialchars($u['descripcion']); ?></span></td>
+          <td class="us-td"><span class="us-svc"><?php echo htmlspecialchars($u['descripcion']); ?></span><?php if ((int) $u['campanas_extra'] > 0) { ?> <span class="badge rounded-pill text-bg-light" title="Otras campañas asignadas">+<?php echo (int) $u['campanas_extra']; ?></span><?php } ?></td>
           <td class="us-td"><span class="us-pill <?php echo ((int)$u['status_id'] === 2) ? 'us-pill--on' : 'us-pill--off'; ?>"><?php echo strtoupper(htmlspecialchars($u['status'])); ?></span></td>
           <td class="us-td us-td--center"><button type="button" class="us-edit" aria-label="Editar <?php echo htmlspecialchars($u['user']); ?>">✎</button></td>
           <td class="us-td us-td--center"><button type="button" class="us-del" aria-label="Eliminar <?php echo htmlspecialchars($u['user']); ?>">🗑</button></td>
@@ -140,9 +140,9 @@ $servicio = isset($servicio) && is_array($servicio) ? $servicio : [];
           <option value="3">Administrador</option>
         </select>
       </label>
-      <label class="us-lbl">Servicio
+      <label class="us-lbl">Campaña principal
         <select class="form-select us-input" name="cliente" id="c_servicio" required>
-          <option value="" selected disabled>Servicio…</option>
+          <option value="" selected disabled>Campaña…</option>
           <?php foreach ($servicio as $s) { ?>
             <option value="<?php echo (int)$s['id']; ?>"><?php echo htmlspecialchars($s['descripcion']); ?></option>
           <?php } ?>
@@ -188,7 +188,7 @@ $servicio = isset($servicio) && is_array($servicio) ? $servicio : [];
           <option value="1">INACTIVO</option>
         </select>
       </label>
-      <label class="us-lbl">Servicio
+      <label class="us-lbl">Campaña principal
         <select class="form-select us-input" name="servicio" id="servicio" required>
           <?php foreach ($servicio as $s) { ?>
             <option value="<?php echo (int)$s['id']; ?>"><?php echo htmlspecialchars($s['descripcion']); ?></option>

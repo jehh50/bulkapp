@@ -48,11 +48,12 @@ class database
 
     foreach ($forms as &$f) {
       $f['servicios'] = $this->db->selectQuery(
-        "SELECT s.id, s.descripcion
+        "SELECT s.id, " . campanas_sql_etiqueta('s', 'em') . " AS descripcion
          FROM formulario_servicios fs
          JOIN servicios s ON s.id = fs.servicio_id
+         LEFT JOIN empresas em ON em.id = s.empresa_id
          WHERE fs.formulario_id = ?
-         ORDER BY s.descripcion",
+         ORDER BY descripcion",
         array((int) $f['id']),
         'i'
       );
@@ -143,10 +144,11 @@ class database
     $types .= 'i';
 
     return $this->db->selectQuery(
-      "SELECT fs.servicio_id, s.descripcion AS servicio, f.id AS formulario_id, f.nombre AS formulario
+      "SELECT fs.servicio_id, " . campanas_sql_etiqueta('s', 'em') . " AS servicio, f.id AS formulario_id, f.nombre AS formulario
        FROM formulario_servicios fs
        JOIN formularios f ON f.id = fs.formulario_id
        JOIN servicios s ON s.id = fs.servicio_id
+       LEFT JOIN empresas em ON em.id = s.empresa_id
        WHERE fs.servicio_id IN ($marcadores) AND f.id <> ? AND f.eliminado = 0 AND f.status_id = ?",
       $params,
       $types
@@ -332,7 +334,8 @@ class database
   public function serviciosDisponibles()
   {
     $servicios = $this->db->selectQuery(
-      "SELECT id, descripcion, status_id FROM servicios ORDER BY descripcion",
+      "SELECT s.id, " . campanas_sql_etiqueta('s', 'em') . " AS descripcion, s.status_id
+         FROM servicios s LEFT JOIN empresas em ON em.id = s.empresa_id ORDER BY descripcion",
       array(),
       ''
     );

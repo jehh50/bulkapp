@@ -389,6 +389,26 @@ Decisiones (2026-10-30):
   directo; con BD vigente, solo sobre un registro encontrado.
 - **Reportería:** filtro por formulario/servicio/fechas (vista previa de 100) + exportación CSV
   (`;`, UTF-8 con BOM), para Supervisor/Administrador (menú Reportes → Formularios dinámicos).
+  *Reemplazado el 2026-11-02 por el reporte cliente → campaña → formulario (ver abajo).*
+
+### Reporte de formularios dinámicos (2026-11-02)
+
+Reemplaza la reportería anterior en el mismo menú (Reportes → Formularios dinámicos,
+`?view=captura&mode=reporte`), para Supervisor/Administrador. Diseño aprobado por el usuario.
+
+- **Filtros en cascada** cliente (`empresas`) → campaña (`servicios`) → formulario + Desde/Hasta.
+  Las combinaciones salen de `formulario_servicios` ∪ los pares (formulario, campaña) que ya
+  tienen envíos (`capturaModel::combinacionesReporte`), solo campañas no bancarias. El
+  servidor valida que la combinación exista en ese árbol (`captura_seleccion_reporte`).
+- **Paginación en servidor** (`LIMIT/OFFSET`, orden `fecha DESC, id DESC`), filas por página
+  10/25/50/100 (`Constantes::filasPorPaginaReporte`, 25 por defecto).
+- **Tabla** con encabezados agrupados (Gestión | Datos de la búsqueda | Formulario · X) y fijos.
+- **Exportar a Excel**: `.xlsx` real sin librerías (`private/lib/xlsx.php`, ZipArchive),
+  generado por tandas de 1000 a archivos temporales. Hoja «Registros» (todas las filas del
+  filtro, encabezado congelado y coloreado por grupo; campos `number`/`date` como valores
+  nativos, los de la BD siempre texto) y hoja «Filtros». Nombre:
+  `reporte_<cliente>_<campaña>_<formulario>_<desde>_<hasta>.xlsx`. Log
+  `reporte.formulario_exportado`.
 
 Implementación:
 - **Migración** `20261030_constructor_envios.sql`: `formulario_carga_filas.clave` (valor de la

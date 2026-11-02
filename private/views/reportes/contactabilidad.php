@@ -31,7 +31,7 @@
                   <option value="" disabled selected>Seleccione...</option>
                   <?php foreach ($servicio as $s) { ?>
                     <option value="<?= $s['id']; ?>">
-                      <?= $s['descripcion']; ?>
+                      <?= htmlspecialchars(isset($s['etiqueta']) ? $s['etiqueta'] : $s['descripcion']); ?>
                     </option>
                   <?php } ?>
                 </select>

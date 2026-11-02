@@ -48,7 +48,7 @@ $stops = empty($segs) ? '#e5e9f2 0% 100%' : implode(',', $segs);
             <option value="" disabled>Seleccione...</option>
             <?php if (!empty($servicio)) { foreach ($servicio as $s) { ?>
               <option value="<?= $s['id']; ?>" <?= ($s['id'] == $serv) ? 'selected' : ''; ?>>
-                <?= htmlspecialchars($s['descripcion']); ?>
+                <?= htmlspecialchars(isset($s['etiqueta']) ? $s['etiqueta'] : $s['descripcion']); ?>
               </option>
             <?php } } ?>
           </select>

@@ -45,6 +45,7 @@ require_once dirname(__DIR__) . '/lib/logger.php';
 require_once dirname(__DIR__) . '/lib/errors.php';
 require_once dirname(__DIR__) . '/lib/assets.php';
 require_once __DIR__ . '/database.php';
+require_once dirname(__DIR__) . '/helpers/campanas.php';
 
 app_registrar_handlers();
 

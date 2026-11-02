@@ -13,7 +13,7 @@ if (!security_usuario_autenticado()) {
         case 'index':
           include(PUBLIC_DIR . 'general/nheader.php');
           include(PUBLIC_DIR . 'general/nnavbar.php');
-          $id = [Constantes::SERVICIO_BANCARIO, Constantes::SERVICIO_BANCARIO_ALIAS];
+          $id = Constantes::serviciosBancarios();
           $servicio = $conn->servicio($id);
           include(HTML_DIR . 'reportes/index.php');
           include(PUBLIC_DIR . 'general/nfooter.php');
@@ -29,7 +29,7 @@ if (!security_usuario_autenticado()) {
             $hasta = $desde;
           }
           $servicioSel = (int) input_enum(isset($_POST['servicio']) ? $_POST['servicio'] : null, Constantes::servicios(), 1);
-          $serv = [Constantes::SERVICIO_BANCARIO, Constantes::SERVICIO_BANCARIO_ALIAS];
+          $serv = Constantes::serviciosBancarios();
 
           $servicio = $conn->servicio($serv);
           $idEfectivo = $conn->efectivo($serv);
@@ -73,7 +73,7 @@ if (!security_usuario_autenticado()) {
             $hasta = $desde;
           }
           $serv = (int) input_enum(isset($_POST['servicio']) ? $_POST['servicio'] : null, Constantes::servicios(), 1);
-          $id = [Constantes::SERVICIO_BANCARIO, Constantes::SERVICIO_BANCARIO_ALIAS];
+          $id = Constantes::serviciosBancarios();
 
           $servicio = $conn->servicio($id);
           $resultn = $conn->gestionContactonoefectivo($desde, $hasta, $serv);
@@ -149,7 +149,7 @@ if (!security_usuario_autenticado()) {
             $nav_period = date('d/m/Y');
           }
 
-          $id = [Constantes::SERVICIO_BANCARIO, Constantes::SERVICIO_BANCARIO_ALIAS];
+          $id = Constantes::serviciosBancarios();
           $servicio = $conn->servicio($id);
           $result = $conn->ventasEstado($desde, $hasta, $serv);
 
@@ -176,7 +176,7 @@ if (!security_usuario_autenticado()) {
           $serv = (int) input_enum(isset($_GET['servicio']) ? $_GET['servicio'] : null, Constantes::servicios(), 1);
           $result = $conn->ventasCiudad($desde, $hasta, $id_estado, $serv);
 
-          $id = [Constantes::SERVICIO_BANCARIO, Constantes::SERVICIO_BANCARIO_ALIAS];
+          $id = Constantes::serviciosBancarios();
           $servicio = $conn->servicio($id);
           $nav_service = null;
           foreach ($servicio as $s) { if ($s['id'] == $serv) { $nav_service = $s['descripcion']; break; } }
@@ -199,7 +199,7 @@ if (!security_usuario_autenticado()) {
           break;
 
         case 'detalleventas':
-          $id = [Constantes::SERVICIO_BANCARIO, Constantes::SERVICIO_BANCARIO_ALIAS];
+          $id = Constantes::serviciosBancarios();
           $servicio = $conn->servicio($id);
 
           $fechaD = input_date(isset($_POST['fecha_d']) ? $_POST['fecha_d'] : null);

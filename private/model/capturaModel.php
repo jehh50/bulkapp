@@ -164,30 +164,46 @@ class database
    * ------------------------------------------------------------------- */
 
   /**
-   * Formularios para el filtro del reporte (incluye eliminados: sus envíos se conservan).
+   * Combinaciones cliente → campaña → formulario para los filtros del reporte: las
+   * asignaciones vigentes del Constructor más las que ya tienen envíos (un formulario
+   * desasignado o eliminado conserva su historial). Solo campañas no bancarias.
    *
-   * @return array
+   * @return array[] empresa_id, empresa, servicio_id, campana, formulario_id, formulario, eliminado
    */
-  public function formulariosReporte()
+  public function combinacionesReporte()
   {
-    return $this->db->selectQuery(
-      "SELECT id, nombre, eliminado FROM formularios ORDER BY eliminado ASC, nombre ASC",
+    $filas = $this->db->selectQuery(
+      "SELECT em.id AS empresa_id, em.nombre AS empresa, s.id AS servicio_id, s.descripcion AS campana,
+              f.id AS formulario_id, f.nombre AS formulario, f.eliminado
+         FROM (SELECT formulario_id, servicio_id FROM formulario_servicios
+               UNION
+               SELECT DISTINCT formulario_id, servicio_id FROM formulario_envios) p
+         JOIN formularios f ON f.id = p.formulario_id
+         JOIN servicios s ON s.id = p.servicio_id
+         JOIN empresas em ON em.id = s.empresa_id
+        ORDER BY em.nombre, s.descripcion, f.eliminado, f.nombre",
       array(),
       ''
     );
+    return array_values(array_filter($filas, function ($f) {
+      return !Constantes::esServicioBancario($f['servicio_id']);
+    }));
   }
 
   /**
-   * Servicios no bancarios para el filtro del reporte.
+   * Número de la versión vigente del formulario (null si no tiene).
    *
-   * @return array
+   * @param int $formId
+   * @return int|null
    */
-  public function serviciosReporte()
+  public function versionVigente($formId)
   {
-    $servicios = $this->db->selectQuery("SELECT id, descripcion FROM servicios ORDER BY descripcion", array(), '');
-    return array_values(array_filter($servicios, function ($s) {
-      return !Constantes::esServicioBancario($s['id']);
-    }));
+    $r = $this->db->selectQuery(
+      "SELECT version FROM formulario_versiones WHERE formulario_id = ? AND vigente = 1 LIMIT 1",
+      array((int) $formId),
+      'i'
+    );
+    return empty($r) ? null : (int) $r[0]['version'];
   }
 
   /**
@@ -198,24 +214,27 @@ class database
    * @param string $desde Y-m-d
    * @param string $hasta Y-m-d
    * @param int|null $limite
+   * @param int $desplazamiento Filas a saltar (paginación).
    * @return array
    */
-  public function envios($formId, $servicioId, $desde, $hasta, $limite = null)
+  public function envios($formId, $servicioId, $desde, $hasta, $limite = null, $desplazamiento = 0)
   {
     list($where, $params, $types) = $this->filtroEnvios($formId, $servicioId, $desde, $hasta);
-    $sql = "SELECT e.id, e.fecha, e.version_id, v.version, s.descripcion AS servicio,
+    $sql = "SELECT e.id, e.fecha, e.version_id, v.version, " . campanas_sql_etiqueta('s', 'em') . " AS servicio,
                    e.registro, e.valores, u.user AS usuario,
                    TRIM(CONCAT(COALESCE(u.nombre, ''), ' ', COALESCE(u.apellido, ''))) AS operador
             FROM formulario_envios e
             JOIN formulario_versiones v ON v.id = e.version_id
             JOIN servicios s ON s.id = e.servicio_id
+            LEFT JOIN empresas em ON em.id = s.empresa_id
             LEFT JOIN users u ON u.id = e.user_id
             WHERE $where
             ORDER BY e.fecha DESC, e.id DESC";
     if ($limite !== null) {
-      $sql .= " LIMIT ?";
+      $sql .= " LIMIT ? OFFSET ?";
       $params[] = (int) $limite;
-      $types .= 'i';
+      $params[] = max(0, (int) $desplazamiento);
+      $types .= 'ii';
     }
     return $this->db->selectQuery($sql, $params, $types);
   }

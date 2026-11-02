@@ -18,7 +18,7 @@ if (!security_usuario_autenticado()) {
 
     // Marcador de venta (gestión efectiva), igual que el Acumulado de gestión
     $idEfectivo = 1;
-    $ef = $conn->efectivo([Constantes::SERVICIO_BANCARIO, Constantes::SERVICIO_BANCARIO_ALIAS]);
+    $ef = $conn->efectivo(Constantes::serviciosBancarios());
     if (!empty($ef) && isset($ef[0]['id'])) { $idEfectivo = $ef[0]['id']; }
 
     $servicios = $conn->dashboardServicios($desde, $hasta, $idEfectivo);

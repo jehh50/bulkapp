@@ -96,7 +96,7 @@ if(!isset($_POST['fecha_d'])){
         <select class="form-select" name="servicio" id="servicio" required>
           <option value="" disabled selected>Seleccione...</option>
           <?php foreach ($servicio as $s) { ?>
-            <option value="<?php echo $s['id']; ?>"><?php echo $s['descripcion']; ?></option>
+            <option value="<?php echo $s['id']; ?>"><?php echo htmlspecialchars(isset($s['etiqueta']) ? $s['etiqueta'] : $s['descripcion']); ?></option>
           <?php } ?>
         </select>
       </div>
