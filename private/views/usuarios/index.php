@@ -50,6 +50,9 @@ $servicio = isset($servicio) && is_array($servicio) ? $servicio : [];
   .us-pass{font-family:ui-monospace,Menlo,monospace;font-weight:700}
 </style>
 
+<div class="row justify-content-center">
+<div class="col-12 col-lg-10 col-xl-8">
+
 <div id="usToast" class="us-toast us-toast--success" style="display:none">
   <span id="usToastMsg"></span>
   <button type="button" class="us-toast__close" id="usToastClose" aria-label="Cerrar">×</button>
@@ -206,6 +209,9 @@ $servicio = isset($servicio) && is_array($servicio) ? $servicio : [];
     </div>
   </form>
 </section>
+
+</div>
+</div>
 
 <script>
 function mayus(e) {

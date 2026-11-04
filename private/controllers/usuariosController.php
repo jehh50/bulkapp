@@ -26,11 +26,14 @@ if (isset($_GET['mode'])) {
 			break;
 	#----------------------------------------------------------
 		case 'new':
-			include(PUBLIC_DIR.'general/header.php');
-			include(PUBLIC_DIR.'general/navbar.php');
+			$nav_crumb = 'Configuración / Usuarios / Nuevo';
+			$nav_title = 'Nuevo usuario';
+			$nav_subtitle = 'Registra un operador, supervisor o administrador y asígnale su campaña principal.';
+			include(PUBLIC_DIR.'general/nheader.php');
+			include(PUBLIC_DIR.'general/nnavbar.php');
 			$servicio = $conexion->servicio();
 			include(HTML_DIR.'usuarios/newuser.php');
-			include(PUBLIC_DIR.'general/footer.php');
+			include(PUBLIC_DIR.'general/nfooter.php');
 			break;
 	#----------------------------------------------------------	
 		case 'registro':
