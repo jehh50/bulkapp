@@ -49,9 +49,9 @@
             <input type="hidden" id="userid" value="<?=$id_user?>">
             
             <div class="mb-3 offset-lg-0 col-lg-7">
-              <input type="button" class="btn btn-large btn-success" aria-describedby="update" id="update" value="Actualizar" />
+              <input type="button" class="btn btn-primary" aria-describedby="update" id="update" value="Actualizar" />
               <input type="button" class="btn btn-large btn-info" aria-describedby="password" id="password" value="Reiniciar Contrase単a" />
-              <a href="?view=usuarios&mode=index" class="btn btn-medium btn-success">Volver</a>
+              <a href="?view=usuarios&mode=index" class="btn btn-outline-primary">Volver</a>
             </div>
           </div>
         </div>

@@ -5,7 +5,12 @@
   'use strict';
 
   $(function () {
-    var BOOT = window.CONSTRUCTOR_BOOT || { servicios: [], formularios: [], tipos: [], estados: {} };
+    var BOOT = window.CONSTRUCTOR_BOOT || { servicios: [], formularios: [], tipos: [], expresiones: [], estados: {} };
+    var EXPRESIONES = {};   // clave -> opción del catálogo formulario_expresiones
+    (BOOT.expresiones || []).forEach(function (e) {
+      e.tiposLista = String(e.tipos || '').split(',').map(function (t) { return t.trim(); }).filter(Boolean);
+      EXPRESIONES[e.clave] = e;
+    });
     var ACTIVO = BOOT.estados.activo;
     var INACTIVO = BOOT.estados.inactivo;
 
@@ -32,6 +37,8 @@
     var eliminarModal = new bootstrap.Modal(document.getElementById('cnsModalEliminar'));
     var conflictoModal = new bootstrap.Modal(document.getElementById('cnsModalConflicto'));
     var previewModal = new bootstrap.Modal(document.getElementById('cnsModalPreview'));
+    var expresionesModal = new bootstrap.Modal(document.getElementById('cnsModalExpresiones'));
+    var sinCampanaModal = new bootstrap.Modal(document.getElementById('cnsModalSinCampana'));
     var toastEl = document.getElementById('cnsToast');
     var toastObj = new bootstrap.Toast(toastEl, { delay: 3000 });
 
@@ -251,6 +258,7 @@
       return '<span class="tag">' + esc(meta.label) + '</span>' +
         (c.req ? '<span class="tag">obligatorio</span>' : '') +
         (c.cond ? '<span class="tag">condicional</span>' : '') +
+        (c.expr && EXPRESIONES[c.expr] ? '<span class="tag">' + esc(EXPRESIONES[c.expr].nombre) + '</span>' : '') +
         ' · <code>' + esc(c.k || '') + '</code>';
     }
 
@@ -318,7 +326,11 @@
         var etq = (c.type === 'number') ? 'valor' : 'longitud';
         $p.append(row('Mín (' + etq + ')', numInput(c.min, function (v) { if (v === undefined) { delete c.min; } else { c.min = v; } })));
         $p.append(row('Máx (' + etq + ')', numInput(c.max, function (v) { if (v === undefined) { delete c.max; } else { c.max = v; } })));
-        $p.append(row('Regex (sin barras)', text(c.regex, function (v) { if (v) { c.regex = v; } else { delete c.regex; } })));
+      }
+
+      var opcionesExpr = (BOOT.expresiones || []).filter(function (e) { return e.tiposLista.indexOf(c.type) >= 0; });
+      if (opcionesExpr.length) {
+        $p.append(row('Validación', selectorExpresion(c, opcionesExpr)));
       }
 
       if (c.type === 'select') {
@@ -360,6 +372,49 @@
         $p.append(row('Mostrar si (campo previo)', $sel));
         $p.append(row('…es igual a', $val));
       }
+    }
+
+    // ---------- Validaciones (catálogo) ----------
+    // Copia en el campo el patrón/transformación de la opción para que la vista previa
+    // la aplique; el servidor vuelve a resolverla desde el catálogo al guardar.
+    function aplicarExpresion(c, clave) {
+      delete c.expr; delete c.regex; delete c.transform;
+      var e = EXPRESIONES[clave];
+      if (!e) { return; }
+      c.expr = e.clave;
+      if (e.patron) { c.regex = e.patron; }
+      if (e.transformacion) { c.transform = e.transformacion; }
+    }
+
+    function selectorExpresion(c, opciones) {
+      var $g = $('<div class="input-group input-group-sm">');
+      var $s = $('<select class="form-select form-select-sm" aria-label="Validación del campo"><option value="">— sin validación —</option></select>');
+      opciones.forEach(function (e) { $s.append($('<option>').val(e.clave).text(e.nombre)); });
+      $s.val(c.expr && EXPRESIONES[c.expr] ? c.expr : '');
+      $s.on('change', function () { aplicarExpresion(c, $s.val()); refrescarChip(c); });
+      var $ayuda = $('<button type="button" class="btn btn-outline-primary" title="¿Qué hace cada validación?" aria-label="Ver ayuda de validaciones"><i class="fi fi-rr-info"></i></button>')
+        .on('click', mostrarAyudaExpresiones);
+      return $g.append($s).append($ayuda);
+    }
+
+    function mostrarAyudaExpresiones() {
+      var nombresTipo = function (lista) {
+        return lista.map(function (t) { return TIPOS[t] ? TIPOS[t].label : t; }).join(', ');
+      };
+      var $tb = $('#cnsExpresionesFilas').empty();
+      if (!(BOOT.expresiones || []).length) {
+        $tb.append('<tr><td colspan="5" class="text-muted text-center">No hay validaciones configuradas.</td></tr>');
+      }
+      (BOOT.expresiones || []).forEach(function (e) {
+        var $tr = $('<tr>');
+        $tr.append($('<td class="fw-semibold">').text(e.nombre));
+        $tr.append($('<td class="small">').text(e.descripcion));
+        $tr.append($('<td>').append($('<code class="text-success">').text(e.ejemplo_valido)));
+        $tr.append($('<td>').append(e.ejemplo_invalido ? $('<code class="text-danger">').text(e.ejemplo_invalido) : $('<span class="text-muted">').text('—')));
+        $tr.append($('<td class="small text-muted">').text(nombresTipo(e.tiposLista)));
+        $tb.append($tr);
+      });
+      expresionesModal.show();
     }
 
     // ---------- Servicios ----------
@@ -571,7 +626,10 @@
         if (BOOT.tipos.indexOf(c.type) < 0) { err.push('Campo #' + pos + ': tipo inválido.'); }
         if (!c.label || !String(c.label).trim()) { err.push('Campo #' + pos + ': etiqueta obligatoria.'); }
         if (c.min != null && c.max != null && c.min > c.max) { err.push('Campo #' + pos + ': «min» mayor que «max».'); }
-        if (c.regex) { try { new RegExp(c.regex); } catch (e) { err.push('Campo #' + pos + ': regex inválida.'); } }
+        if (c.expr) {
+          if (!EXPRESIONES[c.expr]) { err.push('Campo #' + pos + ': la validación «' + c.expr + '» ya no existe en el catálogo.'); }
+          else if (EXPRESIONES[c.expr].tiposLista.indexOf(c.type) < 0) { err.push('Campo #' + pos + ': la validación elegida no aplica a este tipo de campo.'); }
+        }
         if (c.type === 'select' && (!c.opts || !c.opts.length)) { err.push('Campo #' + pos + ': un «select» requiere opciones.'); }
         if (c.type === 'nested' && (!c.tree || !c.tree.length)) { err.push('Campo #' + pos + ': un anidado requiere nodos.'); }
         if (c.cond) {
@@ -597,7 +655,8 @@
       return o;
     }
 
-    function guardar(reasignar) {
+    // sinCampanaOk: el usuario ya confirmó guardar sin campaña en el modal informativo.
+    function guardar(reasignar, sinCampanaOk) {
       form.nombre = $('#cnsNombre').val().trim();
       form.btn_texto = $('#cnsBtnTexto').val().trim() || 'Guardar';
       form.status_id = $('#cnsEstado').is(':checked') ? ACTIVO : INACTIVO;
@@ -607,6 +666,8 @@
       errs = errs.concat(validarDefinicionCliente(form.campos));
       if (errs.length) { mostrarErrores(errs); return; }
       mostrarErrores([]);
+
+      if (!form.servicios.length && !sinCampanaOk) { sinCampanaModal.show(); return; }
 
       var limpio = form.campos.map(limpiarCampo);
       postJSON('save', {
@@ -704,7 +765,12 @@
     $('#cnsPreviewValidar').on('click', validarValores);
     $('#cnsAnalizar').on('click', analizarArchivo);
     $('#cnsConfirmarCarga').on('click', confirmarCarga);
-    $('#cnsReasignar').on('click', function () { conflictoModal.hide(); guardar(true); });
+    $('#cnsReasignar').on('click', function () { conflictoModal.hide(); guardar(true, true); });
+    $('#cnsSinCampanaGuardar').on('click', function () { sinCampanaModal.hide(); guardar(false, true); });
+    $('#cnsSinCampanaAsignar').on('click', function () {
+      sinCampanaModal.hide();
+      bootstrap.Tab.getOrCreateInstance(document.querySelector('[data-bs-target="#tabServicios"]')).show();
+    });
     $('#cnsConfirmarEliminar').on('click', function () {
       if (!aEliminar) { return; }
       postJSON('delete', { id: aEliminar.id }).then(function (res) {

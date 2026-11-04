@@ -345,6 +345,21 @@ class database
     }));
   }
 
+  /**
+   * Catálogo de expresiones de validación activas, en el orden del editor.
+   *
+   * @return array[] { clave, nombre, descripcion, patron, transformacion, tipos, ejemplo_valido, ejemplo_invalido }
+   */
+  public function expresiones()
+  {
+    return $this->db->selectQuery(
+      "SELECT clave, nombre, descripcion, patron, transformacion, tipos, ejemplo_valido, ejemplo_invalido
+         FROM formulario_expresiones WHERE status_id = ? ORDER BY orden, nombre",
+      array(Constantes::REGISTRO_ACTIVO),
+      'i'
+    );
+  }
+
   /* ---------------------------------------------------------------------
    * Fase 2 — Base de datos por formulario (cargas)
    * ------------------------------------------------------------------- */

@@ -13,7 +13,7 @@ $servicio = isset($servicio) && is_array($servicio) ? $servicio : [];
   .us-btn--sec{height:46px;padding:0 22px;border:1px solid #d1d5db;border-radius:10px;background:#fff;color:var(--ink);font-size:15px;font-weight:500}
   .us-btn--sec:hover{background:#f4f6fa}
   .us-actions{display:flex;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:18px}
-  .us-actions .btn-primary{height:46px;padding:0 26px}
+  .us-actions .btn{height:46px;padding:0 26px}
 
   .us-tableWrap{border:1px solid #dfe5f2;border-radius:12px;overflow-x:auto}
   .us-table{width:100%;min-width:820px;border-collapse:collapse;font-size:14px}
@@ -49,9 +49,6 @@ $servicio = isset($servicio) && is_array($servicio) ? $servicio : [];
   .us-toast__close{border:0;background:transparent;font-size:18px;cursor:pointer;color:var(--ink);width:32px;height:32px;flex:none}
   .us-pass{font-family:ui-monospace,Menlo,monospace;font-weight:700}
 </style>
-
-<div class="row justify-content-center">
-<div class="col-12 col-lg-10 col-xl-8">
 
 <div id="usToast" class="us-toast us-toast--success" style="display:none">
   <span id="usToastMsg"></span>
@@ -156,7 +153,7 @@ $servicio = isset($servicio) && is_array($servicio) ? $servicio : [];
     <div id="createError" class="us-error" style="display:none"></div>
 
     <div class="us-actions">
-      <button type="button" class="us-btn--sec us-back">Regresar</button>
+      <button type="button" class="btn btn-outline-primary us-back">Regresar</button>
       <button type="submit" class="btn btn-primary" id="btn-register">Guardar</button>
     </div>
   </form>
@@ -203,15 +200,12 @@ $servicio = isset($servicio) && is_array($servicio) ? $servicio : [];
     <div id="editError" class="us-error" style="display:none"></div>
 
     <div class="us-actions">
-      <button type="button" class="us-btn--sec us-back">Regresar</button>
+      <button type="button" class="btn btn-outline-primary us-back">Regresar</button>
       <button type="button" class="us-btn--sec" id="btn-resetpass">Reiniciar contraseña</button>
       <button type="submit" class="btn btn-primary" id="btn-update">Actualizar</button>
     </div>
   </form>
 </section>
-
-</div>
-</div>
 
 <script>
 function mayus(e) {

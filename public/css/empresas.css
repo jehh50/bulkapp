@@ -12,7 +12,7 @@
 .emp-chip { font-size: 12px; font-weight: 600; background: #f1f4fa; color: var(--ink, #252525); border-radius: 20px; padding: 4px 12px; white-space: nowrap; }
 .emp-sub { display: block; font-size: 12px; color: #6b7280; font-weight: 400; max-width: 420px; white-space: normal; }
 
-.emp-back { font-weight: 600; text-decoration: none; color: var(--blue-700, #1a4391); }
+.emp-back { font-weight: 600; }
 .emp-switch { height: 42px; display: flex; align-items: center; gap: 8px; }
 
 .emp-card-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 18px 24px; }

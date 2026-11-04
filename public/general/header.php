@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="<?php echo asset('public/css/estilos.css'); ?>" type="text/css">
     <link href="public/images/icon.png" rel="icon" type="image/png"/>
     <link href="<?php echo asset('public/css/dashboard.css'); ?>" rel="stylesheet">
+    <link href="<?php echo asset('public/css/botones.css'); ?>" rel="stylesheet">
     <script src="<?php echo asset('public/js/jquery-3.7.1.min.js'); ?>"></script>
     <link href="https://fonts.googleapis.com/css?family=Poppins:400,600&display=swap" rel="stylesheet">
 

@@ -94,7 +94,7 @@ $usuarioSesion = isset($_SESSION['user']) ? (string) $_SESSION['user'] : '';
             <div id="cpError" class="alert alert-danger py-2 px-3 small d-none" role="alert"></div>
 
             <div class="d-flex flex-column flex-sm-row gap-2 pt-2">
-              <a href="?view=formulario&mode=index" class="btn btn-outline-secondary px-4">Cancelar</a>
+              <a href="?view=formulario&mode=index" class="btn btn-outline-primary px-4">Cancelar</a>
               <button id="btn-actualiza" name="btn-actualiza" type="submit" class="btn btn-primary flex-grow-1">
                 Guardar contraseña
               </button>

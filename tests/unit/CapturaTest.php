@@ -70,6 +70,15 @@ test('captura_validar_valores valida tipos, rangos, regex y opciones', function 
   assert_igual('Formato inválido.', $r['errores']['codigo']);
 });
 
+test('captura_validar_valores aplica la transformación a mayúsculas antes de guardar', function () {
+  $def = array('campos' => array(
+    array('k' => 'nombre', 'type' => 'text', 'label' => 'Nombre', 'transform' => 'mayusculas', 'regex' => '^[A-ZÁÉÍÓÚÑ ]+$'),
+  ));
+  $r = captura_validar_valores($def, array('nombre' => '  josé pérez '));
+  assert_verdadero($r['ok']);
+  assert_igual('JOSÉ PÉREZ', $r['valores']['nombre']);
+});
+
 test('captura_validar_valores valida el anidado contra su árbol', function () {
   $def = captura_definicion_ejemplo();
   $base = array('resultado' => 'Contactado');

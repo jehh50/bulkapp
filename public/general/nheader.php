@@ -58,7 +58,6 @@
     .filter-card{background:#fff;border:0;border-radius:16px;box-shadow:0 8px 24px rgba(18,48,107,.12);padding:20px 24px;margin-bottom:20px}
     .filter-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--ink)}
     .filter-card .form-control,.filter-card .form-select{height:42px;border-radius:10px}
-    .btn-primary{--bs-btn-bg:var(--blue-700);--bs-btn-border-color:var(--blue-700);--bs-btn-hover-bg:var(--blue-900);--bs-btn-hover-border-color:var(--blue-900);--bs-btn-active-bg:var(--blue-900);--bs-btn-active-border-color:var(--blue-900)}
     .pagination{--bs-pagination-color:var(--blue-700);--bs-pagination-hover-color:var(--blue-900);--bs-pagination-active-bg:var(--blue-700);--bs-pagination-active-border-color:var(--blue-700);--bs-pagination-focus-box-shadow:0 0 0 .2rem rgba(47,95,196,.25)}
     .btn-gold{--bs-btn-bg:var(--gold);--bs-btn-border-color:var(--gold);--bs-btn-color:var(--ink);--bs-btn-hover-bg:#e9a924;--bs-btn-hover-border-color:#e9a924;--bs-btn-hover-color:var(--ink);--bs-btn-active-bg:#e9a924;--bs-btn-active-border-color:#e9a924;--bs-btn-active-color:var(--ink)}
     .search-btn{height:42px;border-radius:10px;font-weight:600}
@@ -140,5 +139,6 @@
       .kpi__value{font-size:28px}
     }
   </style>
+  <link href="<?php echo asset('public/css/botones.css'); ?>" rel="stylesheet">
 </head>
 <body>

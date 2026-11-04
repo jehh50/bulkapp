@@ -45,11 +45,19 @@ servicios y **vista previa** (renderiza el formulario real con su validación).
 
 - **Tipos:** `text`, `textarea`, `number`, `date`, `email`, `select`, `nested`
   (select anidado de 2 niveles).
-- **Props por campo:** `label`, `placeholder`, `req`, `min`, `max`, `regex`, `help`,
+- **Props por campo:** `label`, `placeholder`, `req`, `min`, `max`, `expr`, `help`,
   `cond:{k,v}` (visibilidad condicional según un campo **previo**), `opts`
   (lista para `select`), `tree:[{p,c}]` + `lv1`/`lv2` (para `nested`, padre→hijos por coma).
 - **Validación en preview (a replicar en servidor):** obligatorio; longitud mín/máx
-  (texto) o valor mín/máx (`number`); `regex`; email; `nested` exige ambos niveles.
+  (texto) o valor mín/máx (`number`); validación del catálogo (`regex`/`transform`); email;
+  `nested` exige ambos niveles.
+- **Validaciones (`expr`, 2026-11-05):** el editor ya no acepta una regex libre; ofrece un
+  select con las opciones del catálogo `formulario_expresiones` (migración `20261105`):
+  correo, solo números, solo letras, convertir a mayúsculas y teléfono `(XXXX)XXX-XX-XX`.
+  Un botón de ayuda abre un modal con una tabla (qué hace, ejemplo válido/no válido, tipos
+  compatibles) alimentada desde el servidor. Al guardar, el servidor copia el `patron` en
+  `regex` y la `transformacion` en `transform` de la versión (queda congelada aunque el
+  catálogo cambie). `mayusculas` también se aplica en servidor antes de guardar el envío.
 
 ### Encaje visual
 El diseño ya está alineado con el rediseño v2: paleta `#1a4391` (azul) / `#f5b83d` (ámbar),
@@ -239,7 +247,7 @@ tiene una clave **`k`** estable que referencia `valores`:
 {
   "campos": [
     { "k": "cedula", "type": "text", "label": "Cédula", "placeholder": "V-12345678",
-      "req": true, "min": 6, "max": 10, "regex": "^[VE]-?\\d+$", "help": "Sin puntos" },
+      "req": true, "min": 6, "max": 10, "expr": "solo_numeros", "regex": "^[0-9]+$", "help": "Sin puntos" },
     { "k": "plan", "type": "select", "label": "Plan", "req": true,
       "opts": ["Básico", "Full", "Premium"], "cond": { "k": "tipo_cliente", "v": "nuevo" } },
     { "k": "ubicacion", "type": "nested", "label": "Estado / Ciudad",
@@ -251,8 +259,8 @@ tiene una clave **`k`** estable que referencia `valores`:
 ```
 
 - Tipos: `text, textarea, number, date, email, select, nested`.
-- Props por campo: `k, type, label, placeholder, req, min, max, regex, help, cond{k,v}, opts,
-  tree[{p,c}], lv1, lv2`. El **orden del array `campos`** = orden de render (lo reordena el drag&drop).
+- Props por campo: `k, type, label, placeholder, req, min, max, expr, help, cond{k,v}, opts,
+  tree[{p,c}], lv1, lv2`. `regex` y `transform` los escribe el servidor a partir de `expr`. El **orden del array `campos`** = orden de render (lo reordena el drag&drop).
 
 `mapping` (en `formulario_cargas`) — definición de la card «Datos de la búsqueda». **No se
 relaciona con los campos del formulario**: como en banca, la BD es la card de la izquierda

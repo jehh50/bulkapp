@@ -39,7 +39,7 @@
 
               <div class="mb-3 col-12 col-sm-6 col-md-3" style="margin-top:25px;">
                 <button type="submit"
-                        class="btn btn-success btn-block">
+                        class="btn btn-primary w-100">
                   Buscar
                 </button>
               </div>

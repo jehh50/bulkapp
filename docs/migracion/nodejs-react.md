@@ -497,6 +497,7 @@ packages/
 | 2026-11-03 | Flujo **Cashea** retirado: código, JS y constantes eliminados. Migración `20261103_eliminar_cashea.sql` aplicada (tablas vacías). |
 | 2026-11-04 | Usuarios eliminados (se conserva solo el administrador). Decisión intencional del negocio. `gestion.user_id` queda con referencias huérfanas: 61 112 de 61 124 gestiones. |
 | 2026-11-04 | Migración `20261104_eliminar_campana_cashea.sql` aplicada: campaña 2 y sus catálogos eliminados. |
+| 2026-11-05 | Migración `20261105_constructor_expresiones.sql` aplicada: catálogo `formulario_expresiones` (5 validaciones del Constructor: correo, solo números, solo letras, mayúsculas, teléfono). No figura en `esquema-actual.sql` (capturado el 2026-11-03). Sus patrones se escribieron sin barras invertidas, así que funcionan igual en PostgreSQL (`~`), PHP y JS. |
 
 ### Pendiente de decisión
 

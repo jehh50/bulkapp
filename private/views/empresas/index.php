@@ -58,7 +58,7 @@
 
   <div class="filter-card">
     <div class="d-flex align-items-center justify-content-between mb-3">
-      <button type="button" class="btn btn-link px-0 emp-back" id="empVolver"><i class="fi fi-rr-angle-small-left"></i> Clientes</button>
+      <button type="button" class="btn btn-sm btn-outline-primary emp-back" id="empVolver"><i class="fi fi-rr-angle-small-left"></i> Clientes</button>
       <span class="emp-chip" id="empResumen"></span>
     </div>
     <div class="row g-3 align-items-end">
@@ -165,7 +165,7 @@
         <div class="alert alert-danger mt-3 mb-0 py-2" id="campError" style="display:none"></div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancelar</button>
         <button type="button" class="btn btn-primary" id="campGuardar">Guardar campaña</button>
       </div>
     </div>
@@ -204,7 +204,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancelar</button>
         <button type="button" class="btn btn-primary" id="usrGuardar">Guardar asignación</button>
       </div>
     </div>

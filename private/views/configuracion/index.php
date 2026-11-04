@@ -23,10 +23,8 @@ switch (isset($_GET['mensaje']) ? $_GET['mensaje'] : '') {
   .pg-btn--sel.is-active:hover{background:var(--blue-900)}
   .pg-btn--ghost{height:44px;padding:0 18px;border:1px dashed var(--blue-700);border-radius:10px;background:#f4f7fd;color:var(--blue-700);font-size:14px;font-weight:600;cursor:pointer}
   .pg-btn--ghost:hover{background:#e8eefb}
-  .pg-btn--sec{height:46px;padding:0 22px;border:1px solid #d1d5db;border-radius:10px;background:#fff;color:var(--ink);font-size:15px;font-weight:500}
-  .pg-btn--sec:hover{background:#f4f6fa}
   .pg-actions{display:flex;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:18px;margin-top:auto}
-  .pg-actions .btn-primary{height:46px;padding:0 26px}
+  .pg-actions .btn{height:46px;padding:0 26px}
 
   .pg-tableWrap{border:1px solid #dfe5f2;border-radius:12px;overflow-x:auto}
   .pg-table{width:100%;min-width:820px;border-collapse:collapse;font-size:14px}
@@ -147,7 +145,7 @@ switch (isset($_GET['mensaje']) ? $_GET['mensaje'] : '') {
     <div id="createError" class="pg-error" style="display:none"></div>
 
     <div class="pg-actions">
-      <button type="button" class="pg-btn--sec pg-back">Regresar</button>
+      <button type="button" class="btn btn-outline-primary pg-back">Regresar</button>
       <button type="submit" class="btn btn-primary pg-btn">Guardar</button>
     </div>
   </form>
@@ -156,7 +154,7 @@ switch (isset($_GET['mensaje']) ? $_GET['mensaje'] : '') {
     <div class="d-flex flex-column gap-3" id="editRows"></div>
     <div id="editError" class="pg-error" style="display:none"></div>
     <div class="pg-actions">
-      <button type="button" class="pg-btn--sec pg-back">Regresar</button>
+      <button type="button" class="btn btn-outline-primary pg-back">Regresar</button>
       <button type="submit" class="btn btn-primary pg-btn">Actualizar</button>
     </div>
   </form>

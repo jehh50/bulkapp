@@ -2,9 +2,6 @@
 $servicio = isset($servicio) && is_array($servicio) ? $servicio : [];
 ?>
 
-<div class="row justify-content-center">
-  <div class="col-12 col-lg-10 col-xl-8">
-
     <section class="card border-0 shadow-sm rounded-4 p-4">
       <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
         <div>
@@ -65,7 +62,7 @@ $servicio = isset($servicio) && is_array($servicio) ? $servicio : [];
         </div>
 
         <div class="col-12 d-flex flex-wrap justify-content-end gap-2 border-top pt-3 mt-2">
-          <a href="?view=usuarios&amp;mode=index" class="btn btn-outline-secondary flex-fill flex-md-grow-0">Regresar</a>
+          <a href="?view=usuarios&amp;mode=index" class="btn btn-outline-primary flex-fill flex-md-grow-0">Regresar</a>
           <button type="submit" class="btn btn-primary px-4 flex-fill flex-md-grow-0" id="btn-register">
             <span class="spinner-border spinner-border-sm d-none" id="newUserSpinner" aria-hidden="true"></span>
             Guardar
@@ -73,8 +70,5 @@ $servicio = isset($servicio) && is_array($servicio) ? $servicio : [];
         </div>
       </form>
     </section>
-
-  </div>
-</div>
 
 <script src="<?php echo asset('public/js/nuevoUsuario.js'); ?>"></script>

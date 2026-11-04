@@ -99,12 +99,53 @@ test('cond debe referenciar un campo anterior', function () {
   assert_igual('tipo', $atras['definicion']['campos'][1]['cond']['k']);
 });
 
-test('rechaza regex inválida y min mayor que max', function () {
-  $regex = constructor_validar_definicion(def(array(
-    array('k' => 'c', 'type' => 'text', 'label' => 'C', 'regex' => '([a-z'),
-  )));
-  assert_falso($regex['ok']);
+/**
+ * Catálogo de expresiones de prueba (mismo formato que formulario_expresiones).
+ *
+ * @return array
+ */
+function catalogo_expresiones()
+{
+  return constructor_indexar_expresiones(array(
+    array('clave' => 'solo_numeros', 'patron' => '^[0-9]+$', 'transformacion' => null, 'tipos' => 'text,textarea'),
+    array('clave' => 'mayusculas', 'patron' => null, 'transformacion' => 'mayusculas', 'tipos' => 'text, textarea'),
+    array('clave' => 'rota', 'patron' => '([a-z', 'transformacion' => null, 'tipos' => 'text'),
+  ));
+}
 
+test('expr del catálogo copia regex/transform en la definición', function () {
+  $r = constructor_validar_definicion(def(array(
+    array('k' => 'doc', 'type' => 'text', 'label' => 'Doc', 'expr' => 'solo_numeros'),
+    array('k' => 'nom', 'type' => 'textarea', 'label' => 'Nombre', 'expr' => 'mayusculas'),
+  )), catalogo_expresiones());
+
+  assert_verdadero($r['ok']);
+  assert_igual('^[0-9]+$', $r['definicion']['campos'][0]['regex']);
+  assert_falso(isset($r['definicion']['campos'][0]['transform']));
+  assert_igual('mayusculas', $r['definicion']['campos'][1]['transform']);
+  assert_falso(isset($r['definicion']['campos'][1]['regex']));
+});
+
+test('rechaza expr inexistente, de otro tipo o con patrón roto; descarta regex libre', function () {
+  $cat = catalogo_expresiones();
+  assert_falso(constructor_validar_definicion(def(array(
+    array('k' => 'c', 'type' => 'text', 'label' => 'C', 'expr' => 'no_existe'),
+  )), $cat)['ok']);
+  assert_falso(constructor_validar_definicion(def(array(
+    array('k' => 'n', 'type' => 'number', 'label' => 'N', 'expr' => 'solo_numeros'),
+  )), $cat)['ok']);
+  assert_falso(constructor_validar_definicion(def(array(
+    array('k' => 'c', 'type' => 'text', 'label' => 'C', 'expr' => 'rota'),
+  )), $cat)['ok']);
+
+  $libre = constructor_validar_definicion(def(array(
+    array('k' => 'c', 'type' => 'text', 'label' => 'C', 'regex' => '^x$'),
+  )), $cat);
+  assert_verdadero($libre['ok']);
+  assert_falso(isset($libre['definicion']['campos'][0]['regex']));
+});
+
+test('rechaza min mayor que max', function () {
   $rango = constructor_validar_definicion(def(array(
     array('k' => 'n', 'type' => 'number', 'label' => 'N', 'min' => 10, 'max' => 5),
   )));

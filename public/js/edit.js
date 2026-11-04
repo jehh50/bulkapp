@@ -213,7 +213,7 @@
               <p class="text-muted small mb-0">Esta acción no se puede deshacer.</p>
             </div>
             <div class="modal-footer border-0 pt-0">
-              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancelar</button>
               <form method="POST" action="?view=configuracion&mode=eliminar" class="d-inline">
                 <input type="hidden" name="id" value="${escapeHtml(item.id_resultado)}">
                 <input type="hidden" name="csrf_token" value="${escapeHtml(token)}">
@@ -239,7 +239,7 @@
               <p class="mb-0">¿Confirmas la actualización de <strong>${escapeHtml(item.nombre)} ${escapeHtml(item.apellido)}</strong>?</p>
             </div>
             <div class="modal-footer border-0 pt-0">
-              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancelar</button>
               <button type="button" class="btn btn-primary" id="confirmUpdate${indice}">Guardar cambios</button>
             </div>
           </div>
@@ -355,8 +355,8 @@
             <input type="hidden" id="gestion${indice}" value="${escapeHtml(item.id_gestion)}">
 
             <div class="d-flex flex-wrap justify-content-end gap-2 border-top pt-3 mt-4">
-              <a href="?view=configuracion&mode=editarResultado" class="btn btn-outline-secondary flex-fill flex-md-grow-0">Regresar</a>
-              <button type="button" class="btn btn-success flex-fill flex-md-grow-0" id="btnGuardar${indice}">Guardar</button>
+              <a href="?view=configuracion&mode=editarResultado" class="btn btn-outline-primary flex-fill flex-md-grow-0">Regresar</a>
+              <button type="button" class="btn btn-primary flex-fill flex-md-grow-0" id="btnGuardar${indice}">Guardar</button>
               <button type="button" class="btn btn-outline-danger flex-fill flex-md-grow-0" id="btnEliminar${indice}">Eliminar</button>
             </div>
           </div>

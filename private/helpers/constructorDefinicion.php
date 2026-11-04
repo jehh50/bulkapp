@@ -8,9 +8,37 @@
  * de la validación del editor: nunca se confía en lo que llega del cliente.
  *
  * Modelo de campo (docs/constructor-plan.md §4.1):
- *   k, type, label, placeholder, req, min, max, regex, help,
+ *   k, type, label, placeholder, req, min, max, expr, help,
  *   cond{k,v}, opts[], tree[{p,c}], lv1, lv2
+ *
+ * `expr` es la clave de una opción del catálogo `formulario_expresiones`. Al validar,
+ * se copian en el campo su `regex` (patrón) y/o `transform` (transformación): la versión
+ * guardada queda congelada aunque el catálogo cambie después. Un `regex` libre enviado
+ * por el cliente se descarta.
  */
+
+/**
+ * Indexa por clave las filas del catálogo de expresiones.
+ *
+ * @param array[] $filas Filas { clave, patron, transformacion, tipos } de formulario_expresiones.
+ * @return array clave => ['regex' => ?string, 'transform' => ?string, 'tipos' => string[]]
+ */
+function constructor_indexar_expresiones(array $filas)
+{
+  $indice = array();
+  foreach ($filas as $f) {
+    if (!isset($f['clave']) || (string) $f['clave'] === '') {
+      continue;
+    }
+    $tipos = array_filter(array_map('trim', explode(',', isset($f['tipos']) ? (string) $f['tipos'] : '')), 'strlen');
+    $indice[(string) $f['clave']] = array(
+      'regex'     => (isset($f['patron']) && $f['patron'] !== '') ? (string) $f['patron'] : null,
+      'transform' => (isset($f['transformacion']) && $f['transformacion'] !== '') ? (string) $f['transformacion'] : null,
+      'tipos'     => array_values($tipos),
+    );
+  }
+  return $indice;
+}
 
 /**
  * Decodifica el JSON de la definición a un arreglo asociativo.
@@ -32,10 +60,11 @@ function constructor_decodificar_definicion($json)
 /**
  * Valida y normaliza una definición de formulario.
  *
- * @param array $definicion Definición ya decodificada: { campos: [...] }.
+ * @param array $definicion  Definición ya decodificada: { campos: [...] }.
+ * @param array $expresiones Catálogo indexado (constructor_indexar_expresiones()).
  * @return array ['ok' => bool, 'errores' => string[], 'definicion' => array]
  */
-function constructor_validar_definicion($definicion)
+function constructor_validar_definicion($definicion, array $expresiones = array())
 {
   if (!is_array($definicion) || !isset($definicion['campos']) || !is_array($definicion['campos'])) {
     return array(
@@ -115,13 +144,27 @@ function constructor_validar_definicion($definicion)
       $errores[] = "Campo #$pos: «min» no puede ser mayor que «max».";
     }
 
-    // regex
-    if (isset($campo['regex']) && is_string($campo['regex']) && $campo['regex'] !== '') {
-      $patron = '/' . str_replace('/', '\\/', $campo['regex']) . '/';
-      if (@preg_match($patron, '') === false) {
-        $errores[] = "Campo #$pos: la expresión regular no es válida.";
+    // expr -> opción del catálogo (se congela regex/transform en la versión)
+    if (isset($campo['expr']) && is_string($campo['expr']) && $campo['expr'] !== '') {
+      $clave = $campo['expr'];
+      if (!isset($expresiones[$clave])) {
+        $errores[] = "Campo #$pos: la validación «{$clave}» no existe en el catálogo.";
+      } elseif (!in_array($type, $expresiones[$clave]['tipos'], true)) {
+        $errores[] = "Campo #$pos: la validación «{$clave}» no aplica a campos de tipo «{$type}».";
       } else {
-        $norm['regex'] = (string) $campo['regex'];
+        $opcion = $expresiones[$clave];
+        $patron = $opcion['regex'] !== null ? '/' . str_replace('/', '\\/', $opcion['regex']) . '/u' : null;
+        if ($patron !== null && @preg_match($patron, '') === false) {
+          $errores[] = "Campo #$pos: la expresión del catálogo «{$clave}» no es válida.";
+        } else {
+          $norm['expr'] = $clave;
+          if ($opcion['regex'] !== null) {
+            $norm['regex'] = $opcion['regex'];
+          }
+          if ($opcion['transform'] !== null && in_array($opcion['transform'], Constantes::transformacionesCampo(), true)) {
+            $norm['transform'] = $opcion['transform'];
+          }
+        }
       }
     }
 

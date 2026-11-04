@@ -65,7 +65,7 @@ $stops = empty($segs) ? '#e5e9f2 0% 100%' : implode(',', $segs);
   <input type="hidden" name="fecha_d" value="<?= htmlspecialchars($backDesde); ?>">
   <input type="hidden" name="fecha_h" value="<?= htmlspecialchars($backHasta); ?>">
   <input type="hidden" name="servicio" value="<?= htmlspecialchars($serv); ?>">
-  <button type="submit" class="btn btn-outline-secondary bg-white rounded-3 fw-semibold">
+  <button type="submit" class="btn btn-outline-primary rounded-3 fw-semibold">
     ← Volver a ventas por estado
   </button>
 </form>

@@ -36,6 +36,7 @@ if (!security_usuario_autenticado()) {
         include(PUBLIC_DIR . 'general/nnavbar.php');
         $servicios = $conexion->serviciosDisponibles();
         $formularios = $conexion->listarFormularios();
+        $expresiones = $conexion->expresiones();
         include(HTML_DIR . 'constructor/index.php');
         include(PUBLIC_DIR . 'general/nfooter.php');
         break;
@@ -95,7 +96,7 @@ if (!security_usuario_autenticado()) {
           break;
         }
 
-        $validacion = constructor_validar_definicion($definicion);
+        $validacion = constructor_validar_definicion($definicion, constructor_indexar_expresiones($conexion->expresiones()));
         if (!$validacion['ok']) {
           echo json_encode(array('response' => 'false', 'message' => 'Hay errores en los campos del formulario.', 'errores' => $validacion['errores']));
           break;

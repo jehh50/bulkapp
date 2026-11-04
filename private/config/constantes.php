@@ -184,6 +184,22 @@ class Constantes
     return array('text', 'textarea', 'number', 'date', 'email', 'select', 'nested');
   }
 
+  /** Transformación del catálogo formulario_expresiones: texto a mayúsculas. */
+  const TRANSFORMACION_MAYUSCULAS = 'mayusculas';
+
+  /** Transformación del catálogo formulario_expresiones: máscara (XXXX)XXX-XX-XX. */
+  const TRANSFORMACION_TELEFONO = 'telefono';
+
+  /**
+   * Transformaciones admitidas en el catálogo de expresiones del Constructor.
+   *
+   * @return string[]
+   */
+  public static function transformacionesCampo()
+  {
+    return array(self::TRANSFORMACION_MAYUSCULAS, self::TRANSFORMACION_TELEFONO);
+  }
+
   /**
    * Normaliza el id de servicio para los catálogos: toda campaña bancaria usa los de la 1
    * (contacto efectivo/no efectivo, estados, ciudades). Las demás se quedan con su id.

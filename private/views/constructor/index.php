@@ -176,7 +176,7 @@
   <ul id="cnsErrores" class="cns-errors mt-3" style="display:none"></ul>
 
   <div class="d-flex justify-content-between mt-3 mb-5">
-    <button type="button" class="btn btn-outline-secondary" id="cnsVolver">Volver al listado</button>
+    <button type="button" class="btn btn-outline-primary" id="cnsVolver">Volver al listado</button>
     <div class="d-flex gap-2">
       <button type="button" class="btn btn-outline-primary" id="cnsPreview">Vista previa</button>
       <button type="button" class="btn btn-primary" id="cnsGuardar">Guardar formulario</button>
@@ -191,7 +191,7 @@
       <div class="modal-header"><h5 class="modal-title">Eliminar formulario</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
       <div class="modal-body">¿Eliminar <strong id="cnsEliminarNombre"></strong>? Es un borrado lógico: se conservan datos e historial para reportería.</div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancelar</button>
         <button type="button" class="btn btn-danger" id="cnsConfirmarEliminar">Eliminar</button>
       </div>
     </div>
@@ -208,7 +208,7 @@
         <p class="mb-0">¿Reasignarlos a este formulario y guardar?</p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancelar</button>
         <button type="button" class="btn btn-primary" id="cnsReasignar">Reasignar y guardar</button>
       </div>
     </div>
@@ -233,8 +233,58 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cerrar</button>
         <button type="button" class="btn btn-primary" id="cnsPreviewValidar">Validar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="cnsModalExpresiones" tabindex="-1" aria-labelledby="cnsExpresionesTitulo" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cnsExpresionesTitulo">Validaciones disponibles</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted small">Elige una validación en el campo para controlar lo que el operador puede escribir. Las de formato rechazan el valor si no coincide; las de transformación cambian el texto mientras se escribe.</p>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col">Validación</th>
+                <th scope="col">Qué hace</th>
+                <th scope="col">Ejemplo válido</th>
+                <th scope="col">Ejemplo no válido</th>
+                <th scope="col">Aplica a</th>
+              </tr>
+            </thead>
+            <tbody id="cnsExpresionesFilas"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Entendido</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="cnsModalSinCampana" tabindex="-1" aria-labelledby="cnsSinCampanaTitulo" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cnsSinCampanaTitulo">Formulario sin campaña</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <p>No seleccionaste ninguna campaña para este formulario.</p>
+        <p class="mb-0 text-muted small">Puedes guardarlo así, pero ningún operador lo verá hasta que lo asignes a una campaña en la pestaña <strong>Servicios</strong>.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-primary" id="cnsSinCampanaGuardar">Guardar sin campaña</button>
+        <button type="button" class="btn btn-primary" id="cnsSinCampanaAsignar">Asignar campaña</button>
       </div>
     </div>
   </div>
@@ -252,6 +302,7 @@ window.CONSTRUCTOR_BOOT = {
   servicios: <?php echo json_encode($servicios, JSON_UNESCAPED_UNICODE); ?>,
   formularios: <?php echo json_encode($formularios, JSON_UNESCAPED_UNICODE); ?>,
   tipos: <?php echo json_encode(Constantes::tiposCampoFormulario()); ?>,
+  expresiones: <?php echo json_encode($expresiones, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP); ?>,
   estados: { activo: <?php echo Constantes::REGISTRO_ACTIVO; ?>, inactivo: <?php echo Constantes::REGISTRO_INACTIVO; ?> }
 };
 </script>

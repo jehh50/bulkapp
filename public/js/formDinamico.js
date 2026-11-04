@@ -33,7 +33,29 @@
       return $w.append($p).append($h);
     }
     var tipo = c.type === 'number' ? 'number' : (c.type === 'date' ? 'date' : (c.type === 'email' ? 'email' : 'text'));
-    return $('<input class="form-control">').attr('type', tipo).attr('name', c.k).attr('placeholder', c.placeholder || '');
+    var $i = $('<input class="form-control">').attr('type', tipo).attr('name', c.k).attr('placeholder', c.placeholder || '');
+    if (c.transform === 'telefono') { $i.attr({ inputmode: 'numeric', maxlength: 15 }); }
+    return $i;
+  }
+
+  /** Máscara (XXXX)XXX-XX-XX: se reconstruye desde los dígitos tecleados. */
+  function formatoTelefono(valor) {
+    var d = String(valor).replace(/\D/g, '').slice(0, 11);
+    if (!d) { return ''; }
+    var out = '(' + d.slice(0, 4);
+    if (d.length > 4) { out += ')' + d.slice(4, 7); }
+    if (d.length > 7) { out += '-' + d.slice(7, 9); }
+    if (d.length > 9) { out += '-' + d.slice(9, 11); }
+    return out;
+  }
+
+  /** Aplica la transformación del catálogo (c.transform) mientras se escribe. */
+  function aplicarTransformacion(c, $ctrl) {
+    if (c.transform !== 'mayusculas' && c.transform !== 'telefono') { return; }
+    $ctrl.on('input', function () {
+      var nuevo = c.transform === 'mayusculas' ? this.value.toUpperCase() : formatoTelefono(this.value);
+      if (nuevo !== this.value) { this.value = nuevo; }
+    });
   }
 
   /** Muestra u oculta (clase d-none) los campos según su condición. */
@@ -57,7 +79,9 @@
       mapa[c.k] = c;
       var $grp = $('<div class="mb-3">').attr('data-k', c.k);
       $grp.append($('<label class="form-label">').html(esc(c.label || c.k) + (c.req ? ' <span class="req-mark">*</span>' : '')));
-      $grp.append(construirControl(c));
+      var $ctrl = construirControl(c);
+      aplicarTransformacion(c, $ctrl);
+      $grp.append($ctrl);
       if (c.help) { $grp.append($('<div class="form-text">').text(c.help)); }
       $grp.append('<div class="field-error" style="display:none"></div>');
       if (c.cond) { $grp.attr('data-cond-k', c.cond.k).attr('data-cond-v', c.cond.v); }

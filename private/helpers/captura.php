@@ -54,6 +54,9 @@ function captura_validar_valores(array $definicion, $valores)
     }
 
     $valor = (isset($valores[$k]) && is_scalar($valores[$k])) ? trim((string) $valores[$k]) : '';
+    if (isset($c['transform']) && $c['transform'] === Constantes::TRANSFORMACION_MAYUSCULAS) {
+      $valor = mb_strtoupper($valor, 'UTF-8');
+    }
     $error = captura_validar_simple($c, $valor);
     if ($error !== null) {
       $errores[$k] = $error;

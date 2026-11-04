@@ -137,8 +137,8 @@ function quitarProductos(e){
             </div>
 
             <div class="text-start">
-              <a href="?view=configuracion&mode=index" class="btn btn-outline-secondary">Regresar</a>
-              <button type="submit" class="btn btn-success">
+              <a href="?view=configuracion&mode=index" class="btn btn-outline-primary">Regresar</a>
+              <button type="submit" class="btn btn-primary">
                 <i class="bi bi-save"></i> Guardar
               </button>
             </div>
