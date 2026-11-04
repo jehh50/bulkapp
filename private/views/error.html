@@ -164,18 +164,33 @@
       <span class="e-code"><span class="e-dot"></span>Error 404</span>
       <div class="e-num" aria-hidden="true">404</div>
       <h1 class="e-title">Página no encontrada</h1>
-      <p class="e-text">La dirección que escribiste no existe o ya no está disponible. Revisa el enlace o vuelve al
-        inicio.</p>
-      <a class="e-btn" href="index.php">
+      <p class="e-text">La dirección que escribiste no existe o ya no está disponible. Revisa el enlace o vuelve a la
+        página anterior.</p>
+      <a class="e-btn" id="e-volver" href="index.php">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M3 11l9-8 9 8"></path>
-          <path d="M5 10v10h14V10"></path>
+          <path d="M15 18l-6-6 6-6"></path>
         </svg>
-        Volver al inicio
+        Volver
       </a>
     </section>
   </main>
+  <script>
+    /* Vuelve a la vista anterior. Si no hay historial (p. ej. se abrió directo),
+       el enlace href="index.php" lleva al inicio. */
+    (function () {
+      var boton = document.getElementById('e-volver');
+      if (!boton) {
+        return;
+      }
+      boton.addEventListener('click', function (evento) {
+        if (window.history.length > 1) {
+          evento.preventDefault();
+          window.history.back();
+        }
+      });
+    })();
+  </script>
 </body>
 
 </html>
