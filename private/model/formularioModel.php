@@ -87,7 +87,7 @@ class database
     return true;
   }
 
-  public function registroGestion(?int $contacto, ?int $efectivo, ?int $producto, ?int $noefectivo, ?int $subcontacto, int $id_usuario, string $date, int $id_cliente, ?int $status, string $hora, int $servicio, ?string $dni, ?array $idQuote, ?string $gestion): int
+  public function registroGestion(?int $contacto, ?int $efectivo, ?int $producto, ?int $noefectivo, ?int $subcontacto, int $id_usuario, string $date, int $id_cliente, ?int $status, string $hora, int $servicio, ?string $gestion): int
   {
     $table = 'clientes';
     $where = 'id = ?';

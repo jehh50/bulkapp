@@ -1,6 +1,6 @@
 -- Clientes (empresas) y campañas — Fase 0.
 --
--- Modelo: una EMPRESA (cliente corporativo: Banco Activo, Bancaribe, Cashea…) tiene N
+-- Modelo: una EMPRESA (cliente corporativo: Banco Activo, Bancaribe…) tiene N
 -- CAMPAÑAS. La campaña es la tabla `servicios` de siempre: se conservan sus ids, así que
 -- gestion, resultados, clientes (BBDD de contactos), productos, catálogos, users y el
 -- Constructor siguen apuntando a `servicio_id` sin migrar una sola fila histórica.
@@ -17,8 +17,7 @@
 -- 3) usuario_servicios: N:M usuario ↔ campaña. users.servicio_id se conserva como la
 --    campaña PRINCIPAL (con la que arranca la sesión) y siempre está asignada.
 --
--- Datos: Banco Activo (1) y Bancaribe (5) → flujo bancario; CASHEA (2) → dinámico
--- (hoy ya se enruta a la captura dinámica). `servicios."campo 2"` no se toca.
+-- Datos: Banco Activo (1) y Bancaribe (5) → flujo bancario; servicio 2 → dinámico. `servicios."campo 2"` no se toca.
 -- El TRIM de "Bancaribe " no altera la carpeta XML (se calcula quitando espacios).
 --
 -- Motor: MariaDB 10.11. Charset utf8mb4. Idempotente donde MariaDB lo permite.

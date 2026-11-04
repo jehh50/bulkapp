@@ -14,7 +14,7 @@ class database
 	 * Guarda un lote de registros en la base de datos.
 	 *
 	 * @param array $batch Un array de arrays, donde cada array interno representa una fila de datos.
-	 * @param int $servicio El identificador del servicio (1 para clientes, otro valor para cashea).
+	 * @param int $servicio El identificador del servicio (solo servicios bancarios; cada uno se guarda en `clientes`).
 	 * @return int|false El número de filas insertadas con éxito, o false si hubo un error.
 	 */
 	public function guardarRegistrosBatch(array $batch, int $servicio)
@@ -34,10 +34,8 @@ class database
 			//$queryUpdate = "UPDATE clientes SET is_active = 0 WHERE is_active = 1 and servicio_id = $servicio";
 			$queryUpdate = "";
 		} else {
-			$tabla = 'cashea_customers';
-			$columnas = ['cedula', 'id_cuota', 'nombre_grupo', 'fecha_pagar', 'monto_cuota', 'numero_cuota', 'fee', 'plata_por_cobrar', 'capital_asignado', 'id_orden', 'identificacion_orden', 'fecha_creacion_orden', 'email', 'telefono', 'nombre_usuario', 'local_origen', 'estado_deuda', 'tramo_inicial', 'tramo_actual', 'segmento'];
-			$columnasEsperadas = 20;
-			$queryUpdate = "UPDATE cashea_customers SET is_active = 0 WHERE is_active = 1";
+			app_log('warning', 'Carga de clientes no soportada para un servicio no bancario.', array('servicio' => $servicio));
+			return false;
 		}
 		$query = "INSERT INTO " . $tabla . " (" . implode(', ', $columnas) . ") VALUES ";
 		$placeHolders = [];
@@ -88,6 +86,6 @@ class database
 	public function servicio(): array
 	{
 		// etiqueta = «Empresa › Campaña» (solo para mostrar).
-		return $this->db->selectQuery("SELECT s.id, s.descripcion, " . campanas_sql_etiqueta() . " AS etiqueta FROM servicios s LEFT JOIN empresas e ON e.id = s.empresa_id WHERE s.status_id = 2 ORDER BY s.id ASC");
+		return $this->db->selectQuery("SELECT s.id, s.descripcion, " . campanas_sql_etiqueta() . " AS etiqueta FROM servicios s LEFT JOIN empresas e ON e.id = s.empresa_id WHERE s.status_id = 2 AND s.tipo_flujo = ? ORDER BY s.id ASC", [Constantes::FLUJO_BANCARIO], 's');
 	}
 }

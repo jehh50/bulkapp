@@ -54,7 +54,6 @@ Verificación adicional (2026-10-28):
 
 | Tema | Estado | Detalle |
 |------|--------|---------|
-| Código duplicado | 🟢 | `validateForm2()` y `validateFormCashea()` (idénticas) se unificaron en una sola implementación, `validarPagoCashea()` en `public/js/fieldsValidation.js`; ambas funciones quedan como alias. |
 | Campo huérfano `cuenta2` | 🟢 | El campo real es `pan`. El único archivo que enviaba `cuenta2` (`public/js/formularioRegistro.js`) era código muerto y se eliminó; el servidor nunca leyó ese campo. |
 | Métodos largos sin separación | 🟢 | El caso `registro` de `formularioController.php` se extrajo a `private/helpers/formularioRegistro.php`: funciones puras para armar/validar los datos (`formulario_registro_datos*`) y funciones de escritura (`formulario_registro_guardar*`). El controlador quedó con un `case` corto. |
 | Valores mágicos | 🟢 | `private/config/constantes.php` define la clase `Constantes` (servicios, tipos de usuario, estados, productos, subcontactos con pago). Se usa en controladores, modelos y vistas en lugar de `1`, `2`, `5`, `7`, `9`, `12`… |
@@ -70,19 +69,18 @@ Verificación adicional (2026-10-28):
 
 | Tema | Estado | Detalle |
 |------|--------|---------|
-| Módulos `editar` y `csv` con SQL de un esquema anterior | 🔴 | `private/model/editarModel.php` consulta columnas que ya no existen (`cod_servicio`, `id_efectivo`, tablas `resultados2`/`resultados3`). Ambos módulos no están enlazados desde la interfaz (solo son alcanzables por URL) y hoy devuelven un error 500 controlado. Hay que rehacerlos contra el esquema actual o retirarlos. |
+| Módulo `csv` con SQL de un esquema anterior | 🔴 | El módulo `csv` consulta columnas que ya no existen. No está enlazado desde la interfaz (solo es alcanzable por URL). El módulo `editar` fue eliminado. Hay que rehacer `csv` contra el esquema actual o retirarlo. |
 | Avisos deprecación en el módulo `csv` | 🟡 | `csvController.php`/`csvModel.php` llaman `substr()` sobre columnas que pueden venir `NULL` (teléfonos vacíos). Ahora quedan registrados en el log (`storage/logs/app.log`) en lugar de mostrarse; conviene usar `substr((string) $valor, …)`. |
 
 ## Hallazgos nuevos (2026-10-28)
 
 | Tema | Estado | Detalle |
 |------|--------|---------|
-| `is_active` de Cashea se reinicia por lote | 🔴 | En `carga_archivoModel::guardarRegistrosBatch()`, para el servicio **Cashea** el `UPDATE cashea_customers SET is_active = 0 WHERE is_active = 1` se ejecuta al inicio de CADA lote (líneas ~40 y ~68-70), y el controlador `carga_archivoController.php` llama al método por cada lote de 1000 filas. Para archivos Cashea de más de 1000 filas, cada lote desactiva (`is_active = 0`) los registros recién insertados por los lotes anteriores, dejando activo solo el último lote. El `UPDATE` debería ejecutarse UNA sola vez, antes de insertar. **Decisión (2026-10-28):** no se corrige en esta sesión porque el módulo Cashea no está en uso según el responsable; queda documentado para corregirlo si se reactiva el servicio. |
 | Robustez del flujo `registro` de carga de BBDD | 🟢 | Corregido en `carga_archivoController.php` + `carga_archivoModel.php`: (1) el flujo `registro` ya no redirige siempre a `exito`; según el resultado real redirige a `mensaje=errorProceso` (si algún lote falló), `mensaje=sinDatos` (0 filas insertadas) o `mensaje=exito`; (2) se agregó guarda contra CSV vacío/sin separador (`fgetcsv` devuelve `false` o una sola columna → `mensaje=errorFormato`); (3) la codificación se detecta sobre una muestra de 1 MB (`fread($fp, 1048576)`) en vez de releer todo el archivo; (4) se eliminó el parámetro muerto `$paramTypes` de `guardarRegistrosBatch()` (ahora `guardarRegistrosBatch(array $batch, int $servicio)`). |
 
 ## Recomendaciones prioritarias (orden sugerido)
 
-1. Resolver o retirar los módulos legacy `editar` y `csv` (SQL de un esquema anterior).
+1. Resolver o retirar el módulo legacy `csv` (SQL de un esquema anterior). `editar` ya fue eliminado.
 2. Tipar por completo la capa procedural (vistas y controladores) y adoptar PSR-12 de forma
    uniforme en todo el repositorio.
 3. Corregir los `substr()` sobre valores `NULL` del módulo `csv`.

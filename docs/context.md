@@ -33,7 +33,6 @@ Detalle en [clientes-campanas-plan.md](clientes-campanas-plan.md).
 | `servicio_id` | Empresa / campaña | Flujo |
 |---------------|-------------------|-------|
 | `1` | Banco Activo | `bancario` — formulario fijo (`formulario/index.php`); dueña de los catálogos de banca. |
-| `2` | Cashea (inactiva) | `dinamico` — captura del Constructor. |
 | `5` | Bancaribe | `bancario` — comparte catálogos con la 1 (`Constantes::servicioBase()`). |
 
 > `Constantes::esServicioBancario()`, `servicios()`, `serviciosBancarios()` y `servicioBase()`
@@ -47,8 +46,7 @@ Detalle en [clientes-campanas-plan.md](clientes-campanas-plan.md).
   **motivo** (tablas `efectivo` / `noefectivo`) y un **subcontacto** (tabla `subcontacto`).
 - **PAN / Número de cuenta** — número de cuenta bancaria del cliente; 20 caracteres,
   dígitos y asteriscos (enmascarado), ej. `123456********7890`. El input se llama `pan`.
-- **status_id** — estado del cliente/gestión (ej. `7` = atendido/sin deuda, `9` = compromiso de pago,
-  `12` = pago abonado). Ver `Constantes::ESTADO_*`.
+- **status_id** — estado del cliente/gestión (ej. `7` = atendido/sin deuda). Ver `Constantes::ESTADO_*`.
 
 ## Estado actual del repositorio
 
@@ -61,8 +59,8 @@ Detalle en [clientes-campanas-plan.md](clientes-campanas-plan.md).
   assets con `asset()` y suite de pruebas en `tests/`.
 - Frontend unificado en **Bootstrap 5.3.8 + jQuery 3.7.1** (locales en `public/`); el diseño
   nuevo usa `nheader`/`nnavbar`/`nfooter` y el layout legacy `header`/`navbar`/`footer`.
-- Pendiente conocido: los módulos legacy `editar` y `csv` consultan un esquema de base de
-  datos anterior (ver [technical-debt.md](technical-debt.md)).
+- Pendiente conocido: el módulo legacy `csv` consulta un esquema de base de datos anterior
+  (ver [technical-debt.md](technical-debt.md)). El módulo `editar` fue eliminado.
 
 ## Documentación relacionada
 

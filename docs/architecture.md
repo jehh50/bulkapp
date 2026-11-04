@@ -115,7 +115,6 @@ bulkapp/
 | `xml` | `xmlController` | `xmlModel` | Exportación a XML/XSD. |
 | `usuarios` | `usuariosController` | `usuariosModel` | ABM de usuarios y cambio de contraseña. |
 | `configuracion` | `configuracionController` | `configuracionModel` | Productos y parámetros. |
-| `editar` | `editarController` | `editarModel` | Edición de registros (legacy: SQL de un esquema anterior). |
 | `dashboard` | `dashboardController` | `reportesModel` | Tablero (acumulado del mes). |
 | `grabaciones` | — | `grabacionesModel` | Grabaciones de llamadas. |
 

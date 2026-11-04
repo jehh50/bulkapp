@@ -49,30 +49,7 @@ function formulario_registro_datos_base($post, $session)
     'status' => $status,
     'producto' => isset($post['venta']) ? input_int($post['venta'], 0) : null,
     'sub_contacto' => isset($post['subContacto']) ? input_int($post['subContacto'], 0) : null,
-    'dni' => isset($post['dni_cliente']) ? input_string($post['dni_cliente'], 30) : null,
-    'id_quote' => formulario_registro_id_quotes(isset($post['idQuote']) ? $post['idQuote'] : null),
-    'payment_date' => isset($post['paymentDate']) ? input_date($post['paymentDate'], 'Y-m-d') : null,
   );
-}
-
-/**
- * Normaliza el arreglo de cuotas (idQuote) recibido del formulario.
- *
- * @param mixed $idQuote
- * @return array|null
- */
-function formulario_registro_id_quotes($idQuote)
-{
-  if (!is_array($idQuote)) {
-    return null;
-  }
-
-  $resultado = array();
-  foreach ($idQuote as $quote) {
-    $resultado[] = input_string($quote, 100);
-  }
-
-  return $resultado;
 }
 
 /**
@@ -245,8 +222,6 @@ function formulario_registro_guardar_gestion($conn, array $datos)
     $datos['status'],
     $datos['hora'],
     $datos['servicio'],
-    $datos['dni'],
-    $datos['id_quote'],
     $datos['gestion']
   );
 }

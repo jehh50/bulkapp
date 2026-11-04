@@ -17,7 +17,7 @@ test('Constantes::esServicioBancario reconoce 1 y 5', function () {
 });
 
 test('Constantes::servicios y tiposUsuario devuelven las listas permitidas', function () {
-  assert_igual(array(1, 2, 5), Constantes::servicios());
+  assert_igual(array(1, 5), Constantes::servicios());
   assert_igual(array(1, 2, 3), Constantes::tiposUsuario());
 });
 

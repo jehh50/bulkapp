@@ -121,7 +121,6 @@ el logging estructurado se cerraron el 2026-10-21, ver secciones 5 y 6).
 
 | Categoría | Estado | Detalle |
 |-----------|--------|---------|
-| **Duplicación** | 🟢 | `validateForm2()` y `validateFormCashea()` se unificaron en `validarPagoCashea()` (`public/js/fieldsValidation.js`). El patrón `while($data = $db->recorrer($sql))` quedó obsoleto: los modelos usan `selectQuery()`. |
 | **Métodos largos** | 🟢 | El caso `'registro'` de `formularioController.php` (87 líneas) se extrajo a `private/helpers/formularioRegistro.php`, con funciones puras de armado/validación y funciones de escritura separadas. |
 | **Valores mágicos** | 🟢 | Clase `Constantes` (`private/config/constantes.php`) para servicios, tipos de usuario, estados, productos y subcontactos; aplicada en controladores, modelos y vistas. |
 | **Manejo de errores** | 🟢 | Handlers globales (`private/lib/errors.php`) + `try/catch` en los 11 controladores + `app_responder_error()` (mensaje genérico). `Conexion` registra el detalle y lanza `RuntimeException` genérica. |
@@ -142,14 +141,14 @@ el logging estructurado se cerraron el 2026-10-21, ver secciones 5 y 6).
 - Variables de entorno implementadas con un cargador propio (sin Composer).
 - Documentación vigente en `docs/` (`context.md`, `architecture.md`, `conventions.md`,
   `technical-debt.md`).
-- Módulos legacy `editar` y `csv` con SQL de un esquema de base de datos anterior:
-  no están enlazados en el menú y fallan con un error 500 controlado.
+- Módulo legacy `csv` con SQL de un esquema de base de datos anterior: no está enlazado
+  en el menú y falla con un error 500 controlado. (`editar` fue eliminado.)
 
 ---
 
 ## 7. Recomendaciones Prioritarias
 
-1. Rehacer o retirar los módulos legacy `editar` y `csv` (SQL de un esquema anterior).
+1. Rehacer o retirar el módulo legacy `csv` (SQL de un esquema anterior).
 2. Extender el guard de autorización (`usertype_id`) a configuración, reportes, XML y carga de archivos.
 3. Mantener documentada la excepción de md5 en ECCP/Elastix.
 4. Tipar la capa procedural (vistas y controladores) y unificar el formato en PSR-12.
@@ -176,8 +175,6 @@ Endurecimiento de la validación en el formulario de captura (`private/views/for
 
 ### Deuda detectada en esta revisión (cerrada el 2026-10-21)
 
-- `validateForm2()` y `validateFormCashea()` en `fieldsValidation.js` eran idénticas → ahora
-  comparten la implementación `validarPagoCashea()`.
 - Campo `cuenta2` referenciado en `formulario.js` / `formularioRegistro.js` pero inexistente en
   la vista (el campo real es `pan`) → `formularioRegistro.js` era código muerto y se eliminó.
 - `print_r($_POST)` y `var_dump` eliminados.

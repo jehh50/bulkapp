@@ -35,7 +35,7 @@ test('xlsx_empaquetar genera un libro válido con texto escapado y valores nativ
   xlsx_hoja_fila($h, array(xlsx_numero('12.5'), xlsx_celda("José \x01Pérez")));
   xlsx_hoja_cerrar($h);
   $f = xlsx_hoja_abrir('Fil/tros');
-  xlsx_hoja_fila($f, array(xlsx_celda('Cliente', XLSX_ESTILO_NEGRITA), xlsx_celda('Cashea')));
+  xlsx_hoja_fila($f, array(xlsx_celda('Cliente', XLSX_ESTILO_NEGRITA), xlsx_celda('Empresa B')));
   xlsx_hoja_cerrar($f);
 
   $destino = tempnam(sys_get_temp_dir(), 'xlsx_test_');
@@ -71,16 +71,16 @@ test('captura_tipos_campos toma el tipo de la versión más reciente', function 
 
 test('captura_arbol_reporte agrupa cliente → campaña → formulario y valida la selección', function () {
   $arbol = captura_arbol_reporte(array(
-    array('empresa_id' => 2, 'empresa' => 'Cashea', 'servicio_id' => 2, 'campana' => 'Cobranza', 'formulario_id' => 7, 'formulario' => 'Compromiso', 'eliminado' => 0),
-    array('empresa_id' => 2, 'empresa' => 'Cashea', 'servicio_id' => 2, 'campana' => 'Cobranza', 'formulario_id' => 8, 'formulario' => 'Viejo', 'eliminado' => 1),
-    array('empresa_id' => 2, 'empresa' => 'Cashea', 'servicio_id' => 9, 'campana' => 'Recuperación', 'formulario_id' => 7, 'formulario' => 'Compromiso', 'eliminado' => 0),
+    array('empresa_id' => 2, 'empresa' => 'Empresa B', 'servicio_id' => 2, 'campana' => 'Campaña B', 'formulario_id' => 7, 'formulario' => 'Compromiso', 'eliminado' => 0),
+    array('empresa_id' => 2, 'empresa' => 'Empresa B', 'servicio_id' => 2, 'campana' => 'Campaña B', 'formulario_id' => 8, 'formulario' => 'Viejo', 'eliminado' => 1),
+    array('empresa_id' => 2, 'empresa' => 'Empresa B', 'servicio_id' => 9, 'campana' => 'Campaña C', 'formulario_id' => 7, 'formulario' => 'Compromiso', 'eliminado' => 0),
   ));
   assert_igual(1, count($arbol));
   assert_igual(2, count($arbol[0]['campanas']));
   assert_igual('Viejo (eliminado)', $arbol[0]['campanas'][0]['formularios'][1]['nombre']);
 
   $sel = captura_seleccion_reporte($arbol, 2, 9, 7);
-  assert_igual('Recuperación', $sel['campana']['nombre']);
+  assert_igual('Campaña C', $sel['campana']['nombre']);
   assert_igual(null, captura_seleccion_reporte($arbol, 2, 9, 8), 'El formulario 8 no está en la campaña 9');
   assert_igual(null, captura_seleccion_reporte($arbol, 1, 2, 7), 'La campaña 2 no es del cliente 1');
 });
@@ -94,8 +94,8 @@ test('captura_paginas muestra extremos, vecinas y huecos', function () {
 });
 
 test('captura_slug arma nombres de archivo seguros', function () {
-  assert_igual('cobranza-temprana', captura_slug(' Cobranza  Temprana '));
-  assert_igual('recuperacion-90', captura_slug('Recuperación 90+'));
+  assert_igual('campana-temprana', captura_slug(' Campaña  Temprana '));
+  assert_igual('campana-90', captura_slug('Campaña 90+'));
   assert_igual('compania-ano', captura_slug('Compañía/Año'));
   assert_igual('sin-nombre', captura_slug('¿?'));
 });

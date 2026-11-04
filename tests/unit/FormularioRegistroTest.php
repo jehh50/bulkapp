@@ -17,7 +17,6 @@ function datos_post_base()
     'noefectivo' => '2',
     'venta' => '7',
     'gestion' => 'llamada',
-    'dni_cliente' => '12624422',
   );
 }
 

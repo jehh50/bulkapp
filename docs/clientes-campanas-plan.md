@@ -5,7 +5,7 @@
 
 ## Problema
 
-`servicios` se usaba como el cliente (Banco Activo, Bancaribe, Cashea) y la campaña no existía.
+`servicios` se usaba como el cliente (Banco Activo, Bancaribe) y la campaña no existía.
 `servicio_id` aparece en 16 tablas (`gestion`, `resultados`, `clientes` = BBDD de contactos,
 `productos`, catálogos, `users`…) y en la sesión del agente, y el flujo bancario estaba fijado en
 código (ids 1 y 5).
@@ -41,7 +41,7 @@ Decisiones del usuario (2026-11-02):
   XML). UNIQUE (`empresa_id`, `descripcion`).
 - **`usuario_servicios`** (`user_id`, `servicio_id`) PK compuesta. `users.servicio_id` se conserva
   como **campaña principal** (con la que arranca la sesión) y siempre está asignada.
-- Datos: una empresa por servicio existente; 1 y 5 → `bancario`, 2 (Cashea) → `dinamico`;
+- Datos: una empresa por servicio existente; 1 y 5 → `bancario`, 2 → `dinamico`;
   `fecha_inicio` = `created_at`; cada usuario asignado a su principal.
 
 ## Reglas de negocio
@@ -84,7 +84,6 @@ opción (`etiqueta`); `descripcion` y los ids enviados quedan iguales.
 1. Aplicar `private/config/migrations/20261102_empresas_campanas.sql` **antes** de publicar el
    código (las consultas de los selectores ya hacen JOIN con `empresas`). `Constantes` tolera la
    ausencia de la migración; los selectores no.
-2. Renombrar «CASHEA» como empresa si se desea; crear campañas nuevas desde el módulo.
 
 ## Pendientes / riesgos conocidos
 

@@ -15,7 +15,7 @@ if (!security_usuario_autenticado()) {
   			case 'index':
   				$nav_crumb = "Configuración / Carga BBDD";
   				$nav_title = "Carga de base de datos";
-  				$nav_subtitle = "Importa masivamente clientes y cuotas desde archivos CSV por cada servicio.";
+  				$nav_subtitle = "Importa masivamente clientes desde archivos CSV por cada servicio.";
   				include(PUBLIC_DIR . 'general/nheader.php');
   				include(PUBLIC_DIR . 'general/nnavbar.php');
   				$servicio = $con->servicio();
@@ -32,7 +32,7 @@ if (!security_usuario_autenticado()) {
   					break;
   				}
   				$archivo = $_FILES["archivo"]['tmp_name'];
-  				$servicio = input_enum(isset($_POST['servicio']) ? $_POST['servicio'] : null, Constantes::servicios());
+  				$servicio = input_enum(isset($_POST['servicio']) ? $_POST['servicio'] : null, Constantes::serviciosBancarios());
   				if ($servicio === null) {
   					header('Location: ?view=carga_archivo&mode=index&mensaje=errorArchivo');
   					break;

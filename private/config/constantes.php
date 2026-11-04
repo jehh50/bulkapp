@@ -15,9 +15,6 @@ class Constantes
   /** Campaña bancaria base (Banco Activo): dueña de los catálogos de banca. */
   const SERVICIO_BANCARIO = 1;
 
-  /** Cashea (hoy inactiva; flujo dinámico). */
-  const SERVICIO_CASHEA = 2;
-
   /** Bancaribe: campaña bancaria que comparte catálogos con la 1. */
   const SERVICIO_BANCARIO_ALIAS = 5;
 
@@ -90,7 +87,6 @@ class Constantes
   {
     return array(
       self::SERVICIO_BANCARIO => self::FLUJO_BANCARIO,
-      self::SERVICIO_CASHEA => self::FLUJO_DINAMICO,
       self::SERVICIO_BANCARIO_ALIAS => self::FLUJO_BANCARIO,
     );
   }

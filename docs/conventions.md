@@ -81,18 +81,14 @@ estilo del archivo que estés tocando para mantener consistencia.
   | Constante | Valor | Significado |
   |-----------|-------|-------------|
   | `SERVICIO_BANCARIO` | 1 | Campañas bancarias (Bancamiga, Bancaribe, Banco Activo) |
-  | `SERVICIO_CASHEA` | 2 | Cobranza Cashea |
   | `SERVICIO_BANCARIO_ALIAS` | 5 | Alias histórico del servicio bancario |
   | `USUARIO_AGENTE` / `USUARIO_ADMINISTRADOR` / `USUARIO_SUPERVISOR` | 1 / 2 / 3 | Tipos de usuario |
   | `ESTADO_NO_EFECTIVO` / `ESTADO_EFECTIVO` | 3 / 4 | Estado de la gestión |
   | `ESTADO_ATENDIDO` | 7 | Cliente atendido / sin deuda |
-  | `ESTADO_COMPROMISO_PAGO` / `ESTADO_PAGO_ABONADO` | 9 / 12 | Estados de Cashea |
   | `REGISTRO_ACTIVO` / `REGISTRO_INACTIVO` | 2 / 1 | Alta/baja de productos, servicios y usuarios |
-  | `PLAN_PAGO_PERSONALIZADO` | 3 | Plan de pago "a medida" en Cashea |
 
 - Helpers útiles: `Constantes::servicioBase($id)` (normaliza 5 → 1),
-  `Constantes::esServicioBancario($id)`, `Constantes::esServicioCashea($id)`,
-  `Constantes::admitePago($subContacto)`.
+  `Constantes::esServicioBancario($id)`.
 
 ## Validación de entrada (servidor)
 
@@ -157,8 +153,7 @@ Archivo central: `public/js/fieldsValidation.js`. Se conecta por atributos inlin
 | Teléfono | clase `.telefono` + `onchange="validaTelf(this)"` | Formato `(0XXX)XXX.XX.XX`. |
 | Correo | `oninput="upperCase(this)"` + `onchange="validateEmail(this)"` | Patrón email + dominio no duplicado. |
 
-- El submit del formulario llama a `validateForm()` (formulario bancario) o a
-  `validateForm2()` (Cashea), que delegan en `validarPagoCashea()`; la función revalida
+- El submit del formulario llama a `validateForm()` (formulario bancario); la función revalida
   todo con expresiones regulares y muestra `alert()` en caso de error.
 - **Convención de IDs**: los campos del formulario de captura usan sufijo `2`
   (`nombre2`, `apellido2`, `cedula2`, `correo2`); el panel de solo-lectura del cliente usa
@@ -172,7 +167,7 @@ Archivo central: `public/js/fieldsValidation.js`. Se conecta por atributos inlin
 ## Nomenclatura y estilo
 
 - Idioma **mixto español/inglés** en identificadores (`buscaCliente`, `registroResultados`,
-  `paymentDate`, `fullName`). Es la realidad del código; **no se migra de forma masiva**.
+  `registroGestion`). Es la realidad del código; **no se migra de forma masiva**.
   Mantené coherencia local.
 - Sin namespaces. Con **tipado gradual**: todo método de clase declara tipos; las vistas y
   los controladores (capa procedural) se tipan a medida que se toquen.
