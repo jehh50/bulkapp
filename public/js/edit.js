@@ -252,15 +252,15 @@
     var generoM = String(item.genero) === 'M' ? ' selected' : '';
 
     return `
-      <div class="accordion-item">
+      <div class="accordion-item border-0 rounded-3 shadow-sm overflow-hidden mb-3">
         <h2 class="accordion-header" id="heading${indice}">
-          <button class="accordion-button ${indice === 0 ? '' : 'collapsed'}" type="button"
+          <button class="accordion-button ${indice === 0 ? '' : 'collapsed'}" type="button" style="background-color:white;"
                   data-bs-toggle="collapse" data-bs-target="#collapse${indice}"
                   aria-expanded="${indice === 0 ? 'true' : 'false'}" aria-controls="collapse${indice}">
-            <span class="er-result__head">
-              <span class="er-result__name">${escapeHtml(item.nombre)} ${escapeHtml(item.apellido)}</span>
-              <span class="er-chip">CI ${escapeHtml(item.cedula)}</span>
-              <span class="er-chip er-chip--muted">${escapeHtml(item.servicio)}</span>
+            <span class="d-flex flex-wrap align-items-center gap-2 text-start">
+              <span class="text-break">${escapeHtml(item.nombre)} ${escapeHtml(item.apellido)}</span>
+              <span class="badge text-bg-primary">CI ${escapeHtml(item.cedula)}</span>
+              <span class="badge text-bg-light border">${escapeHtml(item.servicio)}</span>
             </span>
           </button>
         </h2>
@@ -269,37 +269,37 @@
           <div class="accordion-body">
             <div class="row g-3">
               <div class="col-12 col-md-6 col-lg-4">
-                <div class="er-field">
-                  <label class="form-label" for="producto${indice}">Producto</label>
+                <div class="d-flex flex-column gap-1">
+                  <label class="form-label small text-secondary mb-0" for="producto${indice}">Producto</label>
                   <select class="form-select" id="producto${indice}" required>
                     <option value="" selected disabled>Cargando…</option>
                   </select>
                 </div>
               </div>
               <div class="col-12 col-md-6 col-lg-4">
-                <div class="er-field">
-                  <label class="form-label" for="nombre${indice}">Nombre</label>
+                <div class="d-flex flex-column gap-1">
+                  <label class="form-label small text-secondary mb-0" for="nombre${indice}">Nombre</label>
                   <input type="text" class="form-control" id="nombre${indice}" maxlength="50"
                          value="${escapeHtml(item.nombre)}" required>
                 </div>
               </div>
               <div class="col-12 col-md-6 col-lg-4">
-                <div class="er-field">
-                  <label class="form-label" for="apellido${indice}">Apellido</label>
+                <div class="d-flex flex-column gap-1">
+                  <label class="form-label small text-secondary mb-0" for="apellido${indice}">Apellido</label>
                   <input type="text" class="form-control" id="apellido${indice}" maxlength="50"
                          value="${escapeHtml(item.apellido)}" required>
                 </div>
               </div>
               <div class="col-12 col-md-6 col-lg-4">
-                <div class="er-field">
-                  <label class="form-label" for="cedula${indice}">Cédula</label>
+                <div class="d-flex flex-column gap-1">
+                  <label class="form-label small text-secondary mb-0" for="cedula${indice}">Cédula</label>
                   <input type="text" class="form-control" id="cedula${indice}" maxlength="9"
                          inputmode="numeric" value="${escapeHtml(item.cedula)}" required>
                 </div>
               </div>
               <div class="col-12 col-md-6 col-lg-4">
-                <div class="er-field">
-                  <label class="form-label" for="genero${indice}">Sexo</label>
+                <div class="d-flex flex-column gap-1">
+                  <label class="form-label small text-secondary mb-0" for="genero${indice}">Sexo</label>
                   <select class="form-select" id="genero${indice}" required>
                     <option value="" ${item.genero ? '' : 'selected'} disabled>Seleccione…</option>
                     <option value="F"${generoF}>Femenino</option>
@@ -308,43 +308,43 @@
                 </div>
               </div>
               <div class="col-12 col-md-6 col-lg-4">
-                <div class="er-field">
-                  <label class="form-label" for="d_nacimiento${indice}">Fecha de nacimiento</label>
+                <div class="d-flex flex-column gap-1">
+                  <label class="form-label small text-secondary mb-0" for="d_nacimiento${indice}">Fecha de nacimiento</label>
                   <input type="text" class="form-control" id="d_nacimiento${indice}" maxlength="10"
                          placeholder="DD-MM-AAAA" value="${escapeHtml(item.nacimiento)}" required>
                 </div>
               </div>
               <div class="col-12 col-md-6 col-lg-4">
-                <div class="er-field">
-                  <label class="form-label" for="telf_hab${indice}">Teléfono habitación</label>
+                <div class="d-flex flex-column gap-1">
+                  <label class="form-label small text-secondary mb-0" for="telf_hab${indice}">Teléfono habitación</label>
                   <input type="text" class="form-control telefono" id="telf_hab${indice}" maxlength="15"
                          placeholder="(0212)345.67.89" value="${escapeHtml(item.telf_hab)}">
                 </div>
               </div>
               <div class="col-12 col-md-6 col-lg-4">
-                <div class="er-field">
-                  <label class="form-label" for="telf_cel${indice}">Teléfono celular</label>
+                <div class="d-flex flex-column gap-1">
+                  <label class="form-label small text-secondary mb-0" for="telf_cel${indice}">Teléfono celular</label>
                   <input type="text" class="form-control telefono" id="telf_cel${indice}" maxlength="15"
                          placeholder="(0424)234.56.78" value="${escapeHtml(item.telf_celular)}">
                 </div>
               </div>
               <div class="col-12 col-md-6 col-lg-4">
-                <div class="er-field">
-                  <label class="form-label" for="correo${indice}">Correo electrónico</label>
+                <div class="d-flex flex-column gap-1">
+                  <label class="form-label small text-secondary mb-0" for="correo${indice}">Correo electrónico</label>
                   <input type="email" class="form-control" id="correo${indice}" maxlength="50"
                          placeholder="usuario@dominio.com" value="${escapeHtml(item.correo)}" required>
                 </div>
               </div>
               <div class="col-12 col-md-6 col-lg-4">
-                <div class="er-field">
-                  <label class="form-label" for="saleDate${indice}">Fecha de venta</label>
+                <div class="d-flex flex-column gap-1">
+                  <label class="form-label small text-secondary mb-0" for="saleDate${indice}">Fecha de venta</label>
                   <input type="text" class="form-control" id="saleDate${indice}" maxlength="8"
                          inputmode="numeric" placeholder="20240101" value="${escapeHtml(item.fecha_venta)}">
                 </div>
               </div>
               <div class="col-12 col-md-6 col-lg-4">
-                <div class="er-field">
-                  <label class="form-label" for="account${indice}">Número de cuenta</label>
+                <div class="d-flex flex-column gap-1">
+                  <label class="form-label small text-secondary mb-0" for="account${indice}">Número de cuenta</label>
                   <input type="text" class="form-control" id="account${indice}" maxlength="20"
                          inputmode="numeric" placeholder="12345678901234567890" value="${escapeHtml(item.cuenta)}">
                 </div>
@@ -354,10 +354,10 @@
             <input type="hidden" id="id_resultado${indice}" value="${escapeHtml(item.id_resultado)}">
             <input type="hidden" id="gestion${indice}" value="${escapeHtml(item.id_gestion)}">
 
-            <div class="er-actions">
-              <a href="?view=configuracion&mode=editarResultado" class="btn btn-outline-secondary">Regresar</a>
-              <button type="button" class="btn btn-success" id="btnGuardar${indice}">Guardar</button>
-              <button type="button" class="btn btn-outline-danger" id="btnEliminar${indice}">Eliminar</button>
+            <div class="d-flex flex-wrap justify-content-end gap-2 border-top pt-3 mt-4">
+              <a href="?view=configuracion&mode=editarResultado" class="btn btn-outline-secondary flex-fill flex-md-grow-0">Regresar</a>
+              <button type="button" class="btn btn-success flex-fill flex-md-grow-0" id="btnGuardar${indice}">Guardar</button>
+              <button type="button" class="btn btn-outline-danger flex-fill flex-md-grow-0" id="btnEliminar${indice}">Eliminar</button>
             </div>
           </div>
         </div>

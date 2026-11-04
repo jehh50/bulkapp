@@ -17,7 +17,6 @@ $controladoresPermitidos = [
   'constructor',
   'csv',
   'dashboard',
-  'editar',
   'empresas',
   'formulario',
   'login',
