@@ -271,7 +271,7 @@ if(!isset($_POST['fecha_d'])){
             <td><?php echo $t['c']; ?></td>
             <td><?php echo $t['nc']; ?></td>
             <td><?php echo $t['v']; ?></td>
-            <td class="ta-left" style="font-weight:500;font-size:13px"><?php echo $t['pc']; ?>% contactados · <?php echo $t['pnc']; ?>% no</td>
+            <td colspan="2" class="ta-left" style="font-weight:500;font-size:13px"><?php echo $t['pc']; ?>% CONTACTO · <?php echo $t['pnc']; ?>% NO CONTACTO</td>
             <td><?php echo $t['pv']; ?>%</td>
           </tr>
         </tfoot>
