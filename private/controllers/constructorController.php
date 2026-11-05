@@ -128,8 +128,38 @@ if (!security_usuario_autenticado()) {
           echo json_encode(array('response' => 'false', 'message' => 'Formulario inválido.'));
           break;
         }
-        $conexion->eliminarFormulario($id);
-        echo json_encode(array('response' => 'true'));
+        $resultado = $conexion->eliminarFormulario($id);
+        if ($resultado === 'activo') {
+          echo json_encode(array('response' => 'false', 'message' => 'Un formulario activo no se puede eliminar: desactívalo primero.'));
+        } elseif ($resultado === 'noExiste') {
+          echo json_encode(array('response' => 'false', 'message' => 'Formulario no encontrado.'));
+        } else {
+          echo json_encode(array('response' => 'true'));
+        }
+        break;
+
+      case 'estado':
+        $id = input_int(isset($_POST['id']) ? $_POST['id'] : null, 1);
+        $statusId = input_enum(
+          isset($_POST['estado']) ? $_POST['estado'] : null,
+          array(Constantes::REGISTRO_INACTIVO, Constantes::REGISTRO_ACTIVO),
+          null
+        );
+        $reasignar = !empty($_POST['reasignar']);
+        header('Content-Type: application/json; charset=UTF-8');
+        if ($id === null || $statusId === null) {
+          echo json_encode(array('response' => 'false', 'message' => 'Datos inválidos.'));
+          break;
+        }
+        $resultado = $conexion->cambiarEstado($id, (int) $statusId, $reasignar);
+        if (!empty($resultado['noExiste'])) {
+          echo json_encode(array('response' => 'false', 'message' => 'Formulario no encontrado.'));
+        } elseif (!$resultado['ok']) {
+          echo json_encode(array('response' => 'conflict', 'conflictos' => $resultado['conflictos']));
+        } else {
+          app_log('info', 'Constructor: cambio de estado', array('formulario_id' => $id, 'status_id' => (int) $statusId, 'user_id' => $userId));
+          echo json_encode(array('response' => 'true'));
+        }
         break;
 
       case 'versionVigente':

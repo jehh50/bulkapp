@@ -47,8 +47,62 @@
 .cns-palette__item:hover { border-color: var(--gold, #f5b83d); background: #fff7e6; }
 .cns-palette__item.ui-draggable-dragging { width: 200px; box-shadow: 0 10px 20px rgba(0, 0, 0, .18); opacity: .95; }
 
+/* ---------- Wizard (pasos) ---------- */
+.cns-steps {
+  display: flex;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  counter-reset: none;
+}
+.cns-step { flex: 1; min-width: 0; }
+.cns-step button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  border: 0;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, .08);
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b7280;
+  text-align: left;
+}
+.cns-step button:disabled { cursor: default; opacity: .65; }
+.cns-step__num {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #eef2fb;
+  color: #27324a;
+  font-size: 13px;
+}
+.cns-step__txt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cns-step.is-done .cns-step__num { background: #e6f4ea; color: #1e7e40; }
+.cns-step.is-active button { color: var(--blue-700, #1a4391); box-shadow: 0 0 0 2px var(--gold, #f5b83d); }
+.cns-step.is-active .cns-step__num { background: var(--blue-700, #1a4391); color: #fff; }
+
+.cns-wizard__panel { display: none; }
+.cns-wizard__panel.is-active { display: block; }
+
 /* ---------- Lienzo ---------- */
 .cns-canvas { min-height: 160px; }
+/* Scroll vertical: el lienzo no estira la página con formularios largos.
+   jQuery UI sortable hace autoscroll dentro de este contenedor al arrastrar. */
+.cns-canvas__scroll {
+  max-height: calc(100vh - 340px);
+  min-height: 260px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 4px;
+}
 .cns-canvas__empty {
   border: 2px dashed #d5dcec;
   border-radius: 12px;

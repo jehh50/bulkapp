@@ -33,12 +33,26 @@
     var previewCampos = {}; // k -> campo, para validar la vista previa
     var analisis = null;    // resultado de cargaAnalizar { headers, muestra, filas_total }
 
+    // Wizard: 1 lienzo → 2 servicio → 3 base de datos. El paso 3 necesita el formulario
+    // guardado (form.id), así que se guarda al salir del paso 2. Cada «save» crea una
+    // versión, por eso solo se guarda si el contenido cambió desde el último guardado.
+    var PASO_LIENZO = 1, PASO_SERVICIO = 2, PASO_BD = 3;
+    var paso = PASO_LIENZO;
+    var pasoMax = PASO_LIENZO;  // último paso alcanzado (habilita volver/avanzar por el indicador)
+    var ultimoGuardado = null;  // payload serializado del último guardado (o del abierto)
+    var trasGuardar = null;     // continuación pendiente tras los modales de conflicto / sin campaña
+    var alReasignar = null;     // qué hacer al aceptar «Reasignar» (guardar o activar desde el listado)
+    var aCambiarEstado = null;  // formulario del listado cuyo estado se va a cambiar
+
     // ---------- Modales / toast ----------
     var eliminarModal = new bootstrap.Modal(document.getElementById('cnsModalEliminar'));
     var conflictoModal = new bootstrap.Modal(document.getElementById('cnsModalConflicto'));
     var previewModal = new bootstrap.Modal(document.getElementById('cnsModalPreview'));
     var expresionesModal = new bootstrap.Modal(document.getElementById('cnsModalExpresiones'));
     var sinCampanaModal = new bootstrap.Modal(document.getElementById('cnsModalSinCampana'));
+    var versionesModal = new bootstrap.Modal(document.getElementById('cnsModalVersiones'));
+    var estadoModal = new bootstrap.Modal(document.getElementById('cnsModalEstado'));
+    var cambioEstadoModal = new bootstrap.Modal(document.getElementById('cnsModalCambioEstado'));
     var toastEl = document.getElementById('cnsToast');
     var toastObj = new bootstrap.Toast(toastEl, { delay: 3000 });
 
@@ -103,8 +117,21 @@
           .on('click', function () { previewServidor(f.id); }));
         $acc.append($('<button class="btn btn-sm btn-outline-primary me-1" title="Editar"><i class="fi fi-rr-edit"></i></button>')
           .on('click', function () { editarForm(f.id); }));
-        $acc.append($('<button class="btn btn-sm btn-outline-danger" title="Eliminar"><i class="fi fi-rr-trash"></i></button>')
-          .on('click', function () { pedirEliminar(f); }));
+        var activo = parseInt(f.status_id, 10) === ACTIVO;
+        // El ícono muestra la acción: pausa para desactivar uno activo, play para activar uno inactivo.
+        $acc.append($('<button class="btn btn-sm me-1">')
+          .append($('<i class="fi">').addClass(activo ? 'fi-rr-pause' : 'fi-rr-play'))
+          .addClass(activo ? 'btn-outline-warning' : 'btn-outline-success')
+          .attr({ title: activo ? 'Desactivar' : 'Activar', 'aria-label': activo ? 'Desactivar' : 'Activar' })
+          .on('click', function () { pedirCambioEstado(f); }));
+        // Un formulario activo no se elimina: primero hay que desactivarlo.
+        $acc.append($('<button class="btn btn-sm btn-outline-danger"><i class="fi fi-rr-trash"></i></button>')
+          .prop('disabled', activo)
+          .attr({
+            title: activo ? 'Desactívalo para poder eliminarlo' : 'Eliminar',
+            'aria-label': activo ? 'Eliminar (desactívalo primero)' : 'Eliminar'
+          })
+          .on('click', function () { if (!activo) { pedirEliminar(f); } }));
         $tr.append($acc);
         $tb.append($tr);
       });
@@ -126,7 +153,8 @@
       abrirEditor(null);
     }
 
-    function editarForm(id) {
+    // pasoInicial: paso en el que abrir (p. ej. al recargar tras «Hacer vigente»).
+    function editarForm(id, pasoInicial) {
       getJSON('detalle', { id: id }).then(function (res) {
         if (res.response !== 'true') { toast(res.message || 'No se pudo cargar.', true); return; }
         var f = res.formulario;
@@ -143,26 +171,101 @@
           bd: res.bd || null
         };
         selected = -1;
-        abrirEditor(f);
+        abrirEditor(f, pasoInicial);
       });
     }
 
-    function abrirEditor(f) {
+    function abrirEditor(f, pasoInicial) {
       $('#cnsId').val(form.id || '');
       $('#cnsNombre').val(form.nombre);
       $('#cnsBtnTexto').val(form.btn_texto);
       $('#cnsEstado').prop('checked', form.status_id === ACTIVO);
       actualizarEstadoLbl();
-      $('#cnsVersion').text(form.id ? ('Versión vigente: ' + (f && f.version ? f.version : '—')) : 'Nuevo');
+      actualizarVersion(f && f.version ? f.version : null);
       mostrarErrores([]);
       renderServicios();
       renderLienzo();
       renderProps();
-      renderHistorial();
-      renderBd();
+      // Un formulario existente ya tiene los 3 pasos disponibles; uno nuevo los recorre en orden.
+      pasoMax = form.id ? PASO_BD : PASO_LIENZO;
+      ultimoGuardado = form.id ? JSON.stringify(payloadGuardar()) : null;
+      irAPaso(pasoInicial || PASO_LIENZO);
       $('#cnsListView').hide();
       $('#cnsEditorView').show();
       window.scrollTo(0, 0);
+    }
+
+    function actualizarVersion(version) {
+      $('#cnsVersion').text(form.id ? ('Versión vigente: ' + (version || '—')) : 'Nuevo');
+      $('#cnsVersiones').toggle(!!form.id);
+    }
+
+    // ---------- Wizard ----------
+    function irAPaso(n) {
+      paso = n;
+      if (paso > pasoMax) { pasoMax = paso; }
+      $('.cns-wizard__panel').each(function () {
+        $(this).toggleClass('is-active', parseInt($(this).attr('data-paso'), 10) === paso);
+      });
+      $('#cnsSteps .cns-step').each(function () {
+        var p = parseInt($(this).attr('data-paso'), 10);
+        $(this).toggleClass('is-active', p === paso).toggleClass('is-done', p < paso);
+        $(this).find('button').prop('disabled', p > pasoMax);
+      });
+      $('#cnsAnterior').toggle(paso > PASO_LIENZO);
+      $('#cnsSiguiente').toggle(paso < PASO_BD);
+      $('#cnsFinalizar').toggle(paso === PASO_BD);
+      if (paso === PASO_BD) { renderBd(); }
+    }
+
+    // Validación del paso 1 (nombre + campos). Devuelve true si se puede avanzar.
+    function validarLienzo() {
+      leerCabecera();
+      var errs = [];
+      if (!form.nombre) { errs.push('El nombre del formulario es obligatorio.'); }
+      errs = errs.concat(validarDefinicionCliente(form.campos));
+      mostrarErrores(errs);
+      return !errs.length;
+    }
+
+    function siguiente() {
+      if (paso === PASO_LIENZO) {
+        if (validarLienzo()) { irAPaso(PASO_SERVICIO); }
+        return;
+      }
+      if (paso === PASO_SERVICIO) {
+        // Guarda (si cambió) y entra al paso de la BD, que necesita form.id.
+        guardar({ despues: function () { irAPaso(PASO_BD); } });
+      }
+    }
+
+    function anterior() {
+      if (paso > PASO_LIENZO) { mostrarErrores([]); irAPaso(paso - 1); }
+    }
+
+    // Saltar por el indicador: hacia atrás siempre; hacia adelante solo a pasos ya
+    // alcanzados, y salir del lienzo exige que sea válido.
+    function saltarAPaso(n) {
+      if (n === paso || n > pasoMax) { return; }
+      if (paso === PASO_LIENZO && !validarLienzo()) { return; }
+      mostrarErrores([]);
+      irAPaso(n);
+    }
+
+    // Finalizar pregunta siempre por el estado: el switch de la cabecera pasa desapercibido.
+    function finalizar() {
+      if (!validarLienzo()) { irAPaso(PASO_LIENZO); return; }
+      $('#cnsEstadoActual').text(form.status_id === ACTIVO ? 'Activo' : 'Inactivo');
+      $('#cnsEstadoSinCampana').toggle(!form.servicios.length);
+      estadoModal.show();
+    }
+
+    function finalizarConEstado(activo) {
+      estadoModal.hide();
+      $('#cnsEstado').prop('checked', activo);
+      actualizarEstadoLbl();
+      // El aviso «sin campaña» ya se mostró dentro del modal de estado.
+      guardar({ sinCampanaOk: true, despues: function () { refrescarLista(volverListado); } });
     }
 
     function volverListado() {
@@ -462,7 +565,13 @@
 
     function hacerVigente(versionId) {
       postJSON('versionVigente', { id: form.id, version_id: versionId }).then(function (res) {
-        if (res.response === 'true') { toast('Versión marcada como vigente.'); renderHistorial(); refrescarLista(); }
+        if (res.response === 'true') {
+          toast('Versión marcada como vigente.');
+          versionesModal.hide();
+          refrescarLista();
+          // El editor pasa a mostrar la definición de la versión vigente, en el mismo paso.
+          editarForm(form.id, paso);
+        }
         else { toast(res.message || 'No se pudo.', true); }
       });
     }
@@ -655,35 +764,57 @@
       return o;
     }
 
-    // sinCampanaOk: el usuario ya confirmó guardar sin campaña en el modal informativo.
-    function guardar(reasignar, sinCampanaOk) {
+    function leerCabecera() {
       form.nombre = $('#cnsNombre').val().trim();
       form.btn_texto = $('#cnsBtnTexto').val().trim() || 'Guardar';
       form.status_id = $('#cnsEstado').is(':checked') ? ACTIVO : INACTIVO;
+    }
 
-      var errs = [];
-      if (!form.nombre) { errs.push('El nombre del formulario es obligatorio.'); }
-      errs = errs.concat(validarDefinicionCliente(form.campos));
-      if (errs.length) { mostrarErrores(errs); return; }
-      mostrarErrores([]);
-
-      if (!form.servicios.length && !sinCampanaOk) { sinCampanaModal.show(); return; }
-
-      var limpio = form.campos.map(limpiarCampo);
-      postJSON('save', {
+    // Datos que se envían a «save» (sin el flag de reasignación). Se usa también como
+    // huella para saber si hubo cambios desde el último guardado.
+    function payloadGuardar() {
+      leerCabecera();
+      return {
         id: form.id || '',
         nombre: form.nombre,
         estado: form.status_id,
         btn_texto: form.btn_texto,
-        definicion: JSON.stringify({ campos: limpio }),
-        servicios: form.servicios,
-        reasignar: reasignar ? '1' : ''
-      }).then(function (res) {
+        definicion: JSON.stringify({ campos: form.campos.map(limpiarCampo) }),
+        servicios: form.servicios.slice().sort(function (a, b) { return a - b; })
+      };
+    }
+
+    // opts.despues:     qué hacer tras guardar (o si no había cambios).
+    // opts.reasignar:   el usuario aceptó reasignar servicios ocupados.
+    // opts.sinCampanaOk: el usuario ya confirmó seguir sin campaña.
+    function guardar(opts) {
+      opts = opts || {};
+      var despues = opts.despues || function () {};
+
+      if (!validarLienzo()) { irAPaso(PASO_LIENZO); return; }
+
+      var datos = payloadGuardar();
+      if (form.id && JSON.stringify(datos) === ultimoGuardado) { despues(); return; }  // sin cambios: no crea versión
+
+      if (!form.servicios.length && !opts.sinCampanaOk) {
+        trasGuardar = $.extend({}, opts);
+        sinCampanaModal.show();
+        return;
+      }
+
+      datos.reasignar = opts.reasignar ? '1' : '';
+      postJSON('save', datos).then(function (res) {
         if (res.response === 'true') {
           form.id = res.id;
+          $('#cnsId').val(form.id);
+          // La huella se recalcula con el id ya asignado (en un alta era '').
+          ultimoGuardado = JSON.stringify(payloadGuardar());
+          actualizarVersion(res.version);
           toast('Formulario guardado (v' + res.version + ').');
-          refrescarLista(volverListado);
+          despues();
         } else if (res.response === 'conflict') {
+          trasGuardar = $.extend({}, opts, { sinCampanaOk: true });
+          alReasignar = function () { guardar($.extend({}, trasGuardar, { reasignar: true })); };
           mostrarConflicto(res.conflictos || []);
         } else {
           mostrarErrores((res.errores && res.errores.length) ? res.errores : [res.message || 'No se pudo guardar.']);
@@ -691,10 +822,42 @@
       });
     }
 
-    function mostrarConflicto(conf) {
+    // textoBoton: el modal se comparte entre guardar (wizard) y activar (listado).
+    function mostrarConflicto(conf, textoBoton) {
+      $('#cnsReasignar').text(textoBoton || 'Reasignar y guardar');
       var $l = $('#cnsConflictoLista').empty();
       conf.forEach(function (c) { $l.append($('<li>').html(esc(c.servicio) + ' — ocupado por «' + esc(c.formulario) + '»')); });
       conflictoModal.show();
+    }
+
+    // ---------- Cambio de estado desde el listado (no crea versión) ----------
+    function pedirCambioEstado(f) {
+      var activar = parseInt(f.status_id, 10) !== ACTIVO;
+      aCambiarEstado = f;
+      $('#cnsCambioEstadoTitulo').text(activar ? 'Activar formulario' : 'Desactivar formulario');
+      $('#cnsCambioEstadoTexto').html((activar ? '¿Activar' : '¿Desactivar') + ' <strong>' + esc(f.nombre) + '</strong>?');
+      $('#cnsCambioEstadoDetalle').text(activar
+        ? 'Los operadores de las campañas asignadas lo verán y lo usarán de inmediato.'
+        : 'Los operadores dejarán de verlo de inmediato. Sus datos e historial se conservan.');
+      $('#cnsCambioEstadoSinCampana').toggle(activar && !(f.servicios || []).length);
+      $('#cnsCambioEstadoConfirmar').text(activar ? 'Activar' : 'Desactivar')
+        .toggleClass('btn-primary', activar).toggleClass('btn-warning', !activar);
+      cambioEstadoModal.show();
+    }
+
+    function cambiarEstado(f, reasignar) {
+      var activar = parseInt(f.status_id, 10) !== ACTIVO;
+      postJSON('estado', { id: f.id, estado: activar ? ACTIVO : INACTIVO, reasignar: reasignar ? '1' : '' }).then(function (res) {
+        if (res.response === 'true') {
+          toast(activar ? 'Formulario activado.' : 'Formulario desactivado.');
+          refrescarLista();
+        } else if (res.response === 'conflict') {
+          alReasignar = function () { cambiarEstado(f, true); };
+          mostrarConflicto(res.conflictos || [], 'Reasignar y activar');
+        } else {
+          toast(res.message || 'No se pudo cambiar el estado.', true);
+        }
+      });
     }
 
     // ---------- Eliminar ----------
@@ -760,16 +923,34 @@
     // ---------- Eventos ----------
     $('#cnsNuevo').on('click', nuevoForm);
     $('#cnsVolver').on('click', volverListado);
-    $('#cnsGuardar').on('click', function () { guardar(false); });
+    $('#cnsSiguiente').on('click', siguiente);
+    $('#cnsAnterior').on('click', anterior);
+    $('#cnsFinalizar').on('click', finalizar);
+    $('#cnsFinalizarActivo').on('click', function () { finalizarConEstado(true); });
+    $('#cnsFinalizarInactivo').on('click', function () { finalizarConEstado(false); });
+    $('#cnsSteps').on('click', '.cns-step button', function () {
+      saltarAPaso(parseInt($(this).closest('.cns-step').attr('data-paso'), 10));
+    });
+    $('#cnsVersiones').on('click', function () { renderHistorial(); versionesModal.show(); });
     $('#cnsPreview').on('click', previewEditor);
     $('#cnsPreviewValidar').on('click', validarValores);
     $('#cnsAnalizar').on('click', analizarArchivo);
     $('#cnsConfirmarCarga').on('click', confirmarCarga);
-    $('#cnsReasignar').on('click', function () { conflictoModal.hide(); guardar(true, true); });
-    $('#cnsSinCampanaGuardar').on('click', function () { sinCampanaModal.hide(); guardar(false, true); });
+    $('#cnsReasignar').on('click', function () {
+      conflictoModal.hide();
+      if (alReasignar) { alReasignar(); }
+    });
+    $('#cnsCambioEstadoConfirmar').on('click', function () {
+      cambioEstadoModal.hide();
+      if (aCambiarEstado) { cambiarEstado(aCambiarEstado, false); }
+    });
+    $('#cnsSinCampanaGuardar').on('click', function () {
+      sinCampanaModal.hide();
+      guardar($.extend({}, trasGuardar, { sinCampanaOk: true }));
+    });
     $('#cnsSinCampanaAsignar').on('click', function () {
       sinCampanaModal.hide();
-      bootstrap.Tab.getOrCreateInstance(document.querySelector('[data-bs-target="#tabServicios"]')).show();
+      irAPaso(PASO_SERVICIO);
     });
     $('#cnsConfirmarEliminar').on('click', function () {
       if (!aEliminar) { return; }

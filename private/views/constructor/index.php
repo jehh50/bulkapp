@@ -76,21 +76,24 @@
         </div>
       </div>
       <div class="col-lg-2 text-lg-end">
-        <span class="text-muted" id="cnsVersion"></span>
+        <div class="text-muted small" id="cnsVersion"></div>
+        <button type="button" class="btn btn-sm btn-outline-primary mt-1" id="cnsVersiones" style="display:none">
+          <i class="fi fi-rr-time-past"></i> Versiones
+        </button>
       </div>
     </div>
   </div>
 
-  <ul class="nav nav-tabs mb-3" id="cnsTabs" role="tablist">
-    <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabCampos" type="button">Campos</button></li>
-    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabServicios" type="button">Servicios</button></li>
-    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabBd" type="button">Base de datos</button></li>
-    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabHist" type="button">Historial</button></li>
-  </ul>
+  <!-- Wizard: 1 lienzo → 2 servicio → 3 base de datos (ahí se muestra «Finalizar»). -->
+  <ol class="cns-steps mb-3" id="cnsSteps">
+    <li class="cns-step" data-paso="1"><button type="button"><span class="cns-step__num">1</span><span class="cns-step__txt">Lienzo</span></button></li>
+    <li class="cns-step" data-paso="2"><button type="button"><span class="cns-step__num">2</span><span class="cns-step__txt">Servicio</span></button></li>
+    <li class="cns-step" data-paso="3"><button type="button"><span class="cns-step__num">3</span><span class="cns-step__txt">Base de datos</span></button></li>
+  </ol>
 
-  <div class="tab-content">
-    <!-- Campos -->
-    <div class="tab-pane fade show active" id="tabCampos">
+  <div class="cns-wizard">
+    <!-- Paso 1: Campos (lienzo) -->
+    <div class="cns-wizard__panel" id="tabCampos" data-paso="1">
       <div class="cns-editor__grid">
         <div class="cns-col">
           <div class="cns-col__title">Paleta</div>
@@ -99,8 +102,10 @@
         </div>
         <div class="cns-col">
           <div class="cns-col__title">Lienzo</div>
-          <ul id="cnsLienzo" class="cns-canvas" style="padding:0;margin:0"></ul>
-          <div id="cnsLienzoEmpty" class="cns-canvas__empty">Sin campos todavía. Agrega desde la paleta.</div>
+          <div class="cns-canvas__scroll" id="cnsLienzoScroll">
+            <ul id="cnsLienzo" class="cns-canvas" style="padding:0;margin:0"></ul>
+            <div id="cnsLienzoEmpty" class="cns-canvas__empty">Sin campos todavía. Agrega desde la paleta.</div>
+          </div>
         </div>
         <div class="cns-col">
           <div class="cns-col__title">Propiedades</div>
@@ -109,8 +114,8 @@
       </div>
     </div>
 
-    <!-- Servicios -->
-    <div class="tab-pane fade" id="tabServicios">
+    <!-- Paso 2: Servicio -->
+    <div class="cns-wizard__panel" id="tabServicios" data-paso="2">
       <div class="cns-col">
         <div class="cns-col__title">Servicios asignados</div>
         <p class="text-muted" style="font-size:13px">Regla: un solo formulario <strong>activo</strong> por servicio. Solo servicios no bancarios: los de banca conservan su formulario fijo.</p>
@@ -118,8 +123,8 @@
       </div>
     </div>
 
-    <!-- Base de datos -->
-    <div class="tab-pane fade" id="tabBd">
+    <!-- Paso 3: Base de datos (el formulario ya se guardó al salir del paso 2) -->
+    <div class="cns-wizard__panel" id="tabBd" data-paso="3">
       <div class="cns-col">
         <div class="cns-col__title">Base de datos del formulario</div>
         <div id="cnsBdAviso" class="text-muted" style="display:none">Guarda el formulario primero para poder cargar su base de datos.</div>
@@ -164,32 +169,96 @@
       </div>
     </div>
 
-    <!-- Historial -->
-    <div class="tab-pane fade" id="tabHist">
-      <div class="cns-col">
-        <div class="cns-col__title">Historial de versiones</div>
-        <div id="cnsHistorial"><p class="text-muted mb-0">Guarda el formulario para ver su historial.</p></div>
-      </div>
-    </div>
   </div>
 
   <ul id="cnsErrores" class="cns-errors mt-3" style="display:none"></ul>
 
-  <div class="d-flex justify-content-between mt-3 mb-5">
+  <div class="d-flex flex-wrap justify-content-between gap-2 mt-3 mb-5">
     <button type="button" class="btn btn-outline-primary" id="cnsVolver">Volver al listado</button>
-    <div class="d-flex gap-2">
+    <div class="d-flex flex-wrap gap-2">
       <button type="button" class="btn btn-outline-primary" id="cnsPreview">Vista previa</button>
-      <button type="button" class="btn btn-primary" id="cnsGuardar">Guardar formulario</button>
+      <button type="button" class="btn btn-outline-primary" id="cnsAnterior">
+        <i class="fi fi-rr-angle-small-left"></i> Anterior
+      </button>
+      <button type="button" class="btn btn-primary" id="cnsSiguiente">
+        Siguiente <i class="fi fi-rr-angle-small-right"></i>
+      </button>
+      <button type="button" class="btn btn-primary" id="cnsFinalizar" style="display:none">Finalizar</button>
     </div>
   </div>
 </section>
 
 <!-- ===================== MODALES ===================== -->
+<!-- Al finalizar el wizard: confirmar el estado (el switch de la cabecera pasa desapercibido). -->
+<div class="modal fade" id="cnsModalEstado" tabindex="-1" aria-labelledby="cnsEstadoTitulo" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cnsEstadoTitulo">¿Dejar el formulario activo?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <p>Estado actual: <strong id="cnsEstadoActual"></strong>.</p>
+        <ul class="small text-muted mb-0">
+          <li><strong>Activo:</strong> los operadores de las campañas asignadas lo ven y lo usan de inmediato.</li>
+          <li><strong>Inactivo:</strong> queda guardado, pero nadie lo ve hasta que lo actives.</li>
+        </ul>
+        <div class="alert alert-warning small mt-3 mb-0" id="cnsEstadoSinCampana" style="display:none">
+          No tiene campañas asignadas: aunque quede activo, ningún operador lo verá.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-primary" id="cnsFinalizarInactivo">Dejar inactivo</button>
+        <button type="button" class="btn btn-primary" id="cnsFinalizarActivo">Dejar activo</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="cnsModalCambioEstado" tabindex="-1" aria-labelledby="cnsCambioEstadoTitulo" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cnsCambioEstadoTitulo">Cambiar estado</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <p id="cnsCambioEstadoTexto" class="mb-2"></p>
+        <p id="cnsCambioEstadoDetalle" class="small text-muted mb-0"></p>
+        <div class="alert alert-warning small mt-3 mb-0" id="cnsCambioEstadoSinCampana" style="display:none">
+          No tiene campañas asignadas: aunque quede activo, ningún operador lo verá.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="cnsCambioEstadoConfirmar">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="cnsModalVersiones" tabindex="-1" aria-labelledby="cnsVersionesTitulo" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cnsVersionesTitulo">Historial de versiones</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <div id="cnsHistorial"><p class="text-muted mb-0">Guarda el formulario para ver su historial.</p></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal fade" id="cnsModalEliminar" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header"><h5 class="modal-title">Eliminar formulario</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-      <div class="modal-body">¿Eliminar <strong id="cnsEliminarNombre"></strong>? Es un borrado lógico: se conservan datos e historial para reportería.</div>
+      <div class="modal-body">¿Eliminar <strong id="cnsEliminarNombre"></strong>? Los datos del formulario e historial se conservan para reportería.</div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancelar</button>
         <button type="button" class="btn btn-danger" id="cnsConfirmarEliminar">Eliminar</button>
@@ -280,10 +349,10 @@
       </div>
       <div class="modal-body">
         <p>No seleccionaste ninguna campaña para este formulario.</p>
-        <p class="mb-0 text-muted small">Puedes guardarlo así, pero ningún operador lo verá hasta que lo asignes a una campaña en la pestaña <strong>Servicios</strong>.</p>
+        <p class="mb-0 text-muted small">Puedes guardarlo así, pero ningún operador lo verá hasta que lo asignes a una campaña en el paso <strong>2 · Servicio</strong>.</p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-outline-primary" id="cnsSinCampanaGuardar">Guardar sin campaña</button>
+        <button type="button" class="btn btn-outline-primary" id="cnsSinCampanaGuardar">Continuar sin campaña</button>
         <button type="button" class="btn btn-primary" id="cnsSinCampanaAsignar">Asignar campaña</button>
       </div>
     </div>

@@ -259,20 +259,98 @@ class database
   }
 
   /**
-   * Borrado lógico: conserva datos, BD e historial para reportería.
+   * Cambia solo el estado (activo/inactivo) sin crear versión: el estado vive en
+   * `formularios`, no en la definición versionada. Al activar aplica la regla
+   * 1-activo-por-servicio igual que guardarFormulario().
    *
    * @param int $id
-   * @return bool
+   * @param int $statusId Constantes::REGISTRO_ACTIVO | REGISTRO_INACTIVO
+   * @param bool $reasignar Si true, libera los servicios en conflicto de otros formularios.
+   * @return array ['ok'=>true] | ['ok'=>false,'conflictos'=>[...]] | ['ok'=>false,'noExiste'=>true]
+   */
+  public function cambiarEstado($id, $statusId, $reasignar = false)
+  {
+    $id = (int) $id;
+    $statusId = (int) $statusId;
+
+    $existe = $this->db->selectQuery(
+      "SELECT id FROM formularios WHERE id = ? AND eliminado = 0",
+      array($id),
+      'i'
+    );
+    if (empty($existe)) {
+      return array('ok' => false, 'noExiste' => true);
+    }
+
+    $servicios = array();
+    if ($statusId === Constantes::REGISTRO_ACTIVO) {
+      $filas = $this->db->selectQuery(
+        "SELECT servicio_id FROM formulario_servicios WHERE formulario_id = ?",
+        array($id),
+        'i'
+      );
+      $servicios = array_map('intval', array_column($filas, 'servicio_id'));
+      $conflictos = $this->conflictosDeServicios($id, $servicios);
+      if (!empty($conflictos) && !$reasignar) {
+        return array('ok' => false, 'conflictos' => $conflictos);
+      }
+    }
+
+    $this->db->begin_transaction();
+    try {
+      if ($reasignar && !empty($servicios)) {
+        $marcadores = implode(',', array_fill(0, count($servicios), '?'));
+        $params = $servicios;
+        $params[] = $id;
+        $this->db->preparedQuery(
+          "DELETE FROM formulario_servicios WHERE servicio_id IN ($marcadores) AND formulario_id <> ?",
+          $params,
+          str_repeat('i', count($servicios)) . 'i'
+        );
+      }
+      $this->db->preparedQuery(
+        "UPDATE formularios SET status_id = ? WHERE id = ?",
+        array($statusId, $id),
+        'ii'
+      );
+      $this->db->commit();
+    } catch (Throwable $e) {
+      $this->db->rollback();
+      throw $e;
+    }
+
+    return array('ok' => true);
+  }
+
+  /**
+   * Borrado lógico: conserva datos, BD e historial para reportería.
+   * Solo se eliminan formularios INACTIVOS: uno activo hay que desactivarlo antes.
+   *
+   * @param int $id
+   * @return string 'ok' | 'activo' | 'noExiste'
    */
   public function eliminarFormulario($id)
   {
+    $fila = $this->db->selectQuery(
+      "SELECT status_id FROM formularios WHERE id = ? AND eliminado = 0",
+      array((int) $id),
+      'i'
+    );
+    if (empty($fila)) {
+      return 'noExiste';
+    }
+    if ((int) $fila[0]['status_id'] === Constantes::REGISTRO_ACTIVO) {
+      return 'activo';
+    }
+
+    // La condición de estado se repite en el UPDATE por si se activó entre ambas consultas.
     $this->db->preparedQuery(
-      "UPDATE formularios SET eliminado = 1, eliminado_en = NOW(), status_id = ? WHERE id = ?",
-      array(Constantes::REGISTRO_INACTIVO, (int) $id),
+      "UPDATE formularios SET eliminado = 1, eliminado_en = NOW() WHERE id = ? AND status_id = ?",
+      array((int) $id, Constantes::REGISTRO_INACTIVO),
       'ii'
     );
 
-    return true;
+    return 'ok';
   }
 
   /**
