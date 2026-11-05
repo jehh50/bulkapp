@@ -1,0 +1,9 @@
+# private/ nunca se sirve por HTTP: controladores, vistas, config, migraciones y logs se
+# usan solo vía include desde index.php. La página 404 la incluye app_responder_no_encontrado().
+<IfModule mod_authz_core.c>
+  Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+  Order allow,deny
+  Deny from all
+</IfModule>

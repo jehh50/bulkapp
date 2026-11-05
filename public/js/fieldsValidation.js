@@ -1,7 +1,3 @@
-$(function () {
-    $('[data-toggle="tooltip"]').tooltip()
-})
-
 function onlyLetters(e) {
     // Convertir el texto a mayúsculas y permitir solo letras y números
     e.value = e.value
@@ -150,6 +146,8 @@ function validateForm() {
             return false;
         }
 
+        let campoGenero = document.getElementById('genero');
+        let genero = campoGenero ? campoGenero.value : '';
         if (genero == '') {
             alert("Debe seleccionar el género");
             return false;
@@ -246,110 +244,4 @@ function validateForm() {
         return true;
     }
 
-}
-
-function validateFormCashea() {
-    console.log('Comienza la validación del segundo formulario...');
-
-    // Obtener valores de los campos
-    const amountField = document.getElementById('amount');
-    const dAmount = document.getElementById('dAmount'); // Contenedor de Monto a abonar
-
-    // Si la sección de pago no está visible (no hay compromiso), la validación de compromiso no aplica.
-    const dPaymentDate = document.getElementById('dPaymentDate');
-    if (dPaymentDate.style.display === 'none') {
-        console.log('La sección de Fecha de compromiso no está visible, no se realizarán validaciones de compromiso.');
-        return true;
-    }
-
-    console.log('Valor de contacto: ' + $('#contacto').val());
-    console.log('Valor de noefectivo: ' + $('#noefectivo').val());
-
-    // 1. Validación de monto (solo si el campo está visible, lo que implica paymentPlan=3)
-    // dAmount está visible cuando el plan de pago es "Pago personalizado"
-    if (dAmount.style.display !== 'none') {
-        let amount = amountField.value;
-        if (amount === "" || isNaN(amount) || parseFloat(amount) <= 0) {
-            alert("⚠️ El campo 'Monto a abonar' es obligatorio para el plan de pago seleccionado y debe ser mayor a cero.");
-            amountField.focus();
-            return false;
-        }
-    }
-
-    // 2. Validación de Fecha de compromiso (paymentDate)
-
-    // Usamos querySelectorAll con el atributo NAME, que agrupa todos los radio buttons.
-    const paymentDateRadios = document.querySelectorAll('input[name="paymentDate"]');
-    let isPaymentDateSelected = false;
-
-    // Recorre los radio buttons para ver si alguno está marcado
-    for (const radio of paymentDateRadios) {
-        if (radio.checked) {
-            isPaymentDateSelected = true;
-            break;
-        }
-    }
-
-    // Si no se seleccionó ninguna fecha, mostramos la alerta y evitamos el envío
-    if (!isPaymentDateSelected) {
-        alert("⚠️ El campo 'Fecha de compromiso' es obligatorio. Por favor, selecciona una fecha.");
-        return false; // Evita el envío del formulario
-    }
-
-    // Si todas las validaciones pasan, permite el envío del formulario
-    console.log('Validación del formulario 2 exitosa.');
-    return true;
-}
-
-function validateForm2() {
-    console.log('Comienza la validación del segundo formulario...');
-
-    // Obtener valores de los campos
-    const amountField = document.getElementById('amount');
-    const dAmount = document.getElementById('dAmount'); // Contenedor de Monto a abonar
-
-    // Si la sección de pago no está visible (no hay compromiso), la validación de compromiso no aplica.
-    const dPaymentDate = document.getElementById('dPaymentDate');
-    if (dPaymentDate.style.display === 'none') {
-        console.log('La sección de Fecha de compromiso no está visible, no se realizarán validaciones de compromiso.');
-        return true;
-    }
-
-    console.log('Valor de contacto: ' + $('#contacto').val());
-    console.log('Valor de noefectivo: ' + $('#noefectivo').val());
-
-    // 1. Validación de monto (solo si el campo está visible, lo que implica paymentPlan=3)
-    // dAmount está visible cuando el plan de pago es "Pago personalizado"
-    if (dAmount.style.display !== 'none') {
-        let amount = amountField.value;
-        if (amount === "" || isNaN(amount) || parseFloat(amount) <= 0) {
-            alert("⚠️ El campo 'Monto a abonar' es obligatorio para el plan de pago seleccionado y debe ser mayor a cero.");
-            amountField.focus();
-            return false;
-        }
-    }
-
-    // 2. Validación de Fecha de compromiso (paymentDate)
-
-    // Usamos querySelectorAll con el atributo NAME, que agrupa todos los radio buttons.
-    const paymentDateRadios = document.querySelectorAll('input[name="paymentDate"]');
-    let isPaymentDateSelected = false;
-
-    // Recorre los radio buttons para ver si alguno está marcado
-    for (const radio of paymentDateRadios) {
-        if (radio.checked) {
-            isPaymentDateSelected = true;
-            break;
-        }
-    }
-
-    // Si no se seleccionó ninguna fecha, mostramos la alerta y evitamos el envío
-    if (!isPaymentDateSelected) {
-        alert("⚠️ El campo 'Fecha de compromiso' es obligatorio. Por favor, selecciona una fecha.");
-        return false; // Evita el envío del formulario
-    }
-
-    // Si todas las validaciones pasan, permite el envío del formulario
-    console.log('Validación del formulario 2 exitosa.');
-    return true;
 }

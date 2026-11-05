@@ -1,0 +1,35 @@
+/* Botones de acción de la app (cargado por nheader.php y header.php).
+ * - Guardar / enviar / confirmar: .btn-primary  → azul de marca, texto blanco.
+ * - Regresar / volver / cancelar: .btn-outline-primary → fondo blanco, borde y texto azul.
+ * Los colores salen de las variables del layout nuevo, con respaldo para el legacy. */
+.btn-primary {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--blue-700, #1a4391);
+  --bs-btn-border-color: var(--blue-700, #1a4391);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--blue-900, #12306b);
+  --bs-btn-hover-border-color: var(--blue-900, #12306b);
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--blue-900, #12306b);
+  --bs-btn-active-border-color: var(--blue-900, #12306b);
+  --bs-btn-disabled-color: #fff;
+  --bs-btn-disabled-bg: var(--blue-700, #1a4391);
+  --bs-btn-disabled-border-color: var(--blue-700, #1a4391);
+  --bs-btn-focus-shadow-rgb: 26, 67, 145;
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--blue-700, #1a4391);
+  --bs-btn-bg: #fff;
+  --bs-btn-border-color: var(--blue-700, #1a4391);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--blue-700, #1a4391);
+  --bs-btn-hover-border-color: var(--blue-700, #1a4391);
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--blue-900, #12306b);
+  --bs-btn-active-border-color: var(--blue-900, #12306b);
+  --bs-btn-disabled-color: var(--blue-700, #1a4391);
+  --bs-btn-disabled-bg: #fff;
+  --bs-btn-disabled-border-color: var(--blue-700, #1a4391);
+  --bs-btn-focus-shadow-rgb: 26, 67, 145;
+}

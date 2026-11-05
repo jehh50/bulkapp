@@ -1,13 +1,48 @@
 <?php
-require('private/config/core.php');
-#session_destroy();
+require __DIR__ . '/private/config/core.php';
 
-if(isset($_GET['view'])) {
-  if(file_exists('private/controllers/' . strtolower($_GET['view']) . 'Controller.php')) {
-    include('private/controllers/' . strtolower($_GET['view']) . 'Controller.php');
-	}
+security_session_start();
+
+header_remove('X-Powered-By');
+header('X-Content-Type-Options: nosniff');
+header('X-Frame-Options: SAMEORIGIN');
+header('Referrer-Policy: same-origin');
+header('X-Request-Id: ' . app_request_id());
+
+// Lista blanca de módulos. Solo estos controladores pueden incluirse.
+$controladoresPermitidos = [
+  'captura',
+  'carga_archivo',
+  'configuracion',
+  'constructor',
+  'csv',
+  'dashboard',
+  'empresas',
+  'formulario',
+  'login',
+  'reportes',
+  'session',
+  'usuarios',
+  'xml',
+];
+
+$vista = isset($_GET['view']) ? strtolower(trim((string) $_GET['view'])) : '';
+
+if ($vista === '') {
+  include __DIR__ . '/private/controllers/sessionController.php';
+  exit;
 }
-  else{
-  	include('private/controllers/sessionController.php');
-  }
-?>
+
+if (!preg_match('/^[a-z0-9_]+$/', $vista) || !in_array($vista, $controladoresPermitidos, true)) {
+  app_responder_no_encontrado();
+}
+
+$controlador = __DIR__ . '/private/controllers/' . $vista . 'Controller.php';
+
+if (!is_file($controlador)) {
+  app_responder_no_encontrado();
+}
+
+security_require_csrf();
+
+include $controlador;

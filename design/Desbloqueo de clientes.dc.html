@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#f4f6fa;font-family:Poppins,system-ui,sans-serif;color:#252525}a{color:#1a4391}a:hover{color:#12306b}</style>
+</helmet>
+<nav style="background:#12306b;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 {{ padX }}px;position:relative;z-index:10">
+  <a href="Dashboard.dc.html" style="display:flex;align-items:center;gap:10px;color:#fff;font-weight:700;font-size:18px;text-decoration:none"><span style="width:28px;height:28px;border-radius:8px;background:#f5b83d;color:#12306b;display:flex;align-items:center;justify-content:center;font-size:15px">B</span>Bulksales</a>
+  <button onClick="{{ toggleMenu }}" aria-label="Menú" style="display:{{ toggleDisplay }};width:44px;height:44px;border:1px solid #2d57a8;border-radius:10px;background:transparent;cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:0">
+    <span style="width:20px;height:2px;background:#fff;border-radius:1px;transform:{{ bar1 }};transition:transform .2s"></span>
+    <span style="width:20px;height:2px;background:#fff;border-radius:1px;opacity:{{ bar2 }};transition:opacity .2s"></span>
+    <span style="width:20px;height:2px;background:#fff;border-radius:1px;transform:{{ bar3 }};transition:transform .2s"></span>
+  </button>
+  <div style="display:{{ linksDisplay }};flex-direction:{{ linksDir }};gap:{{ linksGap }}px;font-size:14px;color:#c9d6f0;align-items:stretch;height:{{ linksH }};position:{{ linksPos }};top:56px;left:0;right:0;background:#12306b;padding:{{ linksPad }};box-shadow:{{ linksShadow }}">
+    <a href="Dashboard.dc.html" style="display:flex;align-items:center;padding:{{ itemPad }};text-decoration:none;color:inherit;">Dashboard</a>
+    <span style="display:flex;align-items:center;padding:{{ itemPad }}">Formulario</span>
+    <span style="display:flex;align-items:center;padding:{{ itemPad }}">Configuración ▾</span>
+    <div style="position:{{ repWrapPos }};display:flex;flex-direction:column;align-items:stretch">
+      <div onClick="{{ repToggle }}" style="display:flex;align-items:center;justify-content:space-between;gap:6px;padding:{{ itemPad }};color:#fff;cursor:pointer;height:{{ repRowH }};box-shadow:{{ activeShadow }}">Reportes <span style="font-size:11px">▾</span></div>
+      <div style="display:{{ repDisplay }};position:{{ repPanelPos }};top:56px;left:0;min-width:240px;background:{{ repBg }};color:{{ repColor }};border-radius:0 0 12px 12px;box-shadow:{{ repShadow }};padding:6px;flex-direction:column;gap:2px">
+        <a href="Resumen de gestion.dc.html" style="display:block;text-decoration:none;color:inherit;padding:10px 14px;border-radius:8px;font-weight:400" style-hover="background:rgba(245,184,61,.25)">Acumulado de gestión</a>
+        <a href="Detalle de ventas.dc.html" style="display:block;text-decoration:none;color:inherit;padding:10px 14px;border-radius:8px;font-weight:400" style-hover="background:rgba(245,184,61,.25)">Detalle de ventas</a>
+        <a href="Listado de ventas.dc.html" style="display:block;text-decoration:none;color:inherit;padding:10px 14px;border-radius:8px;font-weight:400" style-hover="background:rgba(245,184,61,.25)">Listado de ventas</a>
+        <a href="Desbloqueo de clientes.dc.html" style="display:block;text-decoration:none;color:inherit;padding:10px 14px;border-radius:8px;background:rgba(245,184,61,.22);font-weight:600" style-hover="background:rgba(245,184,61,.25)">Desbloqueo de cliente</a>
+      </div>
+    </div>
+    <span style="display:flex;align-items:center;padding:{{ itemPad }};color:#fff;font-weight:500">javier ▾</span>
+  </div>
+</nav>
+<header style="background:#1a4391;padding:{{ heroPad }};color:#fff">
+  <div style="max-width:620px;margin:0 auto">
+    <div style="font-size:13px;color:#c9d6f0;margin-bottom:6px">Configuración / Desbloqueo de clientes</div>
+    <h1 style="margin:0;font-size:{{ h1Size }}px;font-weight:600;line-height:1.2">Desbloqueo de clientes</h1>
+    <div style="font-size:14px;color:#c9d6f0;margin-top:6px">Libera a un cliente que ya posee una venta para que pueda volver a ser gestionado.</div>
+  </div>
+</header>
+<main style="max-width:620px;margin:-48px auto 40px;padding:0 {{ mainPad }}px">
+  <form onSubmit="{{ submit }}" style="background:#fff;border-radius:16px;box-shadow:0 8px 24px rgba(18,48,107,.12);padding:{{ cardPad }}">
+    <label style="display:flex;flex-direction:column;gap:8px;font-size:14px;font-weight:600">Introduzca el número de cédula del cliente a liberar
+      <input value="{{ cedula }}" onChange="{{ setCedula }}" inputmode="numeric" placeholder="Ej. 16136850" style="height:46px;border:1px solid #d1d5db;border-radius:10px;padding:0 14px;font:inherit;font-size:15px;font-weight:400;color:#252525" style-focus="border-color:#1a4391;outline:2px solid #c9d6f0">
+    </label>
+    <button type="submit" style="margin-top:14px;width:100%;height:46px;border:0;border-radius:10px;background:#1a4391;color:#fff;font:inherit;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#12306b">Buscar</button>
+    <div style="display:{{ errDisplay }};margin-top:16px;padding:12px 16px;border-radius:10px;background:#fdecec;color:#252525;font-size:14px;border:1px solid #f3c2c2">{{ error }}</div>
+    <div style="display:{{ resDisplay }};margin-top:20px;flex-direction:column;gap:18px">
+      <div style="border:1px solid #dfe5f2;border-radius:12px;overflow:hidden">
+        <div style="background:#f1f4fa;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Cliente encontrado</span><span style="font-size:12px;font-weight:600;padding:3px 12px;border-radius:20px;background:#fde0e0;color:#b42318">{{ c.estatus }}</span></div>
+        <div style="padding:6px 16px 10px;display:grid;grid-template-columns:max-content 1fr;gap:0 18px;font-size:14px">
+          <div style="padding:9px 0;border-bottom:1px solid #eef0f4">Nombre</div><div style="padding:9px 0;border-bottom:1px solid #eef0f4;font-weight:600">{{ c.nombre }}</div>
+          <div style="padding:9px 0;border-bottom:1px solid #eef0f4">Cédula</div><div style="padding:9px 0;border-bottom:1px solid #eef0f4;font-weight:600">{{ c.cedula }}</div>
+          <div style="padding:9px 0;border-bottom:1px solid #eef0f4">Teléfono habitación</div><div style="padding:9px 0;border-bottom:1px solid #eef0f4;font-weight:600">{{ c.hab }}</div>
+          <div style="padding:9px 0;border-bottom:1px solid #eef0f4">Teléfono oficina</div><div style="padding:9px 0;border-bottom:1px solid #eef0f4;font-weight:600">{{ c.ofi }}</div>
+          <div style="padding:9px 0;border-bottom:1px solid #eef0f4">Teléfono celular</div><div style="padding:9px 0;border-bottom:1px solid #eef0f4;font-weight:600">{{ c.cel }}</div>
+          <div style="padding:9px 0">Servicio</div><div style="padding:9px 0;font-weight:600">{{ c.servicio }}</div>
+        </div>
+      </div>
+      <button type="button" onClick="{{ release }}" style="width:100%;height:46px;border:0;border-radius:10px;background:#f5b83d;color:#252525;font:inherit;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#e9a924">Liberar cliente</button>
+    </div>
+  </form>
+</main>
+<div onClick="{{ closeDone }}" style="display:{{ doneDisplay }};position:fixed;inset:0;z-index:100;background:rgba(10,24,56,.55);align-items:center;justify-content:center;padding:16px">
+  <div onClick="{{ stop }}" role="dialog" aria-label="Cliente liberado" style="background:#fff;border-radius:18px;box-shadow:0 24px 60px rgba(0,0,0,.35);width:100%;max-width:400px;padding:28px 24px 24px;text-align:center">
+    <div style="width:56px;height:56px;border-radius:50%;background:#d3f0e6;color:#0b6b4f;font-size:28px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 14px">✓</div>
+    <div style="font-size:18px;font-weight:600">Número liberado correctamente</div>
+    <div style="font-size:14px;margin-top:6px">{{ doneText }}</div>
+    <button onClick="{{ closeDone }}" style="margin-top:20px;width:100%;height:44px;border:0;border-radius:10px;background:#1a4391;color:#fff;font:inherit;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#12306b">Aceptar</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { w: 1200, menu: false, rep: false, cfg: false, cedula: '', found: null, error: '', done: false };
+  db = {
+    '16136850': { nombre: 'JAVIER HERNANDEZ', hab: '2122000000', ofi: '4243000000', cel: '4244000000', servicio: 'Banco Activo', estatus: 'EFECTIVA' },
+    '17545340': { nombre: 'MAYKOL SEGUNDO VARGAS ALVARADO', hab: '2125945219', ofi: '4145945219', cel: '4245945219', servicio: 'Bancaribe', estatus: 'EFECTIVA' },
+    '11102156': { nombre: 'TIBISAY DEL VALLE LEZAMA ESPINOZA', hab: '2124334996', ofi: '4144334996', cel: '4124334996', servicio: 'Bancaribe', estatus: 'EFECTIVA' }
+  };
+  componentDidMount() {
+    this.onR = () => this.setState({ w: window.innerWidth });
+    window.addEventListener('resize', this.onR); this.onR();
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this.onR); }
+  renderVals() {
+    const s = this.state, m = s.w < 768, o = s.menu, f = s.found;
+    const c = f ? { ...f, cedula: s.cedula.trim() } : { nombre: '', cedula: '', hab: '', ofi: '', cel: '', servicio: '', estatus: '' };
+    const find = () => {
+      const k = s.cedula.trim().replace(/\D/g, '');
+      if (!k) return this.setState({ found: null, error: 'Introduce un número de cédula.' });
+      const r = this.db[k];
+      this.setState(r ? { found: r, error: '', cedula: k } : { found: null, error: 'No se encontró ningún cliente con la cédula ' + k + '.' });
+    };
+    return {
+      c, error: s.error, errDisplay: s.error ? 'block' : 'none', resDisplay: f ? 'flex' : 'none', cedula: s.cedula,
+      setCedula: e => this.setState({ cedula: e.target.value, found: null, error: '' }),
+      submit: e => { e.preventDefault(); find(); },
+      release: () => this.setState({ done: true }),
+      doneDisplay: s.done ? 'flex' : 'none', doneText: f ? f.nombre + ' · C.I. ' + s.cedula : '',
+      closeDone: () => this.setState({ done: false, found: null, cedula: '', error: '' }), stop: e => e.stopPropagation(),
+      repWrapPos: m ? 'static' : 'relative', repRowH: m ? 'auto' : '56px',
+      repToggle: () => this.setState(st => ({ rep: !st.rep, cfg: false })), cfgToggle: () => this.setState(st => ({ cfg: !st.cfg, rep: false })),
+      repDisplay: s.rep ? 'flex' : 'none', cfgDisplay: s.cfg ? 'flex' : 'none', repPanelPos: m ? 'static' : 'absolute', repBg: m ? '#1a3f85' : '#fff', repColor: m ? '#e6ecf8' : '#252525', repShadow: m ? 'none' : '0 12px 24px rgba(0,0,0,.25)',
+      padX: m ? 16 : 32, mainPad: m ? 16 : 24, cardPad: m ? '20px 16px' : '28px 32px', heroPad: m ? '24px 16px 72px' : '36px 32px 80px', h1Size: m ? 24 : 30,
+      toggleDisplay: m ? 'flex' : 'none', toggleMenu: () => this.setState(st => ({ menu: !st.menu })),
+      bar1: m && o ? 'translateY(7px) rotate(45deg)' : 'none', bar2: m && o ? 0 : 1, bar3: m && o ? 'translateY(-7px) rotate(-45deg)' : 'none',
+      linksDisplay: m && !o ? 'none' : 'flex', linksDir: m ? 'column' : 'row', linksGap: m ? 0 : 28, linksH: m ? 'auto' : '56px',
+      linksPos: m ? 'absolute' : 'static', linksPad: m ? '8px 0' : '0', linksShadow: m ? '0 12px 20px rgba(0,0,0,.25)' : 'none',
+      itemPad: m ? '14px 16px' : '0', activeShadow: m ? 'inset 4px 0 0 #f5b83d' : 'inset 0 -3px 0 #f5b83d'
+    };
+  }
+}
+</script>
+</body>
+</html>

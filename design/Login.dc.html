@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0;font-family:Poppins,system-ui,sans-serif;color:#252525;background:#fff}a{color:#1a4391}a:hover{color:#12306b}</style>
+<script src="./image-slot.js"></script>
+</helmet>
+<div style="min-height:100vh;display:grid;grid-template-columns:{{ cols }};grid-template-rows:{{ rowsT }}">
+  <div style="position:relative;background:#12306b;overflow:hidden;min-height:{{ heroMin }}">
+    <image-slot id="login-hero" shape="rect" placeholder="Arrastra aquí la foto del call center" style="position:absolute;inset:0;width:100%;height:100%"></image-slot>
+    <div style="position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(18,48,107,.35) 0%,rgba(18,48,107,.88) 100%)"></div>
+    <div style="position:absolute;left:0;right:0;bottom:0;padding:{{ heroPad }};color:#fff;pointer-events:none">
+      <div style="font-size:{{ heroH }}px;font-weight:600;line-height:1.2;max-width:460px">Cada llamada es una oportunidad de venta.</div>
+      <div style="display:{{ heroSubDisplay }};font-size:15px;color:#e6ecf8;margin-top:10px;max-width:420px">Gestiona contactos, ventas y reportes de tu equipo en un solo lugar.</div>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;padding:{{ formPad }};background:#f4f6fa">
+    <div style="width:100%;max-width:400px">
+      <div style="font-size: 34px; color: #252525; margin-bottom: 28px; letter-spacing: .2px"><b style="font-weight: 700; color: #1A4391">B</b>ulksales</div>
+
+      <form onSubmit="{{ doLogin }}" style="display:{{ vLogin }};flex-direction:column;gap:16px">
+        <div><div style="font-size:24px;font-weight:600">Iniciar sesión</div><div style="font-size:14px;margin-top:4px">Ingresa tus credenciales para continuar.</div></div>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600">Usuario
+          <input value="{{ user }}" onChange="{{ setUser }}" autocomplete="username" placeholder="javier" style="height:46px;border:1px solid #d1d5db;border-radius:10px;padding:0 14px;font:inherit;font-size:15px;font-weight:400;color:#252525;background:#fff" style-focus="border-color:#1a4391;outline:2px solid #c9d6f0">
+        </label>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600">Contraseña
+          <div style="position:relative;display:flex">
+            <input type="{{ pwType }}" value="{{ pass }}" onChange="{{ setPass }}" autocomplete="current-password" placeholder="••••••••" style="flex:1;height:46px;border:1px solid #d1d5db;border-radius:10px;padding:0 64px 0 14px;font:inherit;font-size:15px;font-weight:400;color:#252525;background:#fff" style-focus="border-color:#1a4391;outline:2px solid #c9d6f0">
+            <button type="button" onClick="{{ togglePw }}" style="position:absolute;right:6px;top:6px;height:34px;padding:0 10px;border:0;border-radius:8px;background:transparent;color:#1a4391;font:inherit;font-size:13px;font-weight:600;cursor:pointer">{{ pwLabel }}</button>
+          </div>
+        </label>
+        <div style="display:{{ errDisplay }};padding:10px 14px;border-radius:10px;background:#fdecec;border:1px solid #f3c2c2;font-size:13.5px">{{ error }}</div>
+        <button type="submit" style="height:48px;border:0;border-radius:10px;background:#1a4391;color:#fff;font:inherit;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#12306b">Iniciar sesión</button>
+        <button type="button" onClick="{{ goReset }}" style="align-self:center;border:0;background:transparent;color:#1a4391;font:inherit;font-size:14px;font-weight:500;cursor:pointer;text-decoration:underline">¿Olvidaste o necesitas reiniciar tu contraseña?</button>
+      </form>
+
+      <form onSubmit="{{ doCedula }}" style="display:{{ vCedula }};flex-direction:column;gap:16px">
+        <div><div style="font-size:24px;font-weight:600">Reiniciar contraseña</div><div style="font-size:14px;margin-top:4px">Ingresa tu número de cédula para continuar.</div></div>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600">Número de cédula
+          <input value="{{ cedula }}" onChange="{{ setCedula }}" inputmode="numeric" placeholder="Ej. 16136850" style="height:46px;border:1px solid #d1d5db;border-radius:10px;padding:0 14px;font:inherit;font-size:15px;font-weight:400;color:#252525;background:#fff" style-focus="border-color:#1a4391;outline:2px solid #c9d6f0">
+        </label>
+        <div style="display:{{ errDisplay }};padding:10px 14px;border-radius:10px;background:#fdecec;border:1px solid #f3c2c2;font-size:13.5px">{{ error }}</div>
+        <button type="submit" style="height:48px;border:0;border-radius:10px;background:#1a4391;color:#fff;font:inherit;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#12306b">Continuar</button>
+        <button type="button" onClick="{{ goLogin }}" style="align-self:center;border:0;background:transparent;color:#1a4391;font:inherit;font-size:14px;font-weight:500;cursor:pointer;text-decoration:underline">← Volver a iniciar sesión</button>
+      </form>
+
+      <form onSubmit="{{ doNewPass }}" style="display:{{ vNew }};flex-direction:column;gap:16px">
+        <div><div style="font-size:24px;font-weight:600">Nueva contraseña</div><div style="font-size:14px;margin-top:4px">Cédula {{ cedula }}. Elige una contraseña que no sea 123456 ni 12345678. Puede combinar números y letras, pero no es obligatorio.</div></div>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600">Nueva contraseña
+          <div style="position:relative;display:flex">
+            <input type="{{ pwType }}" value="{{ np1 }}" onChange="{{ setNp1 }}" autocomplete="new-password" style="flex:1;height:46px;border:1px solid #d1d5db;border-radius:10px;padding:0 64px 0 14px;font:inherit;font-size:15px;font-weight:400;color:#252525;background:#fff" style-focus="border-color:#1a4391;outline:2px solid #c9d6f0">
+            <button type="button" onClick="{{ togglePw }}" style="position:absolute;right:6px;top:6px;height:34px;padding:0 10px;border:0;border-radius:8px;background:transparent;color:#1a4391;font:inherit;font-size:13px;font-weight:600;cursor:pointer">{{ pwLabel }}</button>
+          </div>
+        </label>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600">Confirmar contraseña
+          <input type="{{ pwType }}" value="{{ np2 }}" onChange="{{ setNp2 }}" autocomplete="new-password" style="height:46px;border:1px solid #d1d5db;border-radius:10px;padding:0 14px;font:inherit;font-size:15px;font-weight:400;color:#252525;background:#fff" style-focus="border-color:#1a4391;outline:2px solid #c9d6f0">
+        </label>
+        <div style="display:{{ errDisplay }};padding:10px 14px;border-radius:10px;background:#fdecec;border:1px solid #f3c2c2;font-size:13.5px">{{ error }}</div>
+        <button type="submit" style="height:48px;border:0;border-radius:10px;background:#1a4391;color:#fff;font:inherit;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#12306b">Cambiar contraseña</button>
+        <button type="button" onClick="{{ goLogin }}" style="align-self:center;border:0;background:transparent;color:#1a4391;font:inherit;font-size:14px;font-weight:500;cursor:pointer;text-decoration:underline">Cancelar</button>
+      </form>
+
+      <div style="display:{{ vDone }};flex-direction:column;gap:16px;align-items:flex-start">
+        <div style="width:56px;height:56px;border-radius:50%;background:#d3f0e6;color:#0b6b4f;font-size:28px;font-weight:700;display:flex;align-items:center;justify-content:center">✓</div>
+        <div><div style="font-size:24px;font-weight:600">Contraseña actualizada</div><div style="font-size:14px;margin-top:4px">Ya puedes iniciar sesión con tu nueva contraseña.</div></div>
+        <button type="button" onClick="{{ goLogin }}" style="width:100%;height:48px;border:0;border-radius:10px;background:#1a4391;color:#fff;font:inherit;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#12306b">Ir a iniciar sesión</button>
+      </div>
+
+      <div style="margin-top:32px;font-size:12.5px;line-height:1.7">Este sitio fue desarrollado por @jehh_50<br>Copyright © 2026</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { w: 1200, view: 'login', user: '', pass: '', show: false, cedula: '', np1: '', np2: '', error: '' };
+  componentDidMount() {
+    this.onR = () => this.setState({ w: window.innerWidth });
+    window.addEventListener('resize', this.onR); this.onR();
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this.onR); }
+  go(v) { this.setState({ view: v, error: '', np1: '', np2: '', show: false }); }
+  renderVals() {
+    const s = this.state, m = s.w < 900, v = s.view, d = x => (v === x ? 'flex' : 'none');
+    const bad = ['123456', '12345678'];
+    return {
+      cols: m ? '1fr' : '1.1fr 1fr', rowsT: m ? '220px 1fr' : 'auto', heroMin: m ? '220px' : '100vh',
+      heroPad: m ? '20px 20px' : '48px 56px', heroH: m ? 20 : 34, heroSubDisplay: m ? 'none' : 'block', formPad: m ? '32px 20px' : '48px 40px',
+      vLogin: d('login'), vCedula: d('cedula'), vNew: d('new'), vDone: d('done'),
+      user: s.user, pass: s.pass, cedula: s.cedula, np1: s.np1, np2: s.np2,
+      error: s.error, errDisplay: s.error ? 'block' : 'none', pwType: s.show ? 'text' : 'password', pwLabel: s.show ? 'Ocultar' : 'Mostrar',
+      togglePw: () => this.setState(st => ({ show: !st.show })),
+      setUser: e => this.setState({ user: e.target.value, error: '' }), setPass: e => this.setState({ pass: e.target.value, error: '' }),
+      setCedula: e => this.setState({ cedula: e.target.value, error: '' }),
+      setNp1: e => this.setState({ np1: e.target.value, error: '' }), setNp2: e => this.setState({ np2: e.target.value, error: '' }),
+      goReset: () => this.go('cedula'), goLogin: () => this.go('login'),
+      doLogin: e => { e.preventDefault(); this.setState(!s.user.trim() || !s.pass ? { error: 'Ingresa tu usuario y contraseña.' } : { error: '' }); if (s.user.trim() && s.pass) window.location.href = 'Dashboard.dc.html'; },
+      doCedula: e => {
+        e.preventDefault();
+        const k = s.cedula.replace(/\D/g, '');
+        if (k.length < 5) return this.setState({ error: 'Ingresa un número de cédula válido.' });
+        this.setState({ cedula: k, view: 'new', error: '' });
+      },
+      doNewPass: e => {
+        e.preventDefault();
+        if (s.np1.length < 6) return this.setState({ error: 'La contraseña debe tener al menos 6 caracteres.' });
+        if (bad.includes(s.np1)) return this.setState({ error: 'La contraseña no puede ser 123456 ni 12345678.' });
+        if (s.np1 !== s.np2) return this.setState({ error: 'Las contraseñas no coinciden.' });
+        this.setState({ view: 'done', error: '', np1: '', np2: '', show: false });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

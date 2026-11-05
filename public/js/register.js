@@ -59,7 +59,7 @@ $(document).ready(function(){
 		      data:{userid: userid},
 		      success:function(datos){
 		        if(datos.response == 'true'){
-		          alert('PASSWORD ACTUALIZADO DEBE INGRESAR \nCON LA CLAVE 123456');
+		          alert('Contraseña restablecida.\nNueva contraseña temporal: ' + datos.password + '\nEl usuario debe cambiarla al ingresar.');
 		          $(location).attr('href','?view=usuarios&mode=index');
 		        }
 		        else{

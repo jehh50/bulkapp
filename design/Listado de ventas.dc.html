@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0;background:#f4f6fa;font-family:Poppins,system-ui,sans-serif;color:#252525}a{color:#1a4391}a:hover{color:#12306b}</style>
+</helmet>
+<nav style="background:#12306b;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 {{ padX }}px;position:relative;z-index:10">
+  <a href="Dashboard.dc.html" style="display:flex;align-items:center;gap:10px;color:#fff;font-weight:700;font-size:18px;text-decoration:none"><span style="width:28px;height:28px;border-radius:8px;background:#f5b83d;color:#12306b;display:flex;align-items:center;justify-content:center;font-size:15px">B</span>Bulksales</a>
+  <button onClick="{{ toggleMenu }}" aria-label="Menú" style="display:{{ toggleDisplay }};width:44px;height:44px;border:1px solid #2d57a8;border-radius:10px;background:transparent;cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:0">
+    <span style="width:20px;height:2px;background:#fff;border-radius:1px;transform:{{ bar1 }};transition:transform .2s"></span>
+    <span style="width:20px;height:2px;background:#fff;border-radius:1px;opacity:{{ bar2 }};transition:opacity .2s"></span>
+    <span style="width:20px;height:2px;background:#fff;border-radius:1px;transform:{{ bar3 }};transition:transform .2s"></span>
+  </button>
+  <div style="display:{{ linksDisplay }};flex-direction:{{ linksDir }};gap:{{ linksGap }}px;font-size:14px;color:#c9d6f0;align-items:stretch;height:{{ linksH }};position:{{ linksPos }};top:56px;left:0;right:0;background:#12306b;padding:{{ linksPad }};box-shadow:{{ linksShadow }}">
+    <a href="Dashboard.dc.html" style="display:flex;align-items:center;padding:{{ itemPad }};text-decoration:none;color:inherit;">Dashboard</a>
+    <span style="display:flex;align-items:center;padding:{{ itemPad }}">Formulario</span>
+    <span style="display:flex;align-items:center;padding:{{ itemPad }}">Configuración ▾</span>
+    <div style="position:{{ repWrapPos }};display:flex;flex-direction:column;align-items:stretch">
+      <div onClick="{{ repToggle }}" style="display:flex;align-items:center;justify-content:space-between;gap:6px;padding:{{ itemPad }};color:#fff;cursor:pointer;height:{{ repRowH }};box-shadow:{{ activeShadow }}">Reportes <span style="font-size:11px">▾</span></div>
+      <div style="display:{{ repDisplay }};position:{{ repPanelPos }};top:56px;left:0;min-width:240px;background:{{ repBg }};color:{{ repColor }};border-radius:0 0 12px 12px;box-shadow:{{ repShadow }};padding:6px;flex-direction:column;gap:2px">
+        <a href="Resumen de gestion.dc.html" style="display:block;text-decoration:none;color:inherit;padding:10px 14px;border-radius:8px;font-weight:400" style-hover="background:rgba(245,184,61,.25)">Acumulado de gestión</a>
+        <a href="Detalle de ventas.dc.html" style="display:block;text-decoration:none;color:inherit;padding:10px 14px;border-radius:8px;font-weight:400" style-hover="background:rgba(245,184,61,.25)">Detalle de ventas</a>
+        <a href="Listado de ventas.dc.html" style="display:block;text-decoration:none;color:inherit;padding:10px 14px;border-radius:8px;background:rgba(245,184,61,.22);font-weight:600" style-hover="background:rgba(245,184,61,.25)">Listado de ventas</a>
+        <a href="Desbloqueo de clientes.dc.html" style="display:block;text-decoration:none;color:inherit;padding:10px 14px;border-radius:8px;font-weight:400" style-hover="background:rgba(245,184,61,.25)">Desbloqueo de cliente</a>
+      </div>
+    </div>
+    <span style="display:flex;align-items:center;padding:{{ itemPad }};color:#fff;font-weight:500">javier ▾</span>
+  </div>
+</nav>
+<header style="background:#1a4391;padding:{{ heroPad }};color:#fff">
+  <div style="max-width:1400px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px">
+    <div>
+      <div style="font-size:13px;color:#c9d6f0;margin-bottom:6px">Reportes / Listado de ventas</div>
+      <h1 style="margin:0;font-size:{{ h1Size }}px;font-weight:600;line-height:1.2">Resumen de ventas</h1>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;background:#12306b;border-radius:14px;padding:12px 18px">
+      <div style="width:10px;height:10px;border-radius:50%;background:#f5b83d"></div>
+      <div><div style="font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:#c9d6f0">Servicio consultado</div><div style="font-size:22px;font-weight:700;line-height:1.2">{{ service }}</div></div>
+      <div style="width:1px;align-self:stretch;background:#2d57a8;margin:0 6px"></div>
+      <div><div style="font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:#c9d6f0">Período</div><div style="font-size:15px;font-weight:500">{{ period }}</div></div>
+    </div>
+  </div>
+</header>
+<main style="max-width:1400px;margin:-56px auto 40px;padding:0 {{ mainPad }}px">
+  <section style="background:#fff;border-radius:16px;box-shadow:0 8px 24px rgba(18,48,107,.12);padding:20px {{ mainPad }}px;margin-bottom:20px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;align-items:end">
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#252525;text-transform:uppercase;letter-spacing:.5px">Desde
+        <input type="date" value="{{ from }}" onChange="{{ setFrom }}" style="height:42px;border:1px solid #d1d5db;border-radius:10px;padding:0 12px;font:inherit;font-size:14px;font-weight:400;text-transform:none;color:#252525">
+      </label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#252525;text-transform:uppercase;letter-spacing:.5px">Hasta
+        <input type="date" value="{{ to }}" onChange="{{ setTo }}" style="height:42px;border:1px solid #d1d5db;border-radius:10px;padding:0 12px;font:inherit;font-size:14px;font-weight:400;text-transform:none;color:#252525">
+      </label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#252525;text-transform:uppercase;letter-spacing:.5px">Servicio
+        <select value="{{ sel }}" onChange="{{ setSel }}" style="height:42px;border:1px solid #d1d5db;border-radius:10px;padding:0 12px;font:inherit;font-size:14px;font-weight:400;text-transform:none;color:#252525;background:#fff"><option value="Bancaribe">Bancaribe</option><option value="Banco Activo">Banco Activo</option></select>
+      </label>
+      <div style="display:flex;gap:12px">
+        <button onClick="{{ search }}" style="flex:1;height:42px;border:0;border-radius:10px;background:#1a4391;color:#fff;font:inherit;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#12306b">Buscar</button>
+        <button onClick="{{ download }}" style="flex:1;height:42px;border:1px solid #1a4391;border-radius:10px;background:#fff;color:#1a4391;font:inherit;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#eef2fb">Descargar</button>
+      </div>
+    </div>
+  </section>
+  <section style="background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(16,24,40,.08);overflow:hidden">
+    <div style="padding:16px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;border-bottom:1px solid #eef0f4">
+      <div style="font-size:15px"><b style="font-weight:700">{{ count }}</b> resultados</div>
+      
+    </div>
+    <div style="max-height:600px;overflow:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:13.5px;min-width:1280px">
+        <thead><tr>
+          <th style="position:sticky;top:0;background:#f1f4fa;text-align:left;padding:12px 16px;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;font-weight:600;box-shadow:0 1px 0 #dfe5f2">#</th>
+          <th style="position:sticky;top:0;background:#f1f4fa;text-align:left;padding:12px 12px;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;font-weight:600;box-shadow:0 1px 0 #dfe5f2">Nombre</th>
+          <th style="position:sticky;top:0;background:#f1f4fa;text-align:left;padding:12px 12px;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;font-weight:600;box-shadow:0 1px 0 #dfe5f2">Apellido</th>
+          <th style="position:sticky;top:0;background:#f1f4fa;text-align:left;padding:12px 12px;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;font-weight:600;box-shadow:0 1px 0 #dfe5f2">Cédula</th>
+          <th style="position:sticky;top:0;background:#f1f4fa;text-align:left;padding:12px 12px;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;font-weight:600;box-shadow:0 1px 0 #dfe5f2">Fecha de nacimiento</th>
+          <th style="position:sticky;top:0;background:#f1f4fa;text-align:left;padding:12px 12px;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;font-weight:600;box-shadow:0 1px 0 #dfe5f2">Teléfono 1</th>
+          <th style="position:sticky;top:0;background:#f1f4fa;text-align:left;padding:12px 12px;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;font-weight:600;box-shadow:0 1px 0 #dfe5f2">Teléfono 2</th>
+          <th style="position:sticky;top:0;background:#f1f4fa;text-align:left;padding:12px 12px;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;font-weight:600;box-shadow:0 1px 0 #dfe5f2">Correo</th>
+          <th style="position:sticky;top:0;background:#f1f4fa;text-align:left;padding:12px 12px;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;font-weight:600;box-shadow:0 1px 0 #dfe5f2">Producto</th>
+          <th style="position:sticky;top:0;background:#f1f4fa;text-align:left;padding:12px 16px 12px 12px;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;font-weight:600;box-shadow:0 1px 0 #dfe5f2">Estado</th>
+        </tr></thead>
+        <tbody>
+          <sc-for list="{{ rows }}" as="r" hint-placeholder-count="10">
+            <tr style="border-top:1px solid #eef0f4" style-hover="background:#f8faff">
+              <td style="padding:12px 16px;color:#252525">{{ r.i }}</td>
+              <td style="padding:12px;font-weight:500">{{ r.nombre }}</td>
+              <td style="padding:12px;font-weight:500">{{ r.apellido }}</td>
+              <td style="padding:12px">{{ r.cedula }}</td>
+              <td style="padding:12px">{{ r.nac }}</td>
+              <td style="padding:12px;white-space:nowrap">{{ r.t1 }}</td>
+              <td style="padding:12px;white-space:nowrap">{{ r.t2 }}</td>
+              <td style="padding:12px">{{ r.correo }}</td>
+              <td style="padding:12px"><span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500;background:{{ r.pbg }};white-space:nowrap">{{ r.producto }}</span></td>
+              <td style="padding:12px 16px 12px 12px">{{ r.estado }}</td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { w: 1200, menu: false, rep: false, cfg: false, sel: 'Bancaribe', applied: 'Bancaribe', from: '2026-10-16', to: '2026-10-16', pf: '2026-10-16', pt: '2026-10-16' };
+  componentDidMount() {
+    this.onR = () => this.setState({ w: window.innerWidth });
+    window.addEventListener('resize', this.onR); this.onR();
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this.onR); }
+  fmt(s) { const [y, m, d] = s.split('-'); return d + '-' + m + '-' + y; }
+  all() {
+    if (this._all) return this._all;
+    const P = ['PLAN CONSULTA MÉDICA FAMILIAR', 'PLAN ODONTOLÓGICO'];
+    const seed = [
+      ['MAYKOL SEGUNDO','VARGAS ALVARADO','17545340','10-12-1982','(0212)594.52.19','(0414)594.52.19','MAIKOLVARGAS572@GMAIL.COM',0,'CARABOBO'],
+      ['TIBISAY DEL VALLE','LEZAMA ESPINOZA','11102156','28-08-1972','(0212)433.49.96','(0414)433.49.96','LEZAMAEXCELENTE@HOTMAIL.COM',1,'DISTRITO CAPITAL'],
+      ['CESAR LUIS','ROMAN','19728209','27-09-1990','(0212)914.59.37','(0424)914.59.37','CESARROMAN27@GMAIL.COM',0,'MIRANDA'],
+      ['ANYELA','MONTILLA','18459809','08-06-1988','(0212)995.69.16','(0412)995.69.16','ANYELAMONTILLA8688@GMAIL.COM',1,'LARA'],
+      ['JOSE','KRISTEN DIAZ','9520095','04-08-1968','(0212)100.93.64','(0412)100.93.64','KRISTENJOSE04@GMAIL.COM',1,'ARAGUA']
+    ];
+    const N = ['LUISA','CARLOS','MARIA','JOSE','ANA','PEDRO','ROSA','JUAN','DAYANA','ALEXANDER','YOLANDA','RICARDO','GABRIELA','MIGUEL','KARLA'];
+    const A = ['PEREZ','GONZALEZ','RODRIGUEZ','MARQUEZ','RAMIREZ','TORREALBA','SUAREZ','MENDOZA','ROJAS','CASTILLO','BRICEÑO','HERNANDEZ'];
+    const E = ['CARABOBO','DISTRITO CAPITAL','MIRANDA','LARA','ARAGUA','ZULIA','FALCÓN','PORTUGUESA','NUEVA ESPARTA'];
+    const rows = seed.map(x => x.slice());
+    let r = 7;
+    const rnd = () => (r = (r * 9301 + 49297) % 233280) / 233280;
+    while (rows.length < 59) {
+      const n = N[Math.floor(rnd() * N.length)], a = A[Math.floor(rnd() * A.length)], c = 6000000 + Math.floor(rnd() * 20000000);
+      const d = String(1 + Math.floor(rnd() * 28)).padStart(2, '0'), m = String(1 + Math.floor(rnd() * 12)).padStart(2, '0'), y = 1960 + Math.floor(rnd() * 42);
+      const t = () => String(100 + Math.floor(rnd() * 899)) + '.' + String(10 + Math.floor(rnd() * 89)) + '.' + String(10 + Math.floor(rnd() * 89));
+      const tt = t();
+      rows.push([n, a, String(c), d + '-' + m + '-' + y, '(0212)' + tt, '(04' + (rnd() > .5 ? '14' : '12') + ')' + tt, (n + a).replace(/ /g, '') + Math.floor(rnd() * 99) + '@GMAIL.COM', rnd() > .5 ? 1 : 0, E[Math.floor(rnd() * E.length)]]);
+    }
+    this._all = rows.map(x => ({ nombre: x[0], apellido: x[1], cedula: x[2], nac: x[3], t1: x[4], t2: x[5], correo: x[6], producto: P[x[7]], pbg: x[7] ? '#fdf0cf' : '#dbe5fa', estado: x[8] }));
+    return this._all;
+  }
+  list() { const a = this.all(); return this.state.applied === 'Bancaribe' ? a : a.filter((x, i) => i % 2 === 0); }
+  renderVals() {
+    const s = this.state, rows = this.list().map((x, i) => ({ ...x, i: i + 1 }));
+    const m = s.w < 768, o = s.menu;
+    const periodShort = this.fmt(s.pf) + ' - ' + this.fmt(s.pt);
+    return {
+      rows, count: rows.length, periodShort, service: s.applied, period: s.pf === s.pt ? this.fmt(s.pf) : periodShort, sel: s.sel, from: s.from, to: s.to,
+      download: () => {
+        const q = v => '"' + String(v).replace(/"/g, '""') + '"';
+        const csv = ['#,Nombre,Apellido,Cédula,Fecha de nacimiento,Teléfono 1,Teléfono 2,Correo,Producto,Estado'].concat(rows.map(r => [r.i, r.nombre, r.apellido, r.cedula, r.nac, r.t1, r.t2, r.correo, r.producto, r.estado].map(q).join(','))).join('\n');
+        const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' }));
+        a.download = 'listado-ventas-' + s.applied.toLowerCase().replace(/ /g, '-') + '.csv'; a.click();
+      },
+      repWrapPos: m ? 'static' : 'relative', repRowH: m ? 'auto' : '56px', repToggle: () => this.setState(st => ({ rep: !st.rep, cfg: false })), cfgToggle: () => this.setState(st => ({ cfg: !st.cfg, rep: false })), cfgDisplay: s.cfg ? 'flex' : 'none',
+      repDisplay: s.rep ? 'flex' : 'none', repPanelPos: m ? 'static' : 'absolute', repBg: m ? '#1a3f85' : '#fff', repColor: m ? '#e6ecf8' : '#252525', repShadow: m ? 'none' : '0 12px 24px rgba(0,0,0,.25)',
+      padX: m ? 16 : 32, mainPad: m ? 16 : 24, heroPad: m ? '24px 16px 80px' : '36px 32px 90px', h1Size: m ? 24 : 30,
+      toggleDisplay: m ? 'flex' : 'none', toggleMenu: () => this.setState(st => ({ menu: !st.menu })),
+      bar1: m && o ? 'translateY(7px) rotate(45deg)' : 'none', bar2: m && o ? 0 : 1, bar3: m && o ? 'translateY(-7px) rotate(-45deg)' : 'none',
+      linksDisplay: m && !o ? 'none' : 'flex', linksDir: m ? 'column' : 'row', linksGap: m ? 0 : 28, linksH: m ? 'auto' : '56px',
+      linksPos: m ? 'absolute' : 'static', linksPad: m ? '8px 0' : '0', linksShadow: m ? '0 12px 20px rgba(0,0,0,.25)' : 'none',
+      itemPad: m ? '14px 16px' : '0', activeShadow: m ? 'inset 4px 0 0 #f5b83d' : 'inset 0 -3px 0 #f5b83d',
+      setSel: e => this.setState({ sel: e.target.value }),
+      setFrom: e => this.setState({ from: e.target.value }),
+      setTo: e => this.setState({ to: e.target.value }),
+      search: () => this.setState(st => ({ applied: st.sel, pf: st.from, pt: st.to }))
+    };
+  }
+}
+</script>
+</body>
+</html>

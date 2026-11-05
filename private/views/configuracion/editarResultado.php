@@ -1,102 +1,75 @@
-<script>
-function onlyLetters(e) {
-    // Convertir el texto a mayúsculas y permitir solo letras y números
-    e.value = e.value
-        .toUpperCase() // Convertir a mayúsculas
-        .replace(/[^A-Z\s]/g, ''); // Eliminar caracteres que no sean letras ni números
+<?php
+$mensajeResultado = isset($_GET['mensaje']) ? (string) $_GET['mensaje'] : '';
+$alertaResultado = null;
+
+switch ($mensajeResultado) {
+  case 'exito':
+    $alertaResultado = ['success', 'Registro actualizado correctamente.'];
+    break;
+  case 'eliminado':
+    $alertaResultado = ['success', 'Registro eliminado correctamente.'];
+    break;
+  case 'error':
+    $alertaResultado = ['danger', 'No se pudo completar la operación. Intenta nuevamente.'];
+    break;
 }
+?>
 
-function onlyNumbers(e) {
-    // Permitir solo números y un solo punto decimal
-    e.value = e.value.replace(/[^0-9.]/g, '');
-    // Solo permite un punto decimal
-    let parts = e.value.split('.');
-    if (parts.length > 2) {
-        e.value = parts[0] + '.' + parts.slice(1).join('');
-    }
-}
-</script>
-<script src="public/js/edit.js"></script>
+<div class="container-xl px-0">
 
-<div class="container-fluid" style="margin-top: 40px";>
-  <div class="row">
-    <div class="col-xs-12 col-sm-12 col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2">
-
-      <div class="panel panel-default">
-        <div class="panel-body">
-
-          <!-- Título -->
-          <div class="row">
-            <div class="col-xs-12">
-              <h2 class="text-center text-sm-left" style="margin-top:0;">
-                Edición de resultados
-              </h2>
-              <hr>
-            </div>
-          </div>
-
-          <?php
-          if (isset($_GET['mensaje'])) {
-            switch ($_GET['mensaje']) {
-              case 'exito':
-                $mensajeHtml = '<strong>¡Éxito!</strong> Registro actualizado.';
-                $tipo_alerta = 'success';
-                break;
-              case 'error':
-                $mensajeHtml = '<strong>Error</strong> Se presentó un error intente de nuevo.';
-                $tipo_alerta = 'danger';
-                break;
-              case 'eliminado':
-                $mensajeHtml = '<strong>¡Éxito!</strong> Registro eliminado.';
-                $tipo_alerta = 'success';
-                break;
-            }
-            echo '
-            <div class="alert alert-'.$tipo_alerta.' alert-dismissible text-center" role="alert" id="message">
-              <button type="button" class="close" data-dismiss="alert">&times;</button>
-              '.$mensajeHtml.'
-            </div>';
-          }
-
-          ?>
-
-          <!-- Campo Cédula -->
-          <div class="row">
-            <div class="form-group col-xs-12 col-sm-6 col-md-4">
-              <label for="cedula">Cédula</label>
-              <input type="text"
-                     class="form-control"
-                     placeholder="12658457"
-                     id="cedula"
-                     maxlength="9"
-                     oninput="onlyNumbers(this)">
-            </div>
-          </div>
-
-          <!-- Panel dinámico -->
-          <div class="row">
-            <div class="col-xs-12">
-              <div id="sales">
-                <div class="panel-group" id="accordion"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Botones -->
-          <div class="row">
-            <div class="col-xs-12 col-sm-6 col-md-4">
-              <button class="btn btn-primary" id="btn-buscar">
-                <span class="glyphicon glyphicon-search"></span> Buscar
-              </button>
-            </div>
-          </div>
-
-        </div>
+  <section class="card border-0 shadow-sm rounded-4 p-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+      <div>
+        <h1 class="h4 fw-semibold mb-1">Edición de resultados</h1>
+        <p class="text-muted small mb-0">Busca una venta por cédula para corregir los datos del cliente o del producto.</p>
       </div>
-
+      <span class="badge rounded-pill text-bg-light border px-3 py-2">Administración</span>
     </div>
+
+    <?php if ($alertaResultado !== null) { ?>
+      <div class="alert alert-<?php echo $alertaResultado[0]; ?> alert-dismissible fade show" role="alert" id="message">
+        <?php echo htmlspecialchars($alertaResultado[1], ENT_QUOTES, 'UTF-8'); ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+      </div>
+    <?php } ?>
+
+    <form id="erSearchForm" class="row g-2" autocomplete="off" novalidate>
+      <div class="col-12">
+        <label class="form-label small fw-semibold text-uppercase mb-0" for="cedula">Cédula del cliente</label>
+      </div>
+      <div class="col-12 col-md-5 col-lg-4">
+        <input type="text" class="form-control" id="cedula" name="cedula"
+               placeholder="12658457" maxlength="9" inputmode="numeric"
+               aria-describedby="cedulaHelp">
+      </div>
+      <div class="col-12 col-md-auto d-flex gap-2">
+        <button type="submit" class="btn btn-primary px-4" id="btn-buscar">
+          <span class="spinner-border spinner-border-sm d-none" id="erSpinner" aria-hidden="true"></span>
+          <span id="erSearchLabel">Buscar</span>
+        </button>
+        <button type="button" class="btn btn-outline-secondary" id="btn-limpiar">Limpiar</button>
+      </div>
+    </form>
+    <div id="cedulaHelp" class="form-text">Sin puntos ni guiones.</div>
+
+    <div id="erFeedback" class="mt-3 d-none" role="alert" aria-live="polite"></div>
+  </section>
+
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-4 mb-2">
+    <h2 class="h6 fw-semibold mb-0">Resultados</h2>
+    <span class="badge rounded-pill text-bg-light border" id="erCount" aria-live="polite">0 registros</span>
   </div>
+
+  <div id="accordion" class="accordion"></div>
+
+  <div id="erEmpty" class="card border-0 shadow-sm rounded-4 text-center py-5 px-3 d-none">
+    <div class="fs-1 text-primary mb-2" aria-hidden="true">⌕</div>
+    <div class="fw-semibold mb-1">Sin resultados</div>
+    <p class="text-muted small mb-0">No encontramos ventas asociadas a esa cédula. Verifica el número e intenta de nuevo.</p>
+  </div>
+
 </div>
 
-<!-- Modales -->
 <div id="modals"></div>
+
+<script src="<?php echo asset('public/js/edit.js'); ?>"></script>

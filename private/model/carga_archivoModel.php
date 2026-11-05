@@ -14,10 +14,10 @@ class database
 	 * Guarda un lote de registros en la base de datos.
 	 *
 	 * @param array $batch Un array de arrays, donde cada array interno representa una fila de datos.
-	 * @param int $servicio El identificador del servicio (1 para clientes, otro valor para cashea).
+	 * @param int $servicio El identificador del servicio (solo servicios bancarios; cada uno se guarda en `clientes`).
 	 * @return int|false El número de filas insertadas con éxito, o false si hubo un error.
 	 */
-	public function guardarRegistrosBatch($batch, $paramTypes,$servicio)
+	public function guardarRegistrosBatch(array $batch, int $servicio)
 	{
 		if (empty($batch)) {
 			return 0;
@@ -27,35 +27,32 @@ class database
 		$tabla = '';
 		$columnasEsperadas = 0;
 
-		if ($servicio == 1 || $servicio == 5) {
+		if (Constantes::esServicioBancario($servicio)) {
 			$tabla = 'clientes';
 			$columnas = ['identificacion', 'nombre_legal', 'telf_hab', 'telf_ofi', 'telf_cel', 'correo', 'direccion', 'cuenta', 'oferta','servicio_id'];
 			$columnasEsperadas = 10;
 			//$queryUpdate = "UPDATE clientes SET is_active = 0 WHERE is_active = 1 and servicio_id = $servicio";
 			$queryUpdate = "";
 		} else {
-			$tabla = 'cashea_customers';
-			$columnas = ['cedula', 'id_cuota', 'nombre_grupo', 'fecha_pagar', 'monto_cuota', 'numero_cuota', 'fee', 'plata_por_cobrar', 'capital_asignado', 'id_orden', 'identificacion_orden', 'fecha_creacion_orden', 'email', 'telefono', 'nombre_usuario', 'local_origen', 'estado_deuda', 'tramo_inicial', 'tramo_actual', 'segmento'];
-			$columnasEsperadas = 20;
-			$queryUpdate = "UPDATE cashea_customers SET is_active = 0 WHERE is_active = 1";
+			app_log('warning', 'Carga de clientes no soportada para un servicio no bancario.', array('servicio' => $servicio));
+			return false;
 		}
 		$query = "INSERT INTO " . $tabla . " (" . implode(', ', $columnas) . ") VALUES ";
 		$placeHolders = [];
 		$paramsAplanados = [];
 		$batchValido = [];
 
-foreach ($batch as $indice => $fila) {
+		foreach ($batch as $indice => $fila) {
 			if (count($fila) === $columnasEsperadas) {
 				$batchValido[] = $fila;
 			} else {
 				$msg = "Error en la carga batch: La fila " . ($indice + 1) . " fue omitida. Se esperaban " . $columnasEsperadas . " columnas, pero se recibieron " . count($fila) . ". Contenido: " . json_encode($fila);
-				error_log($msg);
-				echo "<pre>DEBUG: $msg</pre>";
+				app_log('warning', $msg);
 			}
 		}
 		
 		if (empty($batchValido)) {
-			echo "<br>Carga batch abortada: Ninguna fila pasó la validación de columnas.";
+			app_log('warning', 'Carga batch abortada: ninguna fila pasó la validación de columnas.');
 			return 0;
 		}
 
@@ -81,123 +78,14 @@ foreach ($batch as $indice => $fila) {
             return 0;
 			
 		} catch (Exception $e) {
-			error_log("Error en guardarRegistrosBatch: " . $e->getMessage());
+			app_log('error', 'Error en guardarRegistrosBatch: ' . $e->getMessage());
 			return false;
 		}
 	}
 
-
-	public function registroCashea(
-		$cedula,
-		$id_cuota,
-		$nombre_grupo,
-		$fecha_pagar,
-		$monto_cuota,
-		$numero_cuota,
-		$fee,
-		$plata_por_cobrar,
-		$capital_asignado,
-		$id_orden,
-		$identificacion_orden,
-		$fecha_creacion_orden,
-		$email,
-		$telefono,
-		$nombre_usuario,
-		$local_origen,
-		$estado_deuda,
-		$tramo_inicial,
-		$tramo_actual,
-		$segmento
-	) {
-		$cedula = iconv(mb_detect_encoding($cedula, mb_detect_order(), true), "UTF-8", $cedula);
-		$nombre_grupo = iconv(mb_detect_encoding($nombre_grupo, mb_detect_order(), true), "UTF-8", $nombre_grupo);
-		$email = iconv(mb_detect_encoding($email, mb_detect_order(), true), "UTF-8", $email);
-		$telefono = iconv(mb_detect_encoding($telefono, mb_detect_order(), true), "UTF-8", $telefono);
-		$nombre_usuario = iconv(mb_detect_encoding($nombre_usuario, mb_detect_order(), true), "UTF-8", $nombre_usuario);
-		$local_origen = iconv(mb_detect_encoding($local_origen, mb_detect_order(), true), "UTF-8", $local_origen);
-		$estado_deuda = iconv(mb_detect_encoding($estado_deuda, mb_detect_order(), true), "UTF-8", $estado_deuda);
-		$tramo_inicial = iconv(mb_detect_encoding($tramo_inicial, mb_detect_order(), true), "UTF-8", $tramo_inicial);
-		$tramo_actual = iconv(mb_detect_encoding($tramo_actual, mb_detect_order(), true), "UTF-8", $tramo_actual);
-		$segmento = iconv(mb_detect_encoding($segmento, mb_detect_order(), true), "UTF-8", $segmento);
-
-		$query = "INSERT INTO cashea_customers (
-        cedula, id_cuota, nombre_grupo, fecha_pagar, monto_cuota, numero_cuota, fee, plata_por_cobrar,
-        capital_asignado, id_orden, identificacion_orden, fecha_creacion_orden, email, telefono,
-        nombre_usuario, local_origen, estado_deuda, tramo_inicial, tramo_actual, segmento
-    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-
-		$params = [
-			$cedula,
-			$id_cuota,
-			$nombre_grupo,
-			$fecha_pagar,
-			$monto_cuota,
-			$numero_cuota,
-			$fee,
-			$plata_por_cobrar,
-			$capital_asignado,
-			$id_orden,
-			$identificacion_orden,
-			$fecha_creacion_orden,
-			$email,
-			$telefono,
-			$nombre_usuario,
-			$local_origen,
-			$estado_deuda,
-			$tramo_inicial,
-			$tramo_actual,
-			$segmento
-		];
-
-		$paramTypes = 'ssssssssssssssssssss';
-
-		try {
-			$stmt = $this->db->preparedQuery($query, $params, $paramTypes);
-			$stmt->close();
-			return true;
-		} catch (Exception $e) {
-			echo "Error al guardar en cashea_customers => " . $e->getMessage();
-		}
-	}
-
-	public function servicio()
+	public function servicio(): array
 	{
-		$sql = $this->db->query("SELECT id,descripcion FROM servicios WHERE status_id = 2 ORDER BY id ASC");
-		if ($this->db->rows($sql) > 0) {
-			while ($data = $this->db->recorrer($sql)) {
-				$respuesta[] = $data;
-			}
-		} else {
-			$respuesta = false;
-		}
-		return $respuesta;
-	}
-
-	public function updateQuotes($paramsBatch, $paramTypes)
-	{
-		try {
-			foreach ($paramsBatch as $param) {
-				if($param[1] === 'Pago'):
-					$status = 7;
-					$set = ", cc.plata_por_cobrar = REPLACE(CAST(REPLACE(cc.plata_por_cobrar,',','.') AS DECIMAL (10,2)) - $param[2],'.',',')";
-				elseif ($param[1] === 'Pago parcial'):
-					$status = 13;
-					$set = ", cc.plata_por_cobrar = REPLACE(CAST(REPLACE(cc.plata_por_cobrar,',','.') AS DECIMAL (10,2)) - $param[2],'.',',')";
-				else:
-					$status = 10;
-					$set = '';
-				endif;
-				
-				// Reactivar cuota
-				$query = "UPDATE cashea_customers cc SET cc.status_id = $status $set WHERE cc.id_cuota = ?";
-				$stmt = $this->db->preparedQuery($query, [$param[0]], $paramTypes);
-				if ($stmt) $stmt->close();
-
-			}
-			return true;
-		} catch (Exception $e) {
-			echo "Error en updateQuotes: " . $e->getMessage();
-			return false;
-		}
+		// etiqueta = «Empresa › Campaña» (solo para mostrar).
+		return $this->db->selectQuery("SELECT s.id, s.descripcion, " . campanas_sql_etiqueta() . " AS etiqueta FROM servicios s LEFT JOIN empresas e ON e.id = s.empresa_id WHERE s.status_id = 2 AND s.tipo_flujo = ? ORDER BY s.id ASC", [Constantes::FLUJO_BANCARIO], 's');
 	}
 }

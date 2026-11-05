@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#f4f6fa;font-family:Poppins,system-ui,sans-serif;color:#252525}a{color:#1a4391}a:hover{color:#12306b}</style>
+</helmet>
+<nav style="background:#12306b;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 {{ padX }}px;position:relative;z-index:10">
+  <a href="Dashboard.dc.html" style="display:flex;align-items:center;gap:10px;color:#fff;font-weight:700;font-size:18px;text-decoration:none"><span style="width:28px;height:28px;border-radius:8px;background:#f5b83d;color:#12306b;display:flex;align-items:center;justify-content:center;font-size:15px">B</span>Bulksales</a>
+  <button onClick="{{ toggleMenu }}" aria-label="Menú" style="display:{{ toggleDisplay }};width:44px;height:44px;border:1px solid #2d57a8;border-radius:10px;background:transparent;cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:0">
+    <span style="width:20px;height:2px;background:#fff;border-radius:1px;transform:{{ bar1 }};transition:transform .2s"></span>
+    <span style="width:20px;height:2px;background:#fff;border-radius:1px;opacity:{{ bar2 }};transition:opacity .2s"></span>
+    <span style="width:20px;height:2px;background:#fff;border-radius:1px;transform:{{ bar3 }};transition:transform .2s"></span>
+  </button>
+  <div style="display:{{ linksDisplay }};flex-direction:{{ linksDir }};gap:{{ linksGap }}px;font-size:14px;color:#c9d6f0;align-items:stretch;height:{{ linksH }};position:{{ linksPos }};top:56px;left:0;right:0;background:#12306b;padding:{{ linksPad }};box-shadow:{{ linksShadow }}">
+    <a href="Dashboard.dc.html" style="display:flex;align-items:center;padding:{{ itemPad }};text-decoration:none;color:inherit;">Dashboard</a>
+    <span style="display:flex;align-items:center;padding:{{ itemPad }}">Formulario</span>
+    <span style="display:flex;align-items:center;padding:{{ itemPad }}">Configuración ▾</span>
+    <div style="position:{{ repWrapPos }};display:flex;flex-direction:column;align-items:stretch">
+      <div onClick="{{ repToggle }}" style="display:flex;align-items:center;justify-content:space-between;gap:6px;padding:{{ itemPad }};color:#fff;cursor:pointer;height:{{ repRowH }};box-shadow:{{ activeShadow }}">Reportes <span style="font-size:11px">▾</span></div>
+      <div style="display:{{ repDisplay }};position:{{ repPanelPos }};top:56px;left:0;min-width:240px;background:{{ repBg }};color:{{ repColor }};border-radius:0 0 12px 12px;box-shadow:{{ repShadow }};padding:6px;flex-direction:column;gap:2px">
+        <a href="Resumen de gestion.dc.html" style="display:block;text-decoration:none;color:inherit;padding:10px 14px;border-radius:8px;font-weight:400;" style-hover="background:rgba(245,184,61,.25)">Acumulado de gestión</a>
+        <a href="Detalle de ventas.dc.html" style="display:block;text-decoration:none;color:inherit;padding:10px 14px;border-radius:8px;font-weight:400" style-hover="background:rgba(245,184,61,.25)">Detalle de ventas</a>
+        <a href="Listado de ventas.dc.html" style="display:block;text-decoration:none;color:inherit;padding:10px 14px;border-radius:8px;font-weight:400" style-hover="background:rgba(245,184,61,.25)">Listado de ventas</a>
+        <a href="Desbloqueo de clientes.dc.html" style="display:block;text-decoration:none;color:inherit;padding:10px 14px;border-radius:8px;font-weight:400" style-hover="background:rgba(245,184,61,.25)">Desbloqueo de cliente</a>
+      </div>
+    </div>
+    <span style="display:flex;align-items:center;padding:{{ itemPad }};color:#fff;font-weight:500">javier ▾</span>
+  </div>
+</nav>
+<header style="background:#1a4391;padding:{{ heroPad }};color:#fff">
+  <div style="max-width:1400px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px">
+    <div>
+      <div style="font-size:13px;color:#c9d6f0;margin-bottom:6px">Reportes / Motivos de contactos</div>
+      <h1 style="margin:0;font-size:{{ h1Size }}px;font-weight:600;line-height:1.2">Resumen de gestión por contactos</h1>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;background:#12306b;border-radius:14px;padding:12px 18px">
+      <div style="width:10px;height:10px;border-radius:50%;background:#f5b83d"></div>
+      <div><div style="font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:#c9d6f0">Servicio consultado</div><div style="font-size:22px;font-weight:700;line-height:1.2">{{ service }}</div></div>
+      <div style="width:1px;align-self:stretch;background:#2d57a8;margin:0 6px"></div>
+      <div><div style="font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:#c9d6f0">Período</div><div style="font-size:15px;font-weight:500">{{ period }}</div></div>
+    </div>
+  </div>
+</header>
+<main style="max-width:1400px;margin:-56px auto 40px;padding:0 {{ mainPad }}px">
+  <section style="background:#fff;border-radius:16px;box-shadow:0 8px 24px rgba(18,48,107,.12);padding:20px {{ mainPad }}px;margin-bottom:20px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;align-items:end">
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#252525;text-transform:uppercase;letter-spacing:.5px">Desde
+        <input type="date" value="{{ from }}" onChange="{{ setFrom }}" style="height:42px;border:1px solid #d1d5db;border-radius:10px;padding:0 12px;font:inherit;font-size:14px;font-weight:400;text-transform:none;color:#252525">
+      </label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#252525;text-transform:uppercase;letter-spacing:.5px">Hasta
+        <input type="date" value="{{ to }}" onChange="{{ setTo }}" style="height:42px;border:1px solid #d1d5db;border-radius:10px;padding:0 12px;font:inherit;font-size:14px;font-weight:400;text-transform:none;color:#252525">
+      </label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#252525;text-transform:uppercase;letter-spacing:.5px">Servicio
+        <select value="{{ sel }}" onChange="{{ setSel }}" style="height:42px;border:1px solid #d1d5db;border-radius:10px;padding:0 12px;font:inherit;font-size:14px;font-weight:400;text-transform:none;color:#252525;background:#fff"><option value="Bancaribe">Bancaribe</option><option value="Banco Activo">Banco Activo</option></select>
+      </label>
+      <button onClick="{{ search }}" style="height:42px;border:0;border-radius:10px;background:#1a4391;color:#fff;font:inherit;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#12306b">Buscar</button>
+    </div>
+  </section>
+  <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:20px;align-items:start">
+    <div style="background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(16,24,40,.08);overflow:hidden">
+      <div style="background:#8f2626;color:#fff;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;gap:12px">
+        <div><div style="font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:#f6cfcf">Gestión</div><div style="font-size:18px;font-weight:600">No contacto</div></div>
+        <div style="text-align:right"><div style="font-size:30px;font-weight:700;line-height:1">{{ nc.total }}</div><div style="font-size:12px;color:#f6cfcf">{{ nc.share }} del total</div></div>
+      </div>
+      <div style="padding:{{ panelPad }}">
+        <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:24px;margin-bottom:20px">
+          <div style="width:176px;height:176px;border-radius:50%;background:conic-gradient({{ nc.stops }});display:flex;align-items:center;justify-content:center"><div style="width:108px;height:108px;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-size:11px;color:#252525;text-transform:uppercase">No efectivo</div><div style="font-size:24px;font-weight:700;color:#252525;line-height:1.1">{{ nc.total }}</div></div></div>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:14px">
+          <thead><tr style="color:#252525;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px"><th style="text-align:left;padding:8px 0;font-weight:600">Descripción</th><th style="text-align:right;padding:8px 8px;font-weight:600">Total</th><th style="text-align:right;padding:8px 0;font-weight:600;width:64px">%</th></tr></thead>
+          <tbody>
+            <sc-for list="{{ nc.rows }}" as="r" hint-placeholder-count="7">
+              <tr style="border-top:1px solid #eef0f4">
+                <td style="padding:10px 0"><div style="display:flex;align-items:center;gap:10px"><span style="width:10px;height:10px;border-radius:3px;background:{{ r.color }};flex:none"></span><span style="font-weight:{{ r.fw }}">{{ r.label }}</span></div><div style="height:4px;border-radius:2px;background:#eef0f4;margin:6px 0 0 20px"><div style="height:100%;border-radius:2px;background:{{ r.color }};width:{{ r.w }}"></div></div></td>
+                <td style="text-align:right;padding:10px 8px;font-weight:{{ r.fw }}">{{ r.n }}</td>
+                <td style="text-align:right;padding:10px 0;color:#252525">{{ r.pct }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+          <tfoot><tr style="background:#fbeaea;color:#252525;font-weight:700"><td style="padding:12px 10px;border-radius:8px 0 0 8px">Total</td><td style="text-align:right;padding:12px 8px">{{ nc.total }}</td><td style="text-align:right;padding:12px 10px;border-radius:0 8px 8px 0">100%</td></tr></tfoot>
+        </table>
+      </div>
+    </div>
+    <div style="background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(16,24,40,.08);overflow:hidden">
+      <div style="background:#1f6b3a;color:#fff;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;gap:12px">
+        <div><div style="font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:#cfeedb">Gestión</div><div style="font-size:18px;font-weight:600">Contacto</div></div>
+        <div style="text-align:right"><div style="font-size:30px;font-weight:700;line-height:1">{{ c.total }}</div><div style="font-size:12px;color:#cfeedb">{{ c.share }} del total</div></div>
+      </div>
+      <div style="padding:{{ panelPad }}">
+        <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:24px;margin-bottom:20px">
+          <div style="width:176px;height:176px;border-radius:50%;background:conic-gradient({{ c.stops }});display:flex;align-items:center;justify-content:center"><div style="width:108px;height:108px;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-size:11px;color:#252525;text-transform:uppercase">Efectivo</div><div style="font-size:24px;font-weight:700;color:#252525;line-height:1.1">{{ c.total }}</div></div></div>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:14px">
+          <thead><tr style="color:#252525;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px"><th style="text-align:left;padding:8px 0;font-weight:600">Descripción</th><th style="text-align:right;padding:8px 8px;font-weight:600">Total</th><th style="text-align:right;padding:8px 0;font-weight:600;width:64px">%</th></tr></thead>
+          <tbody>
+            <sc-for list="{{ c.rows }}" as="r" hint-placeholder-count="9">
+              <tr style="border-top:1px solid #eef0f4">
+                <td style="padding:10px 0"><div style="display:flex;align-items:center;gap:10px"><span style="width:10px;height:10px;border-radius:3px;background:{{ r.color }};flex:none"></span><span style="font-weight:{{ r.fw }}">{{ r.label }}</span></div><div style="height:4px;border-radius:2px;background:#eef0f4;margin:6px 0 0 20px"><div style="height:100%;border-radius:2px;background:{{ r.color }};width:{{ r.w }}"></div></div></td>
+                <td style="text-align:right;padding:10px 8px;font-weight:{{ r.fw }}">{{ r.n }}</td>
+                <td style="text-align:right;padding:10px 0;color:#252525">{{ r.pct }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+          <tfoot><tr style="background:#e6f4ec;color:#252525;font-weight:700"><td style="padding:12px 10px;border-radius:8px 0 0 8px">Total</td><td style="text-align:right;padding:12px 8px">{{ c.total }}</td><td style="text-align:right;padding:12px 10px;border-radius:0 8px 8px 0">100%</td></tr></tfoot>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { w: 1200, menu: false, rep: false, cfg: false, sel: 'Bancaribe', applied: 'Bancaribe', from: '2026-10-16', to: '2026-10-16', pf: '2026-10-16', pt: '2026-10-16' };
+  nc = [['Cliente contesta y cuelga',240],['Contestadora',7],['El titular no esta en el país',5],['Mensaje con tercero',62],['No contesta',86],['Número equivocado',28],['Ocupado',4]];
+  c = [['Desempleado',23],['Exclusión del cliente',3],['Gestión Efectiva',62],['Interesado pero muy costoso',2],['Llamar luego',173],['No esta interesado',390],['No tengo como pagar',16],['Ya posee cobertura',24],['Ya tengo un servicio',96]];
+  pal = ['#2f5fc4','#12306b','#f5b83d','#e8743b','#1f6b3a','#8a3fb0','#0f9bb5','#d94a7a','#8f2626'];
+  componentDidMount() {
+    this.onR = () => this.setState({ w: window.innerWidth });
+    window.addEventListener('resize', this.onR); this.onR();
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this.onR); }
+  fmt(s) { const [y, m, d] = s.split('-'); return d + '/' + m + '/' + y; }
+  panel(src, k, other) {
+    const data = src.map((x, i) => [x[0], k === 1 ? x[1] : Math.max(1, Math.round(x[1] * 0.6) + i % 3)]);
+    return data;
+  }
+  build(data) {
+    const total = data.reduce((a, x) => a + x[1], 0), max = Math.max(...data.map(x => x[1]));
+    let acc = 0;
+    const stops = data.map((x, i) => { const a = acc / total * 100; acc += x[1]; return this.pal[i % 9] + ' ' + a + '% ' + (acc / total * 100) + '%'; }).join(',');
+    const rows = data.map((x, i) => ({ label: x[0], n: x[1], color: this.pal[i % 9], pct: (Math.round(x[1] / total * 1000) / 10) + '%', w: (x[1] / max * 100) + '%', fw: x[1] === max ? 600 : 400 }));
+    return { total, stops, rows };
+  }
+  renderVals() {
+    const s = this.state, k = s.applied === 'Bancaribe' ? 1 : 0.6;
+    const nc = this.build(this.panel(this.nc, k)), c = this.build(this.panel(this.c, k));
+    const all = nc.total + c.total;
+    nc.share = (Math.round(nc.total / all * 1000) / 10) + '%'; c.share = (Math.round(c.total / all * 1000) / 10) + '%';
+    const m = s.w < 768, o = s.menu;
+    const period = s.pf === s.pt ? this.fmt(s.pf) : this.fmt(s.pf) + ' – ' + this.fmt(s.pt);
+    return {
+      nc, c, service: s.applied, period, sel: s.sel, from: s.from, to: s.to,
+      repWrapPos: m ? 'static' : 'relative', repRowH: m ? 'auto' : '56px', repToggle: () => this.setState(st => ({ rep: !st.rep, cfg: false })), cfgToggle: () => this.setState(st => ({ cfg: !st.cfg, rep: false })), cfgDisplay: s.cfg ? 'flex' : 'none',
+      repDisplay: s.rep ? 'flex' : 'none', repPanelPos: m ? 'static' : 'absolute', repBg: m ? '#1a3f85' : '#fff', repColor: m ? '#e6ecf8' : '#252525', repShadow: m ? 'none' : '0 12px 24px rgba(0,0,0,.25)',
+      padX: m ? 16 : 32, mainPad: m ? 16 : 24, heroPad: m ? '24px 16px 80px' : '36px 32px 90px', h1Size: m ? 24 : 30, panelPad: m ? '16px' : '20px 24px 24px',
+      toggleDisplay: m ? 'flex' : 'none', toggleMenu: () => this.setState(st => ({ menu: !st.menu })),
+      bar1: m && o ? 'translateY(7px) rotate(45deg)' : 'none', bar2: m && o ? 0 : 1, bar3: m && o ? 'translateY(-7px) rotate(-45deg)' : 'none',
+      linksDisplay: m && !o ? 'none' : 'flex', linksDir: m ? 'column' : 'row', linksGap: m ? 0 : 28, linksH: m ? 'auto' : '56px',
+      linksPos: m ? 'absolute' : 'static', linksPad: m ? '8px 0' : '0', linksShadow: m ? '0 12px 20px rgba(0,0,0,.25)' : 'none',
+      itemPad: m ? '14px 16px' : '0', activeShadow: m ? 'inset 4px 0 0 #f5b83d' : 'inset 0 -3px 0 #f5b83d',
+      setSel: e => this.setState({ sel: e.target.value }),
+      setFrom: e => this.setState({ from: e.target.value }),
+      setTo: e => this.setState({ to: e.target.value }),
+      search: () => this.setState(st => ({ applied: st.sel, pf: st.from, pt: st.to }))
+    };
+  }
+}
+</script>
+</body>
+</html>

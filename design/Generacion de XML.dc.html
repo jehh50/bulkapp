@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#f4f6fa;font-family:Poppins,system-ui,sans-serif;color:#252525}a{color:#1a4391}a:hover{color:#12306b}</style>
+</helmet>
+<nav style="background:#12306b;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 {{ padX }}px;position:relative;z-index:10">
+  <a href="Dashboard.dc.html" style="display:flex;align-items:center;gap:10px;color:#fff;font-weight:700;font-size:18px;text-decoration:none"><span style="width:28px;height:28px;border-radius:8px;background:#f5b83d;color:#12306b;display:flex;align-items:center;justify-content:center;font-size:15px">B</span>Bulksales</a>
+  <button onClick="{{ toggleMenu }}" aria-label="Menú" style="display:{{ toggleDisplay }};width:44px;height:44px;border:1px solid #2d57a8;border-radius:10px;background:transparent;cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:0">
+    <span style="width:20px;height:2px;background:#fff;border-radius:1px;transform:{{ bar1 }};transition:transform .2s"></span>
+    <span style="width:20px;height:2px;background:#fff;border-radius:1px;opacity:{{ bar2 }};transition:opacity .2s"></span>
+    <span style="width:20px;height:2px;background:#fff;border-radius:1px;transform:{{ bar3 }};transition:transform .2s"></span>
+  </button>
+  <div style="display:{{ linksDisplay }};flex-direction:{{ linksDir }};gap:{{ linksGap }}px;font-size:14px;color:#c9d6f0;align-items:stretch;height:{{ linksH }};position:{{ linksPos }};top:56px;left:0;right:0;background:#12306b;padding:{{ linksPad }};box-shadow:{{ linksShadow }}">
+    <a href="Dashboard.dc.html" style="display:flex;align-items:center;padding:{{ itemPad }};text-decoration:none;color:inherit;">Dashboard</a>
+    <span style="display:flex;align-items:center;padding:{{ itemPad }}">Formulario</span>
+    <span style="display:flex;align-items:center;padding:{{ itemPad }};color:#fff;box-shadow:{{ activeShadow }}">Configuración ▾</span>
+    <div style="position:{{ repWrapPos }};display:flex;flex-direction:column;align-items:stretch">
+      <div onClick="{{ repToggle }}" style="display:flex;align-items:center;justify-content:space-between;gap:6px;padding:{{ itemPad }};cursor:pointer;height:{{ repRowH }}">Reportes <span style="font-size:11px">▾</span></div>
+      <div style="display:{{ repDisplay }};position:{{ repPanelPos }};top:56px;left:0;min-width:240px;background:{{ repBg }};color:{{ repColor }};border-radius:0 0 12px 12px;box-shadow:{{ repShadow }};padding:6px;flex-direction:column;gap:2px">
+        <a href="Resumen de gestion.dc.html" style="display:block;text-decoration:none;color:inherit;padding:10px 14px;border-radius:8px" style-hover="background:rgba(245,184,61,.25)">Acumulado de gestión</a>
+        <a href="Detalle de ventas.dc.html" style="display:block;text-decoration:none;color:inherit;padding:10px 14px;border-radius:8px" style-hover="background:rgba(245,184,61,.25)">Detalle de ventas</a>
+        <a href="Listado de ventas.dc.html" style="display:block;text-decoration:none;color:inherit;padding:10px 14px;border-radius:8px" style-hover="background:rgba(245,184,61,.25)">Listado de ventas</a>
+        <a href="Desbloqueo de clientes.dc.html" style="display:block;text-decoration:none;color:inherit;padding:10px 14px;border-radius:8px" style-hover="background:rgba(245,184,61,.25)">Desbloqueo de cliente</a>
+      </div>
+    </div>
+    <span style="display:flex;align-items:center;padding:{{ itemPad }};color:#fff;font-weight:500">javier ▾</span>
+  </div>
+</nav>
+<header style="background:#1a4391;padding:{{ heroPad }};color:#fff">
+  <div style="max-width:1000px;margin:0 auto">
+    <div style="font-size:13px;color:#c9d6f0;margin-bottom:6px">Configuración / XML MD5SUM</div>
+    <h1 style="margin:0;font-size:{{ h1Size }}px;font-weight:600;line-height:1.2">XML - MD5SUM</h1>
+    <div style="font-size:14px;color:#c9d6f0;margin-top:6px">Genera el archivo XML de un servicio por fecha y descárgalo.</div>
+  </div>
+</header>
+<main style="max-width:1000px;margin:-48px auto 40px;padding:0 {{ mainPad }}px;display:grid;grid-template-columns:{{ cols }};gap:20px;align-items:start">
+  <section style="background:#fff;border-radius:16px;box-shadow:0 8px 24px rgba(18,48,107,.12);padding:{{ cardPad }}">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+      <span style="width:40px;height:40px;border-radius:10px;background:#e8eefb;color:#1a4391;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px">&lt;/&gt;</span>
+      <div><div style="font-size:17px;font-weight:600">Generar XML</div><div style="font-size:13px">Crea el archivo del día elegido</div></div>
+    </div>
+    <form onSubmit="{{ generate }}" style="display:flex;flex-direction:column;gap:16px">
+      <label style="display:flex;flex-direction:column;gap:8px;font-size:14px;font-weight:600">Servicio
+        <select value="{{ gSvc }}" onChange="{{ setGSvc }}" style="height:46px;border:1px solid #d1d5db;border-radius:10px;padding:0 12px;font:inherit;font-size:15px;font-weight:400;color:#252525;background:#fff" style-focus="border-color:#1a4391;outline:2px solid #c9d6f0">
+          <option value="">Seleccione un servicio…</option>
+          <sc-for list="{{ services }}" as="s" hint-placeholder-count="2"><option value="{{ s.id }}">{{ s.name }}</option></sc-for>
+        </select>
+      </label>
+      <label style="display:flex;flex-direction:column;gap:8px;font-size:14px;font-weight:600">Fecha
+        <input type="date" value="{{ gDate }}" onChange="{{ setGDate }}" style="height:46px;border:1px solid #d1d5db;border-radius:10px;padding:0 12px;font:inherit;font-size:15px;font-weight:400;color:#252525;background:#fff" style-focus="border-color:#1a4391;outline:2px solid #c9d6f0">
+      </label>
+      <button type="submit" style="height:46px;border:0;border-radius:10px;background:#1a4391;color:#fff;font:inherit;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#12306b">Generar XML</button>
+      <div style="display:{{ errDisplay }};padding:12px 16px;border-radius:10px;background:#fdecec;border:1px solid #f3c2c2;font-size:14px">{{ error }}</div>
+      <div style="display:{{ okDisplay }};padding:12px 16px;border-radius:10px;background:#d3f0e6;border:1px solid #a9dcc8;font-size:14px">{{ ok }}</div>
+    </form>
+  </section>
+  <section style="background:#fff;border-radius:16px;box-shadow:0 8px 24px rgba(18,48,107,.12);padding:{{ cardPad }}">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+      <span style="width:40px;height:40px;border-radius:10px;background:#fdf1d4;color:#252525;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700">↓</span>
+      <div><div style="font-size:17px;font-weight:600">Descargar XML</div><div style="font-size:13px">Elige servicio y archivo</div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <label style="display:flex;flex-direction:column;gap:8px;font-size:14px;font-weight:600">Servicio
+        <select value="{{ dSvc }}" onChange="{{ setDSvc }}" style="height:46px;border:1px solid #d1d5db;border-radius:10px;padding:0 12px;font:inherit;font-size:15px;font-weight:400;color:#252525;background:#fff" style-focus="border-color:#1a4391;outline:2px solid #c9d6f0">
+          <option value="">Seleccione un servicio…</option>
+          <sc-for list="{{ services }}" as="s" hint-placeholder-count="2"><option value="{{ s.id }}">{{ s.name }}</option></sc-for>
+        </select>
+      </label>
+      <label style="display:flex;flex-direction:column;gap:8px;font-size:14px;font-weight:600">Archivo
+        <select value="{{ dSel }}" onChange="{{ setDSel }}" style="height:46px;border:1px solid #d1d5db;border-radius:10px;padding:0 12px;font:inherit;font-size:15px;font-weight:400;color:#252525;background:#fff" style-focus="border-color:#1a4391;outline:2px solid #c9d6f0">
+          <option value="">{{ dPlaceholder }}</option>
+          <sc-for list="{{ dFiles }}" as="f" hint-placeholder-count="3"><option value="{{ f.v }}">{{ f.label }}</option></sc-for>
+        </select>
+      </label>
+      <button onClick="{{ download }}" style="height:46px;border:0;border-radius:10px;background:{{ dBg }};color:{{ dColor }};font:inherit;font-size:15px;font-weight:600;cursor:pointer" style-hover="filter:brightness(.95)">Descargar XML</button>
+    </div>
+  </section>
+</main>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { w: 1200, menu: false, rep: false, gSvc: '', gDate: '2026-10-19', error: '', ok: '',
+    dSvc: '', dSel: '',
+    files: { bancaribe: ['2026-10-16', '2026-10-15', '2026-10-14', '2026-10-13'], activo: ['2026-10-16', '2026-10-15', '2026-10-14'] } };
+  svc = [{ id: 'bancaribe', name: 'Bancaribe' }, { id: 'activo', name: 'Banco Activo' }];
+  fmt = v => { const [y, m, d] = v.split('-'); return d + '/' + m + '/' + y; };
+  componentDidMount() {
+    this.onR = () => this.setState({ w: window.innerWidth });
+    window.addEventListener('resize', this.onR); this.onR();
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this.onR); }
+  renderVals() {
+    const s = this.state, m = s.w < 768, o = s.menu, fmt = this.fmt;
+    const name = id => this.svc.find(x => x.id === id).name;
+    const on = !!(s.dSvc && s.dSel), dFiles = s.dSvc ? s.files[s.dSvc].map(f => ({ v: f, label: s.dSvc + '_' + f + '.xml' })) : [];
+    return {
+      services: this.svc, dFiles, dSvc: s.dSvc, dSel: s.dSel, dPlaceholder: s.dSvc ? 'Seleccione un archivo…' : 'Primero elige un servicio',
+      setDSvc: e => this.setState({ dSvc: e.target.value, dSel: '', error: '', ok: '' }),
+      setDSel: e => this.setState({ dSel: e.target.value, error: '', ok: '' }),
+      dBg: on ? '#1a4391' : '#e4e8f0', dColor: on ? '#fff' : '#252525',
+      download: () => {
+        if (!on) return this.setState({ error: 'Selecciona un servicio y un archivo para descargar.', ok: '' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob(['<?xml version="1.0"?>\n<md5sum servicio="' + name(s.dSvc) + '" fecha="' + s.dSel + '"/>'], { type: 'text/xml' }));
+        a.download = s.dSvc + '_' + s.dSel + '.xml'; a.click();
+        this.setState({ ok: 'Descargando ' + s.dSvc + '_' + s.dSel + '.xml', error: '' });
+      }, gSvc: s.gSvc, gDate: s.gDate,
+      setGSvc: e => this.setState({ gSvc: e.target.value, error: '', ok: '' }),
+      setGDate: e => this.setState({ gDate: e.target.value, error: '', ok: '' }),
+      generate: e => {
+        e.preventDefault();
+        if (!s.gSvc || !s.gDate) return this.setState({ error: 'Selecciona un servicio y una fecha.', ok: '' });
+        this.setState(st => {
+          const l = st.files[st.gSvc];
+          const nl = l.includes(st.gDate) ? l : [st.gDate, ...l].sort().reverse();
+          return { files: { ...st.files, [st.gSvc]: nl }, dSvc: st.gSvc, dSel: st.gDate, error: '',
+            ok: 'XML de ' + name(st.gSvc) + ' del ' + fmt(st.gDate) + ' generado. Ya puedes descargarlo.' };
+        });
+      },
+      error: s.error, errDisplay: s.error ? 'block' : 'none', ok: s.ok, okDisplay: s.ok ? 'block' : 'none',
+      cols: m ? '1fr' : 'repeat(2,minmax(0,1fr))',
+      repWrapPos: m ? 'static' : 'relative', repRowH: m ? 'auto' : '56px',
+      repToggle: () => this.setState(st => ({ rep: !st.rep })),
+      repDisplay: s.rep ? 'flex' : 'none', repPanelPos: m ? 'static' : 'absolute', repBg: m ? '#1a3f85' : '#fff', repColor: m ? '#e6ecf8' : '#252525', repShadow: m ? 'none' : '0 12px 24px rgba(0,0,0,.25)',
+      padX: m ? 16 : 32, mainPad: m ? 16 : 24, cardPad: m ? '20px 16px' : '28px 28px', heroPad: m ? '24px 16px 72px' : '36px 32px 80px', h1Size: m ? 24 : 30,
+      toggleDisplay: m ? 'flex' : 'none', toggleMenu: () => this.setState(st => ({ menu: !st.menu })),
+      bar1: m && o ? 'translateY(7px) rotate(45deg)' : 'none', bar2: m && o ? 0 : 1, bar3: m && o ? 'translateY(-7px) rotate(-45deg)' : 'none',
+      linksDisplay: m && !o ? 'none' : 'flex', linksDir: m ? 'column' : 'row', linksGap: m ? 0 : 28, linksH: m ? 'auto' : '56px',
+      linksPos: m ? 'absolute' : 'static', linksPad: m ? '8px 0' : '0', linksShadow: m ? '0 12px 20px rgba(0,0,0,.25)' : 'none',
+      itemPad: m ? '14px 16px' : '0', activeShadow: m ? 'inset 4px 0 0 #f5b83d' : 'inset 0 -3px 0 #f5b83d'
+    };
+  }
+}
+</script>
+</body>
+</html>
