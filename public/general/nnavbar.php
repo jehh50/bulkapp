@@ -8,6 +8,9 @@
   $nav_period  = isset($nav_period)  ? $nav_period  : null;
   $nav_service_label = isset($nav_service_label) ? $nav_service_label : 'Servicio consultado';
   $nav_service_sub   = isset($nav_service_sub)   ? $nav_service_sub   : null;
+  // Indicadores en tarjetas del hero (mismo estilo que la de servicio/período):
+  // [['label','value','color'?,'sub'?,'detalle'? => [['label','value']], 'detalle_titulo'?], ...]
+  $nav_kpis    = isset($nav_kpis) && is_array($nav_kpis) ? $nav_kpis : array();
   $usertype    = isset($_SESSION['usertype_id']) ? $_SESSION['usertype_id'] : 0;
   $username    = isset($_SESSION['user']) ? $_SESSION['user'] : '';
 
@@ -142,6 +145,44 @@
           <div>
             <div class="hero__lbl">Período</div>
             <div class="hero__val hero__val--sm"><?php echo htmlspecialchars($nav_period); ?></div>
+          </div>
+        <?php } ?>
+      </div>
+    <?php } ?>
+    <?php if (!empty($nav_kpis)) { ?>
+      <div class="hero__kpis">
+        <?php foreach ($nav_kpis as $k) { ?>
+          <div class="hero__card">
+            <div class="hero__dot"<?php if (!empty($k['color'])) { ?> style="background:<?php echo htmlspecialchars($k['color'], ENT_QUOTES); ?>"<?php } ?>></div>
+            <div class="hero__kpi-body">
+              <div class="hero__lbl"><?php echo htmlspecialchars($k['label']); ?></div>
+              <div class="hero__val"><?php echo (int) $k['value']; ?></div>
+              <?php if (!empty($k['sub']) || isset($k['detalle'])) { ?>
+                <div class="hero__kpi-foot">
+                  <?php if (!empty($k['sub'])) { ?><span><?php echo htmlspecialchars($k['sub']); ?></span><?php } ?>
+                  <?php if (isset($k['detalle'])) {
+                    $det = '';
+                    if (empty($k['detalle'])) {
+                      $det = '<span class="text-muted">Sin ventas en el período.</span>';
+                    } else {
+                      $det = '<ul class="hero-pop">';
+                      foreach ($k['detalle'] as $d) {
+                        $det .= '<li><span>' . htmlspecialchars($d['label']) . '</span><strong>' . (int) $d['value'] . '</strong></li>';
+                      }
+                      $det .= '</ul>';
+                    }
+                  ?>
+                    <button type="button" class="hero__kpi-link"
+                            data-bs-toggle="popover" data-bs-trigger="focus" data-bs-placement="bottom" data-bs-html="true"
+                            data-bs-custom-class="hero-popover"
+                            data-bs-title="<?php echo htmlspecialchars(isset($k['detalle_titulo']) ? $k['detalle_titulo'] : 'Detalle', ENT_QUOTES); ?>"
+                            data-bs-content="<?php echo htmlspecialchars($det, ENT_QUOTES); ?>">
+                      <?php echo htmlspecialchars(isset($k['detalle_titulo']) ? $k['detalle_titulo'] : 'Detalle'); ?> <i class="fi fi-rr-angle-small-down"></i>
+                    </button>
+                  <?php } ?>
+                </div>
+              <?php } ?>
+            </div>
           </div>
         <?php } ?>
       </div>

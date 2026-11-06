@@ -232,7 +232,15 @@
     setHero('Edición de usuario · ' + data(row, 'user'), HERO.crumb + ' / Edición', 'Actualiza datos, rol, servicio y estatus del usuario.');
   }
 
-  function rowRefresh(row, vals) {
+  // vals llega con las claves del POST (rol, status, servicio): se traducen a las de los data-* de la fila.
+  function rowRefresh(row, post) {
+    var vals = {
+      nombre: post.nombre,
+      apellido: post.apellido,
+      rolid: String(post.rol),
+      statusid: String(post.status),
+      servicioid: String(post.servicio)
+    };
     var rolName = vals.rolid === '3' ? 'ADMINISTRADOR' : (vals.rolid === '2' ? 'SUPERVISOR' : 'OPERADOR');
     var statusName = vals.statusid === '2' ? 'ACTIVO' : 'INACTIVO';
     var servicioSel = document.getElementById('servicio');

@@ -23,6 +23,26 @@ if (!security_usuario_autenticado()) {
           $nav_crumb = 'Inicio / Formulario';
           $nav_title = 'Formulario de gestión';
           $nav_subtitle = 'Busca al cliente por su número de teléfono para cargar sus datos.';
+
+          // Indicadores del operador en el hero (diseño «Formulario»): su propia gestión del día
+          // en la campaña activa. Mismas definiciones que el «Acumulado de gestión».
+          $hoy = date('Y-m-d');
+          $ind = $conn->indicadoresOperador(
+            (int) $_SESSION['id'],
+            (int) $_SESSION['servicio_id'],
+            $id,
+            $hoy,
+            $hoy
+          );
+          $nav_kpis = array(
+            array('label' => 'Contactos efectivos', 'value' => $ind['efectivos'], 'color' => '#F5B83D'),
+            array('label' => 'Ventas totales', 'value' => $ind['ventas'], 'color' => '#0F9D75',
+                  'detalle' => array_map(function ($p) {
+                    return array('label' => $p['producto'], 'value' => $p['vendidos']);
+                  }, $ind['porProducto']),
+                  'detalle_titulo' => 'Ventas por producto'),
+          );
+
           include(PUBLIC_DIR . 'general/nheader.php');
           include(PUBLIC_DIR . 'general/nnavbar.php');
           $noefectivo = $conn->contactoNoEfectivo($id);

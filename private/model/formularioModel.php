@@ -12,6 +12,55 @@ class database
     return $this->db->selectQuery("SELECT * FROM efectivo WHERE servicio_id = ?", [$id], 's');
   }
 
+  /**
+   * Indicadores del operador de banca en su campaña (hero del formulario).
+   * Mismas definiciones que el «Acumulado de gestión» (reportesModel):
+   *  - efectivos: gestiones con efectivo_id (contacto efectivo).
+   *  - ventas: gestiones con el efectivo «gestión efectiva» del catálogo base y producto.
+   *
+   * @param int $userId       operador de la sesión
+   * @param int $servicio     campaña de la sesión (servicio_id de gestion)
+   * @param int $servicioBase dueña del catálogo `efectivo` (Constantes::servicioBase)
+   * @return array{efectivos:int, ventas:int, porProducto:array<int,array{producto:string,vendidos:int}>}
+   */
+  public function indicadoresOperador(int $userId, int $servicio, int $servicioBase, string $desde, string $hasta): array
+  {
+    $ef = $this->db->selectQuery(
+      "SELECT COUNT(efectivo_id) AS efectivos FROM gestion
+       WHERE user_id = ? AND servicio_id = ? AND fecha BETWEEN ? AND ?",
+      [$userId, $servicio, $desde, $hasta],
+      'iiss'
+    );
+
+    $porProducto = [];
+    $idVenta = $this->db->selectQuery(
+      "SELECT id FROM efectivo WHERE servicio_id = ? AND descripcion = ? LIMIT 1",
+      [$servicioBase, 'gestión efectiva'],
+      'is'
+    );
+    if (!empty($idVenta)) {
+      $filas = $this->db->selectQuery(
+        "SELECT p.descripcion AS producto, COUNT(g.producto_id) AS vendidos
+         FROM gestion g
+         INNER JOIN productos p ON p.id = g.producto_id
+         WHERE g.user_id = ? AND g.servicio_id = ? AND g.efectivo_id = ? AND g.fecha BETWEEN ? AND ?
+         GROUP BY p.id, p.descripcion
+         ORDER BY vendidos DESC, p.descripcion",
+        [$userId, $servicio, (int) $idVenta[0]['id'], $desde, $hasta],
+        'iiiss'
+      );
+      foreach ($filas as $f) {
+        $porProducto[] = ['producto' => (string) $f['producto'], 'vendidos' => (int) $f['vendidos']];
+      }
+    }
+
+    return [
+      'efectivos'   => !empty($ef) ? (int) $ef[0]['efectivos'] : 0,
+      'ventas'      => array_sum(array_column($porProducto, 'vendidos')),
+      'porProducto' => $porProducto,
+    ];
+  }
+
   public function contactoNoEfectivo(int $id): array
   {
     return $this->db->selectQuery("SELECT * FROM noefectivo WHERE servicio_id = ?", [$id], 's');

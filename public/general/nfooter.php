@@ -6,6 +6,10 @@
         document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (elemento) {
             new bootstrap.Tooltip(elemento);
         });
+        // Popovers (p. ej. «Ventas por producto» en los indicadores del hero).
+        document.querySelectorAll('[data-bs-toggle="popover"]').forEach(function (elemento) {
+            new bootstrap.Popover(elemento);
+        });
     });
 </script>
 </body>

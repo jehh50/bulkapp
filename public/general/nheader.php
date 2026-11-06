@@ -50,6 +50,16 @@
     .hero__val{font-size:22px;font-weight:700;line-height:1.2}
     .hero__val--sm{font-size:15px;font-weight:500}
     .hero__sep{width:1px;align-self:stretch;background:var(--blue-600);margin:0 6px}
+    .hero__kpis{display:flex;flex-wrap:wrap;gap:12px;justify-content:flex-end}
+    .hero__kpis .hero__card{min-width:170px}
+    .hero__kpi-body{flex:1;text-align:center}
+    .hero__kpi-foot{display:flex;align-items:center;justify-content:center;gap:10px;font-size:12px;color:var(--muted);margin-top:2px}
+    .hero__kpi-link{background:none;border:0;padding:0;font:inherit;color:var(--gold);cursor:pointer;display:inline-flex;align-items:center;gap:2px}
+    .hero__kpi-link:hover,.hero__kpi-link:focus-visible{text-decoration:underline}
+    .hero-popover{--bs-popover-max-width:300px;font-family:inherit}
+    .hero-pop{list-style:none;margin:0;padding:0;min-width:200px}
+    .hero-pop li{display:flex;justify-content:space-between;gap:16px;padding:4px 0;border-top:1px solid #eef0f4}
+    .hero-pop li:first-child{border-top:0}
 
     /* ---------- Main ---------- */
     .app-main{max-width:1280px;margin:-56px auto 40px;padding:0 24px}
