@@ -301,10 +301,14 @@
         forcePlaceholderSize: true,
         tolerance: 'pointer',
         receive: function (ev, ui) {
+          // Con connectToSortable, ui.item es el elemento ORIGINAL de la paleta: no se
+          // toca (si se quita, ese tipo desaparece de la paleta y no puede volver a
+          // agregarse). Lo que se descarta es la copia soltada en el lienzo.
           var type = ui.item.attr('data-type');
-          var index = ui.item.index();
+          var $soltado = $(this).children('.cns-palette__item').first();
+          var index = $soltado.length ? $soltado.index() : form.campos.length;
           recibido = true;
-          try { ui.item.remove(); } catch (e) { /* noop */ }
+          $(this).children('.cns-palette__item').remove();
           setTimeout(function () { agregarCampo(type, index); }, 0);
         },
         update: function () {
